@@ -1,6 +1,7 @@
 const APP_CONFIG = {
   epsilon: 1e-6,
   defaultCustomSegmentCount: 3,
+  maxCustomSegmentCount: 9,
   drugs: {
     prednisone: {
       id: "prednisone",
@@ -895,6 +896,10 @@ const UISetup = {
   },
 
   appendCustomSegmentRow(values = ["", "", ""]) {
+    if (DOMRefs.customSegmentBody.querySelectorAll("tr").length >= APP_CONFIG.maxCustomSegmentCount) {
+      return false;
+    }
+
     const row = UISetup.createCustomSegmentRow();
     const fields = UISetup.getCustomRowFields(row);
 
@@ -903,6 +908,7 @@ const UISetup = {
     fields.repeatsInput.value = values[2] ?? "";
 
     DOMRefs.customSegmentBody.appendChild(row);
+    return true;
   },
 
   reindexCustomSegmentRows() {
@@ -960,16 +966,26 @@ const UISetup = {
   rebuildCustomSegmentRows(valuesList = APP_CONFIG.defaults.customSegments) {
     DOMRefs.customSegmentBody.innerHTML = "";
 
-    valuesList.forEach((values) => UISetup.appendCustomSegmentRow(values));
+    valuesList.slice(0, APP_CONFIG.maxCustomSegmentCount).forEach((values) => UISetup.appendCustomSegmentRow(values));
 
     if (valuesList.length === 0) {
-      for (let index = 0; index < APP_CONFIG.defaultCustomSegmentCount; index += 1) {
+      for (
+        let index = 0;
+        index < Math.min(APP_CONFIG.defaultCustomSegmentCount, APP_CONFIG.maxCustomSegmentCount);
+        index += 1
+      ) {
         UISetup.appendCustomSegmentRow();
       }
     }
 
     UISetup.reindexCustomSegmentRows();
     UISetup.syncCustomSegmentDoseHelpers();
+    UISetup.syncCustomSegmentControls();
+  },
+
+  syncCustomSegmentControls() {
+    const rowCount = DOMRefs.customSegmentBody.querySelectorAll("tr").length;
+    DOMRefs.addSegmentRowButton.disabled = rowCount >= APP_CONFIG.maxCustomSegmentCount;
   },
 
   applyDefaults() {
@@ -1020,9 +1036,11 @@ const AppController = {
   },
 
   handleAddCustomRow() {
-    UISetup.appendCustomSegmentRow();
+    const added = UISetup.appendCustomSegmentRow();
+    if (!added) return;
     UISetup.reindexCustomSegmentRows();
     UISetup.syncCustomSegmentDoseHelpers();
+    UISetup.syncCustomSegmentControls();
   },
 
   handleCustomRowDelete(event) {
@@ -1032,6 +1050,7 @@ const AppController = {
     deleteButton.closest("tr")?.remove();
     UISetup.reindexCustomSegmentRows();
     UISetup.syncCustomSegmentDoseHelpers();
+    UISetup.syncCustomSegmentControls();
   },
 
   handlePrint() {

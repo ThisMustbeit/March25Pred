@@ -530,14 +530,13 @@ textarea {
   align-items: center;
   justify-content: center;
   padding: 0;
+  font-size: 0;
 }
 
 .icon-button {
   width: 2.4rem;
   height: 2.4rem;
   border-radius: 999px;
-  font-size: 1.45rem;
-  line-height: 0;
   font-weight: 700;
 }
 
@@ -545,8 +544,25 @@ textarea {
   width: 2rem;
   height: 2rem;
   border-radius: 10px;
-  font-size: 1.2rem;
-  line-height: 0;
+}
+
+.icon-button::before,
+.row-delete-button::before {
+  content: attr(data-icon);
+  font-family: Arial, sans-serif;
+  line-height: 1;
+  color: var(--accent-dark);
+  transform: translateY(-1px);
+}
+
+.icon-button::before {
+  font-size: 1.55rem;
+  font-weight: 700;
+}
+
+.row-delete-button::before {
+  font-size: 1.35rem;
+  font-weight: 500;
 }
 
 .icon-button:hover,
@@ -554,6 +570,11 @@ textarea {
 .row-delete-button:hover,
 .row-delete-button:focus-visible {
   background: #e6f0f5;
+}
+
+.icon-button:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
 }
 
 .schedule-table td.pre {
