@@ -720,6 +720,7 @@ const DOMBuilders = {
   printMonthMarkup(calendar) {
     const monthLabel = Formatters.monthYear(calendar.monthStart);
     const weekdayLabels = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
+    const printableWeeks = DOMBuilders.getPrintableWeeks(calendar);
 
     return `
       <section class="print-month">
@@ -741,12 +742,25 @@ const DOMBuilders = {
                 .join("")}
             </div>
             <div class="print-calendar-grid">
-              ${calendar.weeks.flat().map(DOMBuilders.printCalendarCellMarkup).join("")}
+              ${printableWeeks.flat().map(DOMBuilders.printCalendarCellMarkup).join("")}
             </div>
           </div>
         </div>
       </section>
     `;
+  },
+
+  getPrintableWeeks(calendar) {
+    const weeks = [...calendar.weeks];
+
+    while (weeks.length > 4) {
+      const lastWeek = weeks[weeks.length - 1];
+      const hasCurrentMonthDay = lastWeek.some((cell) => cell.inCurrentMonth);
+      if (hasCurrentMonthDay) break;
+      weeks.pop();
+    }
+
+    return weeks;
   },
 
   printCalendarCellMarkup(cell) {
