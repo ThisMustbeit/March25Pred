@@ -727,7 +727,7 @@ const DOMBuilders = {
         <div class="print-page">
           <div class="print-header">
             <div class="print-title-block">
-              <div>MEDICATION</div>
+              <div>PREDNISONE</div>
               <div>DOSAGE</div>
               <div>CALENDAR</div>
             </div>
