@@ -552,7 +552,6 @@ textarea {
   font-family: Arial, sans-serif;
   line-height: 1;
   color: var(--accent-dark);
-  transform: translateY(-1px);
 }
 
 .icon-button::before {

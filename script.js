@@ -1,7 +1,7 @@
 const APP_CONFIG = {
   epsilon: 1e-6,
   defaultCustomSegmentCount: 3,
-  maxCustomSegmentCount: 9,
+  maxCustomSegmentCount: 8,
   drugs: {
     prednisone: {
       id: "prednisone",
