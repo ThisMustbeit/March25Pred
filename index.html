@@ -47,10 +47,6 @@
             <fieldset class="group">
               <legend>Primary Taper</legend>
               <label>
-                <span>Display Month</span>
-                <input id="display-month" name="displayMonth" type="month" required>
-              </label>
-              <label>
                 <span>Taper Start Date</span>
                 <input id="taper-start-date" name="taperStartDate" type="date" required>
               </label>
@@ -70,6 +66,10 @@
                 <span>Total Taper Steps</span>
                 <input id="total-steps" name="totalSteps" type="number" min="0" step="1" required>
               </label>
+              <label class="checkbox-row">
+                <input id="use-custom-override" name="useCustomOverride" type="checkbox">
+                <span>Use custom taper override</span>
+              </label>
             </fieldset>
 
             <fieldset class="group">
@@ -85,18 +85,6 @@
               <label>
                 <span>Tablet Strength C (mg)</span>
                 <input id="tablet-strength-c" name="tabletStrengthC" type="number" step="0.1" min="0.1">
-              </label>
-              <label>
-                <span>Minimum Dose Clamp (mg)</span>
-                <input id="min-dose-clamp" name="minDoseClamp" type="number" step="0.1" value="0" required>
-              </label>
-              <label>
-                <span>Maximum Dose Clamp (mg)</span>
-                <input id="max-dose-clamp" name="maxDoseClamp" type="number" step="0.1" value="1000" required>
-              </label>
-              <label class="checkbox-row">
-                <input id="use-custom-override" name="useCustomOverride" type="checkbox">
-                <span>Use custom taper override</span>
               </label>
             </fieldset>
 

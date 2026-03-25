@@ -223,7 +223,7 @@ const Strengths = {
       .map((item) => `${item.count} x ${Formatters.dose(item.strength)}`);
 
     if (parts.length === 0 && NumberUtils.isNearZero(doseMg)) {
-      return Messages.discontinued();
+      return "";
     }
 
     return parts.join("\n");
@@ -234,7 +234,6 @@ const Validation = {
   validateInputs(inputs) {
     const errors = [];
 
-    if (!inputs.displayMonthDate) errors.push("Display month is required.");
     if (!inputs.taperStartDate) errors.push("Taper start date is required.");
     if (inputs.startingDose == null || inputs.startingDose < 0) {
       errors.push("Starting daily dose must be 0 or greater.");
@@ -350,7 +349,7 @@ const ScheduleLogic = {
 
   buildPrintableText(doseMg, allocation, warning) {
     if (NumberUtils.isNearZero(doseMg)) {
-      return `0 mg\n${Messages.discontinued()}`;
+      return "";
     }
 
     if (warning) {
@@ -451,15 +450,14 @@ const CalendarLogic = {
   },
 
   generateCalendarRange(inputs, scheduleRows) {
-    const selectedMonthStart = DateUtils.firstDayOfMonth(inputs.displayMonthDate);
     const taperStartMonth = DateUtils.firstDayOfMonth(inputs.taperStartDate);
     const lastScheduleDate = scheduleRows.length
       ? scheduleRows[scheduleRows.length - 1].date
       : inputs.taperStartDate;
     const taperEndMonth = DateUtils.firstDayOfMonth(lastScheduleDate);
 
-    let currentMonth = selectedMonthStart < taperStartMonth ? selectedMonthStart : taperStartMonth;
-    const finalMonth = taperEndMonth > selectedMonthStart ? taperEndMonth : selectedMonthStart;
+    let currentMonth = taperStartMonth;
+    const finalMonth = taperEndMonth;
     const months = [];
 
     while (currentMonth <= finalMonth) {
@@ -483,7 +481,6 @@ const ViewModelFactory = {
 
     return {
       summaryItems: [
-        ["Display Month", Formatters.monthYear(inputs.displayMonthDate)],
         ["Taper Start", Formatters.date(inputs.taperStartDate)],
         ["Taper End", Formatters.date(summary.taperEndDateExclusive)],
         ["Total Taper Days", String(summary.totalTaperDays)],
@@ -528,7 +525,6 @@ const DOMRefs = {
 const InputFactory = {
   readDateInputs() {
     return {
-      displayMonthDate: InputFactory.parseMonth(DOMRefs.form.displayMonth.value),
       taperStartDate: InputFactory.parseDate(DOMRefs.form.taperStartDate.value),
     };
   },
@@ -542,8 +538,8 @@ const InputFactory = {
       tabletStrengthA: NumberUtils.parseOptionalNumber(DOMRefs.form.tabletStrengthA.value),
       tabletStrengthB: NumberUtils.parseOptionalNumber(DOMRefs.form.tabletStrengthB.value),
       tabletStrengthC: NumberUtils.parseOptionalNumber(DOMRefs.form.tabletStrengthC.value),
-      minDoseClamp: NumberUtils.parseOptionalNumber(DOMRefs.form.minDoseClamp.value),
-      maxDoseClamp: NumberUtils.parseOptionalNumber(DOMRefs.form.maxDoseClamp.value),
+      minDoseClamp: Number(APP_CONFIG.defaults.taper.minDoseClamp),
+      maxDoseClamp: Number(APP_CONFIG.defaults.taper.maxDoseClamp),
     };
   },
 
@@ -622,9 +618,10 @@ const DOMBuilders = {
     if (!cell.inCurrentMonth) classes.push("outside-month");
     if (cell.scheduleRow?.warning) classes.push("warning");
 
-    const dose = cell.scheduleRow ? Formatters.dose(cell.scheduleRow.doseMg) : "";
-    const combo = cell.scheduleRow ? cell.scheduleRow.compactTabletSummary : "";
-    const warning = cell.scheduleRow?.warning ?? "";
+    const hasVisibleDose = cell.scheduleRow && !NumberUtils.isNearZero(cell.scheduleRow.doseMg);
+    const dose = hasVisibleDose ? Formatters.dose(cell.scheduleRow.doseMg) : "";
+    const combo = hasVisibleDose ? cell.scheduleRow.compactTabletSummary : "";
+    const warning = hasVisibleDose ? cell.scheduleRow?.warning ?? "" : "";
 
     return `
       <article class="${classes.join(" ")}">
@@ -670,17 +667,25 @@ const DOMBuilders = {
       <div class="calendar-list-grid">
         ${scheduleRows
           .map(
-            (row) => `
+            (row) => {
+              const hasVisibleDose = !NumberUtils.isNearZero(row.doseMg);
+
+              return `
               <article class="list-card ${row.warning ? "warning" : ""}">
                 <h4>${Html.escape(Formatters.date(row.date))}</h4>
-                <p><strong>Total dose:</strong> ${Html.escape(Formatters.dose(row.doseMg))}</p>
+                ${
+                  hasVisibleDose
+                    ? `<p><strong>Total dose:</strong> ${Html.escape(Formatters.dose(row.doseMg))}</p>
                 <p><strong>Tablet combination:</strong><br>${Html.escape(row.compactTabletSummary).replace(
                   /\n/g,
                   "<br>"
                 )}</p>
-                ${row.warning ? `<p><strong>Warning:</strong> ${Html.escape(row.warning)}</p>` : ""}
+                ${row.warning ? `<p><strong>Warning:</strong> ${Html.escape(row.warning)}</p>` : ""}`
+                    : ""
+                }
               </article>
-            `
+            `;
+            }
           )
           .join("")}
       </div>
@@ -781,7 +786,7 @@ const DOMBuilders = {
   },
 
   printDayBody(cell) {
-    if (!cell.inCurrentMonth || !cell.scheduleRow) {
+    if (!cell.inCurrentMonth || !cell.scheduleRow || NumberUtils.isNearZero(cell.scheduleRow.doseMg)) {
       return "";
     }
 
@@ -874,11 +879,12 @@ const UISetup = {
 
   applyDefaults() {
     const now = new Date();
-    DOMRefs.form.displayMonth.value = DateUtils.toMonthInputValue(now);
     DOMRefs.form.taperStartDate.value = DateUtils.toDateInputValue(now);
 
     Object.entries(APP_CONFIG.defaults.taper).forEach(([key, value]) => {
-      DOMRefs.form[key].value = value;
+      if (DOMRefs.form[key]) {
+        DOMRefs.form[key].value = value;
+      }
     });
 
     const rows = [...DOMRefs.customSegmentBody.querySelectorAll("tr")];
