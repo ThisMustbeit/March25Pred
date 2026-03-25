@@ -618,32 +618,32 @@ textarea {
   }
 
   .print-page {
-    width: 7.42in;
-    min-height: 9.8in;
+    width: 7.1in;
+    min-height: 9.55in;
     margin: 0 auto;
-    padding: 0.3in 0 0;
+    padding: 0.28in 0 0;
   }
 
   .print-header {
     display: flex;
     justify-content: space-between;
     align-items: flex-start;
-    margin: 0 0 0.12in;
+    margin: 0 0 0.22in;
   }
 
   .print-title-block {
     font-family: Arial, sans-serif;
-    font-size: 16px;
+    font-size: 17px;
     font-weight: 700;
     line-height: 1.02;
     letter-spacing: 0;
-    margin-top: 0.22in;
-    margin-left: 0.01in;
+    margin-top: 0.14in;
+    margin-left: 0.02in;
   }
 
   .print-label-box {
-    width: 2.62in;
-    height: 1.55in;
+    width: 2.45in;
+    height: 1.48in;
     border: 1px dashed #777;
     display: flex;
     align-items: center;
@@ -654,122 +654,114 @@ textarea {
     text-align: center;
   }
 
+  .print-calendar-shell {
+    position: relative;
+    width: 100%;
+    padding-top: 0.18in;
+  }
+
   .print-month-banner {
-    width: 2.72in;
-    margin: 0 auto -2px;
-    padding: 0.03in 0.1in 0.04in;
+    width: 2.18in;
+    margin: 0 auto -1px;
+    padding: 0.04in 0.12in;
     border: 2px solid #000;
     border-bottom-width: 1px;
     font-family: Arial, sans-serif;
-    font-size: 15px;
+    font-size: 12px;
     font-weight: 700;
     line-height: 1;
     text-align: center;
     background: #fff;
+    position: relative;
+    z-index: 2;
   }
 
-  .tg {
-    border-collapse: collapse;
-    border-spacing: 0;
+  .print-weekday-row,
+  .print-calendar-grid {
+    display: grid;
+    grid-template-columns: repeat(7, 1fr);
     width: 100%;
-    table-layout: fixed;
+  }
+
+  .print-weekday-row {
     border: 2px solid #000;
+    border-bottom: 0;
   }
 
-  .tg td,
-  .tg th {
-    border-color: black;
-    border-style: solid;
-    border-width: 1px;
-    font-family: Arial, sans-serif;
-    font-size: 12px;
-    overflow: hidden;
-    padding: 0;
-    word-break: normal;
-  }
-
-  .tg .tg-lboi {
-    border-color: inherit;
-    text-align: left;
-    vertical-align: middle;
-  }
-
-  .tg .tg-9wq8 {
-    border-color: inherit;
-    text-align: center;
-    vertical-align: top;
-  }
-
-  .tg .tg-u7nq {
+  .print-weekday-cell {
     background-color: #dfdfdf;
-    border-color: inherit;
+    border-right: 1px solid #000;
+    border-bottom: 2px solid #000;
     font-weight: bold;
     text-align: center;
-    vertical-align: middle;
-    height: 0.44in;
+    height: 0.38in;
     font-size: 8px;
-    padding: 0.03in;
+    font-family: Arial, sans-serif;
+    padding-top: 0.12in;
   }
 
-  .tg .tg-za14 {
-    border-color: inherit;
-    text-align: left;
-    vertical-align: bottom;
+  .print-weekday-cell:last-child {
+    border-right: 0;
   }
 
-  .tg .tg-uzvj {
-    border-color: inherit;
-    font-weight: bold;
-    text-align: center;
-    vertical-align: middle;
-  }
-
-  .tg .print-day-warning {
-    font-weight: bold;
+  .print-calendar-grid {
+    border-left: 2px solid #000;
+    border-right: 2px solid #000;
+    border-bottom: 2px solid #000;
   }
 
   .print-day-cell {
     position: relative;
-    height: 0.94in;
-    vertical-align: top;
+    height: 0.9in;
+    border-right: 1px solid #000;
+    border-bottom: 1px solid #000;
     background: #fff;
+  }
+
+  .print-calendar-grid .print-day-cell:nth-child(7n) {
+    border-right: 0;
+  }
+
+  .print-calendar-grid .print-day-cell:nth-last-child(-n + 7) {
+    border-bottom: 0;
   }
 
   .print-date-tab {
     position: absolute;
     top: -1px;
-    left: 0.5in;
-    transform: none;
+    left: 50%;
+    transform: translateX(-50%);
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    min-width: 0.48in;
-    min-height: 0.19in;
-    padding: 0.015in 0.055in;
+    min-width: 0.42in;
+    min-height: 0.18in;
+    max-width: calc(100% - 0.16in);
+    padding: 0.015in 0.04in;
     border: 2px solid #000;
     border-top: 0;
     background: #fff;
     font-family: Arial, sans-serif;
-    font-size: 8px;
+    font-size: 7px;
     font-weight: 700;
     line-height: 1;
     text-align: center;
   }
 
   .print-day-body {
-    height: 0.79in;
-    padding: 0.16in 0.04in 0.03in;
+    height: 100%;
+    padding: 0.22in 0.05in 0.05in;
     font-family: Arial, sans-serif;
     font-size: 7px;
-    line-height: 1.08;
-    text-align: left;
+    line-height: 1.12;
+    text-align: center;
     white-space: normal;
     overflow: hidden;
   }
 
   .print-dose-line {
     font-weight: 700;
-    margin-bottom: 0.03in;
+    margin-bottom: 0.02in;
     text-align: center;
   }
 
@@ -784,44 +776,41 @@ textarea {
     text-align: center;
   }
 
-  body.compact-print .tg td,
-  body.compact-print .tg th {
-    font-size: 12px;
+  .print-day-cell.is-outside-month .print-day-body {
+    color: transparent;
   }
 
   body.compact-print .print-page {
-    width: 7.2in;
+    width: 6.9in;
     padding-top: 0.18in;
   }
 
   body.compact-print .print-title-block {
-    font-size: 14px;
+    font-size: 15px;
   }
 
   body.compact-print .print-label-box {
-    width: 2.4in;
-    height: 1.3in;
+    width: 2.2in;
+    height: 1.28in;
   }
 
   body.compact-print .print-month-banner {
-    width: 2.5in;
-    font-size: 14px;
+    width: 2in;
+    font-size: 11px;
   }
 
   body.compact-print .print-day-cell {
-    height: 0.84in;
+    height: 0.8in;
   }
 
   body.compact-print .print-date-tab {
-    font-size: 7px;
-    min-height: 0.18in;
-    left: 0.45in;
+    font-size: 6px;
+    min-height: 0.16in;
   }
 
   body.compact-print .print-day-body {
-    height: 0.68in;
-    font-size: 7px;
-    line-height: 1.05;
-    padding-top: 0.145in;
+    font-size: 6px;
+    line-height: 1.02;
+    padding-top: 0.2in;
   }
 }

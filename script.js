@@ -719,6 +719,7 @@ const DOMBuilders = {
 
   printMonthMarkup(calendar) {
     const monthLabel = Formatters.monthYear(calendar.monthStart);
+    const weekdayLabels = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
 
     return `
       <section class="print-month">
@@ -732,43 +733,31 @@ const DOMBuilders = {
             <div class="print-label-box">Place Prescription Label Here</div>
           </div>
 
-          <div class="print-month-banner">${Html.escape(monthLabel)}</div>
-
-          <table class="tg" aria-label="${Html.escape(monthLabel)} printable calendar">
-            <thead>
-              <tr>
-                <th class="tg-u7nq">Sunday</th>
-                <th class="tg-u7nq">Monday</th>
-                <th class="tg-u7nq">Tuesday</th>
-                <th class="tg-u7nq">Wednesday</th>
-                <th class="tg-u7nq">Thursday</th>
-                <th class="tg-u7nq">Friday</th>
-                <th class="tg-u7nq">Saturday</th>
-              </tr>
-            </thead>
-            <tbody>
-              ${calendar.weeks.map(DOMBuilders.printWeekMarkup).join("")}
-            </tbody>
-          </table>
+          <div class="print-calendar-shell" aria-label="${Html.escape(monthLabel)} printable calendar">
+            <div class="print-month-banner">${Html.escape(monthLabel)}</div>
+            <div class="print-weekday-row">
+              ${weekdayLabels
+                .map((label) => `<div class="print-weekday-cell">${Html.escape(label)}</div>`)
+                .join("")}
+            </div>
+            <div class="print-calendar-grid">
+              ${calendar.weeks.flat().map(DOMBuilders.printCalendarCellMarkup).join("")}
+            </div>
+          </div>
         </div>
       </section>
     `;
   },
 
-  printWeekMarkup(week) {
+  printCalendarCellMarkup(cell) {
+    const classes = ["print-day-cell"];
+    if (!cell.inCurrentMonth) classes.push("is-outside-month");
+
     return `
-      <tr>
-        ${week
-          .map(
-            (cell) => `
-              <td class="tg-9wq8 print-day-cell">
-                <div class="print-date-tab">${Html.escape(DOMBuilders.printDateLabel(cell))}</div>
-                <div class="print-day-body">${DOMBuilders.printDayBody(cell)}</div>
-              </td>
-            `
-          )
-          .join("")}
-      </tr>
+      <div class="${classes.join(" ")}">
+        <div class="print-date-tab">${Html.escape(DOMBuilders.printDateLabel(cell))}</div>
+        <div class="print-day-body">${DOMBuilders.printDayBody(cell)}</div>
+      </div>
     `;
   },
 
