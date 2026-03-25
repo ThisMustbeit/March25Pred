@@ -526,6 +526,10 @@ textarea {
   background: #f6fafc;
   color: var(--accent-dark);
   cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
 }
 
 .icon-button {
@@ -533,7 +537,7 @@ textarea {
   height: 2.4rem;
   border-radius: 999px;
   font-size: 1.45rem;
-  line-height: 1;
+  line-height: 0;
   font-weight: 700;
 }
 
@@ -542,7 +546,7 @@ textarea {
   height: 2rem;
   border-radius: 10px;
   font-size: 1.2rem;
-  line-height: 1;
+  line-height: 0;
 }
 
 .icon-button:hover,
