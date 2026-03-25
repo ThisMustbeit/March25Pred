@@ -124,6 +124,12 @@ const Formatters = {
     });
   },
 
+  monthName(date) {
+    return date.toLocaleDateString(undefined, {
+      month: "long",
+    });
+  },
+
   dose(value) {
     const normalized = Number(value);
     const text = Number.isInteger(normalized)
@@ -716,114 +722,86 @@ const DOMBuilders = {
 
     return `
       <section class="print-month">
-        <table class="tg" aria-label="${Html.escape(monthLabel)} printable calendar">
-          <thead>
-            <tr>
-              <th class="tg-lboi"></th>
-              <th class="tg-za14"></th>
-              <th class="tg-za14"></th>
-              <th class="tg-za14"></th>
-              <th class="tg-uzvj" colspan="6" rowspan="3">${Html.escape(monthLabel)}</th>
-              <th class="tg-za14"></th>
-              <th class="tg-za14"></th>
-              <th class="tg-za14"></th>
-              <th class="tg-za14"></th>
-            </tr>
-            <tr>
-              <th class="tg-lboi"></th>
-              <th class="tg-za14"></th>
-              <th class="tg-za14"></th>
-              <th class="tg-za14"></th>
-              <th class="tg-za14"></th>
-              <th class="tg-za14"></th>
-              <th class="tg-za14"></th>
-              <th class="tg-za14"></th>
-            </tr>
-            <tr>
-              <th class="tg-lboi"></th>
-              <th class="tg-za14"></th>
-              <th class="tg-za14"></th>
-              <th class="tg-za14"></th>
-              <th class="tg-za14"></th>
-              <th class="tg-za14"></th>
-              <th class="tg-za14"></th>
-              <th class="tg-za14"></th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr>
-              <td class="tg-u7nq" colspan="2" rowspan="4">Sunday</td>
-              <td class="tg-u7nq" colspan="2" rowspan="4">Monday</td>
-              <td class="tg-u7nq" colspan="2" rowspan="4">Tuesday</td>
-              <td class="tg-u7nq" colspan="2" rowspan="4">Wednesday</td>
-              <td class="tg-u7nq" colspan="2" rowspan="4">Thursday</td>
-              <td class="tg-u7nq" colspan="2" rowspan="4">Friday</td>
-              <td class="tg-u7nq" colspan="2" rowspan="4">Saturday</td>
-            </tr>
-            <tr></tr>
-            <tr></tr>
-            <tr></tr>
-            ${calendar.weeks.map(DOMBuilders.printWeekMarkup).join("")}
-          </tbody>
-        </table>
+        <div class="print-page">
+          <div class="print-header">
+            <div class="print-title-block">
+              <div>MEDICATION</div>
+              <div>DOSAGE</div>
+              <div>CALENDAR</div>
+            </div>
+            <div class="print-label-box">Place Prescription Label Here</div>
+          </div>
+
+          <div class="print-month-banner">${Html.escape(monthLabel)}</div>
+
+          <table class="tg" aria-label="${Html.escape(monthLabel)} printable calendar">
+            <thead>
+              <tr>
+                <th class="tg-u7nq">Sunday</th>
+                <th class="tg-u7nq">Monday</th>
+                <th class="tg-u7nq">Tuesday</th>
+                <th class="tg-u7nq">Wednesday</th>
+                <th class="tg-u7nq">Thursday</th>
+                <th class="tg-u7nq">Friday</th>
+                <th class="tg-u7nq">Saturday</th>
+              </tr>
+            </thead>
+            <tbody>
+              ${calendar.weeks.map(DOMBuilders.printWeekMarkup).join("")}
+            </tbody>
+          </table>
+        </div>
       </section>
     `;
   },
 
   printWeekMarkup(week) {
-    const dateRow = week
-      .map(
-        (cell) => `
-          <td class="tg-lboi"></td>
-          <td class="tg-uzvj print-day-date" rowspan="2">${Html.escape(
-            DOMBuilders.printDateLabel(cell)
-          )}</td>
-        `
-      )
-      .join("");
-
-    const spacerRow = week.map(() => `<td class="tg-lboi"></td>`).join("");
-
-    const bodyRow = week
-      .map(
-        (cell) => `
-          <td class="tg-9wq8 print-day-body" colspan="2" rowspan="4">${DOMBuilders.printDayBody(cell)}</td>
-        `
-      )
-      .join("");
-
     return `
-      <tr>${dateRow}</tr>
-      <tr>${spacerRow}</tr>
-      <tr>${bodyRow}</tr>
-      <tr></tr>
-      <tr></tr>
-      <tr></tr>
+      <tr>
+        ${week
+          .map(
+            (cell) => `
+              <td class="tg-9wq8 print-day-cell">
+                <div class="print-date-tab">${Html.escape(DOMBuilders.printDateLabel(cell))}</div>
+                <div class="print-day-body">${DOMBuilders.printDayBody(cell)}</div>
+              </td>
+            `
+          )
+          .join("")}
+      </tr>
     `;
   },
 
   printDateLabel(cell) {
     if (!cell.inCurrentMonth) return "";
-    return `${cell.date.toLocaleDateString(undefined, { month: "long" })} ${cell.date.getDate()}`;
+    return `${Formatters.monthName(cell.date)} ${cell.date.getDate()}`;
   },
 
   printDayBody(cell) {
     if (!cell.inCurrentMonth || !cell.scheduleRow) {
-      return "&nbsp;<br>&nbsp;<br>&nbsp;<br>&nbsp;";
+      return "";
     }
 
     const lines = [
-      Html.escape(Formatters.dose(cell.scheduleRow.doseMg)),
-      Html.escape(cell.scheduleRow.compactTabletSummary).replace(/\n/g, "<br>"),
+      `<div class="print-dose-line">${Html.escape(Formatters.dose(cell.scheduleRow.doseMg))}</div>`,
     ];
 
-    if (cell.scheduleRow.warning) {
+    if (cell.scheduleRow.compactTabletSummary) {
       lines.push(
-        `<span class="print-day-warning">${Html.escape(cell.scheduleRow.warning)}</span>`
+        `<div class="print-tablet-line">${Html.escape(cell.scheduleRow.compactTabletSummary).replace(
+          /\n/g,
+          "<br>"
+        )}</div>`
       );
     }
 
-    return lines.filter(Boolean).join("<br><br>");
+    if (cell.scheduleRow.warning) {
+      lines.push(
+        `<div class="print-day-warning">${Html.escape(cell.scheduleRow.warning)}</div>`
+      );
+    }
+
+    return lines.join("");
   },
 };
 
