@@ -386,15 +386,19 @@ const ScheduleLogic = {
 
     for (let dayIndex = 0; dayIndex < totalDays; dayIndex += 1) {
       const date = DateUtils.addDays(inputs.taperStartDate, dayIndex);
-      rows.push(ScheduleLogic.buildScheduleRow(date, dayIndex, inputs));
+      const row = ScheduleLogic.buildScheduleRow(date, dayIndex, inputs);
+      if (NumberUtils.isNearZero(row.doseMg)) {
+        break;
+      }
+      rows.push(row);
     }
 
     return rows;
   },
 
   generateSummary(inputs, scheduleRows) {
-    const totalTaperDays = Templates.totalTaperDays(inputs);
-    const taperEndDateExclusive = DateUtils.addDays(inputs.taperStartDate, totalTaperDays);
+    const totalTaperDays = scheduleRows.length;
+    const taperEndDate = scheduleRows.length ? scheduleRows[scheduleRows.length - 1].date : null;
 
     const totals = scheduleRows.reduce(
       (summary, row) => {
@@ -414,7 +418,7 @@ const ScheduleLogic = {
 
     return {
       totalTaperDays,
-      taperEndDateExclusive,
+      taperEndDate,
       lastDailyDose: scheduleRows.length ? scheduleRows[scheduleRows.length - 1].doseMg : null,
       tabletTotals: totals.tabletTotals,
       totalMgDispensed: totals.totalMgDispensed,
@@ -493,7 +497,7 @@ const ViewModelFactory = {
     return {
       summaryItems: [
         ["Taper Start", Formatters.date(inputs.taperStartDate)],
-        ["Taper End", Formatters.date(summary.taperEndDateExclusive)],
+        ["Taper End", summary.taperEndDate ? Formatters.date(summary.taperEndDate) : "-"],
         ["Total Taper Days", String(summary.totalTaperDays)],
         ["Last Daily Dose", summary.lastDailyDose == null ? "-" : Formatters.dose(summary.lastDailyDose)],
         ["Tablet A Total", String(summary.tabletTotals.A)],
