@@ -424,6 +424,10 @@ const ScheduleLogic = {
 };
 
 const CalendarLogic = {
+  hasVisibleCalendarDose(row) {
+    return Boolean(row) && !NumberUtils.isNearZero(row.doseMg);
+  },
+
   generateCalendarDateCells(monthStart) {
     const gridStart = DateUtils.gridStartDate(monthStart);
     return Array.from({ length: 42 }, (_, index) => DateUtils.addDays(gridStart, index));
@@ -449,12 +453,19 @@ const CalendarLogic = {
     return { monthStart, monthEndExclusive, weeks };
   },
 
+  monthHasVisibleContent(calendar) {
+    return calendar.weeks.flat().some((cell) => CalendarLogic.hasVisibleCalendarDose(cell.scheduleRow));
+  },
+
   generateCalendarRange(inputs, scheduleRows) {
     const taperStartMonth = DateUtils.firstDayOfMonth(inputs.taperStartDate);
-    const lastScheduleDate = scheduleRows.length
-      ? scheduleRows[scheduleRows.length - 1].date
+    const lastVisibleScheduleRow = [...scheduleRows]
+      .reverse()
+      .find((row) => CalendarLogic.hasVisibleCalendarDose(row));
+    const rangeEndDate = lastVisibleScheduleRow
+      ? lastVisibleScheduleRow.date
       : inputs.taperStartDate;
-    const taperEndMonth = DateUtils.firstDayOfMonth(lastScheduleDate);
+    const taperEndMonth = DateUtils.firstDayOfMonth(rangeEndDate);
 
     let currentMonth = taperStartMonth;
     const finalMonth = taperEndMonth;
@@ -465,7 +476,7 @@ const CalendarLogic = {
       currentMonth = new Date(currentMonth.getFullYear(), currentMonth.getMonth() + 1, 1);
     }
 
-    return months;
+    return months.filter(CalendarLogic.monthHasVisibleContent);
   },
 };
 
@@ -473,7 +484,7 @@ const ViewModelFactory = {
   create(inputs, scheduleRows, summary, calendars) {
     const mode = Messages.modeLabel(inputs.useCustomOverride);
     const calendarStatus =
-      scheduleRows.length === 0
+      scheduleRows.length === 0 || calendars.length === 0
         ? APP_CONFIG.messages.noSchedule
         : `Showing ${calendars.length} month${calendars.length === 1 ? "" : "s"} from ${Formatters.monthYear(
             calendars[0].monthStart
@@ -493,7 +504,9 @@ const ViewModelFactory = {
         ["Mode", mode],
       ],
       calendarTitle:
-        calendars.length > 1
+        calendars.length === 0
+          ? "Month Calendar"
+          : calendars.length > 1
           ? `Month Calendar - ${calendars.length} months`
           : `Month Calendar - ${Formatters.monthYear(calendars[0].monthStart)}`,
       calendarStatus,
