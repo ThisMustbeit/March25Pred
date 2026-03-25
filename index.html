@@ -83,25 +83,27 @@
               </label>
             </fieldset>
 
-            <fieldset class="group group-wide">
-              <legend>Custom Taper Override</legend>
-              <p class="help-text">
-                Row 1 starts on the taper start date. Use 0 mg in the first row if you want to hold the starting dose first.
-              </p>
-              <div class="table-scroll">
-                <table class="input-table">
-                  <thead>
-                    <tr>
-                      <th>Segment</th>
-                      <th>Dose Change (mg)</th>
-                      <th>Days Per Step</th>
-                      <th>Repeats</th>
-                    </tr>
-                  </thead>
-                  <tbody id="custom-segment-body"></tbody>
-                </table>
-              </div>
-            </fieldset>
+            <div id="custom-override-panel" class="custom-override-panel group-wide-panel is-hidden" aria-hidden="true">
+              <fieldset class="group group-wide">
+                <legend>Custom Taper Override</legend>
+                <p class="help-text">
+                  Row 1 starts on the taper start date. Use 0 mg in the first row if you want to hold the starting dose first.
+                </p>
+                <div class="table-scroll">
+                  <table class="input-table">
+                    <thead>
+                      <tr>
+                        <th>Segment</th>
+                        <th>Dose Change (mg)</th>
+                        <th>Days Per Step</th>
+                        <th>Repeats</th>
+                      </tr>
+                    </thead>
+                    <tbody id="custom-segment-body"></tbody>
+                  </table>
+                </div>
+              </fieldset>
+            </div>
           </div>
         </form>
 

@@ -164,6 +164,10 @@ textarea {
   grid-column: 1 / -1;
 }
 
+.group-wide-panel {
+  grid-column: 1 / -1;
+}
+
 .group legend {
   padding: 0 0.5rem;
   font-weight: 700;
@@ -214,6 +218,19 @@ textarea {
   margin: 0 0 0.9rem;
   color: var(--muted);
   line-height: 1.5;
+}
+
+.custom-override-panel {
+  overflow: hidden;
+  max-height: 800px;
+  opacity: 1;
+  transition: max-height 0.22s ease, opacity 0.18s ease;
+}
+
+.custom-override-panel.is-hidden {
+  max-height: 0;
+  opacity: 0;
+  pointer-events: none;
 }
 
 .validation-summary {

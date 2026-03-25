@@ -517,6 +517,7 @@ const ViewModelFactory = {
 
 const DOMRefs = {
   form: document.getElementById("taper-form"),
+  customOverridePanel: document.getElementById("custom-override-panel"),
   customSegmentBody: document.getElementById("custom-segment-body"),
   segmentRowTemplate: document.getElementById("segment-row-template"),
   validationSummary: document.getElementById("validation-summary"),
@@ -866,6 +867,12 @@ const DOMRenderer = {
 };
 
 const UISetup = {
+  syncCustomOverrideVisibility() {
+    const isVisible = DOMRefs.form.useCustomOverride.checked;
+    DOMRefs.customOverridePanel.classList.toggle("is-hidden", !isVisible);
+    DOMRefs.customOverridePanel.setAttribute("aria-hidden", String(!isVisible));
+  },
+
   buildCustomSegmentRows() {
     for (let index = 0; index < APP_CONFIG.customSegmentCount; index += 1) {
       const row = DOMRefs.segmentRowTemplate.content.firstElementChild.cloneNode(true);
@@ -898,6 +905,8 @@ const UISetup = {
         inputs[inputIndex].value = value;
       });
     });
+
+    UISetup.syncCustomOverrideVisibility();
   },
 };
 
@@ -907,6 +916,7 @@ const AppController = {
     UISetup.applyDefaults();
     DOMRefs.form.addEventListener("submit", AppController.handleGenerate);
     DOMRefs.form.addEventListener("reset", AppController.handleReset);
+    DOMRefs.form.useCustomOverride.addEventListener("change", UISetup.syncCustomOverrideVisibility);
     DOMRefs.printButton.addEventListener("click", AppController.handlePrint);
     DOMRefs.compactPrintToggle.addEventListener("change", DOMRenderer.syncLayoutControls);
     DOMRefs.calendarViewInputs.forEach((input) =>
