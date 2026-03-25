@@ -1,6 +1,6 @@
 const APP_CONFIG = {
   epsilon: 1e-6,
-  customSegmentCount: 10,
+  defaultCustomSegmentCount: 3,
   drugs: {
     prednisone: {
       id: "prednisone",
@@ -517,6 +517,7 @@ const ViewModelFactory = {
 
 const DOMRefs = {
   form: document.getElementById("taper-form"),
+  addSegmentRowButton: document.getElementById("add-segment-row"),
   customOverridePanel: document.getElementById("custom-override-panel"),
   customSegmentBody: document.getElementById("custom-segment-body"),
   segmentRowTemplate: document.getElementById("segment-row-template"),
@@ -873,18 +874,91 @@ const UISetup = {
     DOMRefs.customOverridePanel.setAttribute("aria-hidden", String(!isVisible));
   },
 
-  buildCustomSegmentRows() {
-    for (let index = 0; index < APP_CONFIG.customSegmentCount; index += 1) {
-      const row = DOMRefs.segmentRowTemplate.content.firstElementChild.cloneNode(true);
-      row.querySelector(".segment-label").textContent = `Step ${index}`;
+  createCustomSegmentRow() {
+    return DOMRefs.segmentRowTemplate.content.firstElementChild.cloneNode(true);
+  },
 
+  appendCustomSegmentRow(values = ["", "", ""]) {
+    const row = UISetup.createCustomSegmentRow();
+    const inputs = row.querySelectorAll("input");
+
+    values.forEach((value, index) => {
+      if (inputs[index]) {
+        inputs[index].value = value;
+      }
+    });
+
+    DOMRefs.customSegmentBody.appendChild(row);
+  },
+
+  reindexCustomSegmentRows() {
+    [...DOMRefs.customSegmentBody.querySelectorAll("tr")].forEach((row, index) => {
+      row.querySelector(".segment-label").textContent = `Step ${index + 1}`;
       const inputs = row.querySelectorAll("input");
       inputs[0].name = `customDoseChange${index}`;
       inputs[1].name = `customDaysPerStep${index}`;
       inputs[2].name = `customRepeats${index}`;
+    });
+  },
 
-      DOMRefs.customSegmentBody.appendChild(row);
+  syncCustomSegmentDoseHelpers() {
+    const startingDose = NumberUtils.parseOptionalNumber(DOMRefs.form.startingDose.value);
+    const rows = [...DOMRefs.customSegmentBody.querySelectorAll("tr")];
+
+    if (startingDose == null) {
+      rows.forEach((row) => {
+        row.querySelector(".helper-dose-start").textContent = "";
+        row.querySelector(".helper-dose-end").textContent = "";
+      });
+      return;
     }
+
+    let runningDose = NumberUtils.clamp(
+      startingDose,
+      Number(APP_CONFIG.defaults.taper.minDoseClamp),
+      Number(APP_CONFIG.defaults.taper.maxDoseClamp)
+    );
+
+    rows.forEach((row) => {
+      const [doseChangeInput, , repeatsInput] = row.querySelectorAll("input");
+      const startDoseEl = row.querySelector(".helper-dose-start");
+      const endDoseEl = row.querySelector(".helper-dose-end");
+
+      const doseChange = NumberUtils.parseOptionalNumber(doseChangeInput.value.trim());
+      const repeats = NumberUtils.parseOptionalInteger(repeatsInput.value.trim());
+
+      if (doseChange == null || repeats == null) {
+        startDoseEl.textContent = "";
+        endDoseEl.textContent = "";
+        return;
+      }
+
+      const startDose = runningDose;
+      const endDose = NumberUtils.clamp(
+        startDose + doseChange * repeats,
+        Number(APP_CONFIG.defaults.taper.minDoseClamp),
+        Number(APP_CONFIG.defaults.taper.maxDoseClamp)
+      );
+
+      startDoseEl.textContent = Formatters.dose(startDose);
+      endDoseEl.textContent = Formatters.dose(endDose);
+      runningDose = endDose;
+    });
+  },
+
+  rebuildCustomSegmentRows(valuesList = APP_CONFIG.defaults.customSegments) {
+    DOMRefs.customSegmentBody.innerHTML = "";
+
+    valuesList.forEach((values) => UISetup.appendCustomSegmentRow(values));
+
+    if (valuesList.length === 0) {
+      for (let index = 0; index < APP_CONFIG.defaultCustomSegmentCount; index += 1) {
+        UISetup.appendCustomSegmentRow();
+      }
+    }
+
+    UISetup.reindexCustomSegmentRows();
+    UISetup.syncCustomSegmentDoseHelpers();
   },
 
   applyDefaults() {
@@ -897,26 +971,21 @@ const UISetup = {
       }
     });
 
-    const rows = [...DOMRefs.customSegmentBody.querySelectorAll("tr")];
-    APP_CONFIG.defaults.customSegments.forEach((values, index) => {
-      if (!rows[index]) return;
-      const inputs = rows[index].querySelectorAll("input");
-      values.forEach((value, inputIndex) => {
-        inputs[inputIndex].value = value;
-      });
-    });
-
+    UISetup.rebuildCustomSegmentRows(APP_CONFIG.defaults.customSegments);
     UISetup.syncCustomOverrideVisibility();
   },
 };
 
 const AppController = {
   initialize() {
-    UISetup.buildCustomSegmentRows();
     UISetup.applyDefaults();
     DOMRefs.form.addEventListener("submit", AppController.handleGenerate);
     DOMRefs.form.addEventListener("reset", AppController.handleReset);
     DOMRefs.form.useCustomOverride.addEventListener("change", UISetup.syncCustomOverrideVisibility);
+    DOMRefs.form.startingDose.addEventListener("input", UISetup.syncCustomSegmentDoseHelpers);
+    DOMRefs.customSegmentBody.addEventListener("input", UISetup.syncCustomSegmentDoseHelpers);
+    DOMRefs.customSegmentBody.addEventListener("click", AppController.handleCustomRowDelete);
+    DOMRefs.addSegmentRowButton.addEventListener("click", AppController.handleAddCustomRow);
     DOMRefs.printButton.addEventListener("click", AppController.handlePrint);
     DOMRefs.compactPrintToggle.addEventListener("change", DOMRenderer.syncLayoutControls);
     DOMRefs.calendarViewInputs.forEach((input) =>
@@ -937,6 +1006,21 @@ const AppController = {
       UISetup.applyDefaults();
       AppController.render();
     }, 0);
+  },
+
+  handleAddCustomRow() {
+    UISetup.appendCustomSegmentRow();
+    UISetup.reindexCustomSegmentRows();
+    UISetup.syncCustomSegmentDoseHelpers();
+  },
+
+  handleCustomRowDelete(event) {
+    const deleteButton = event.target.closest(".row-delete-button");
+    if (!deleteButton) return;
+
+    deleteButton.closest("tr")?.remove();
+    UISetup.reindexCustomSegmentRows();
+    UISetup.syncCustomSegmentDoseHelpers();
   },
 
   handlePrint() {

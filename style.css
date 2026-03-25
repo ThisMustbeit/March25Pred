@@ -496,6 +496,62 @@ textarea {
   padding: 0.65rem 0.7rem;
 }
 
+.input-table .action-col,
+.input-table .row-action-cell {
+  width: 56px;
+  text-align: center;
+}
+
+.dose-helper {
+  min-width: 110px;
+  color: var(--muted);
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+.helper-dose:empty::before {
+  content: "-";
+  color: #9fb0b8;
+}
+
+.custom-table-footer {
+  text-align: center !important;
+  padding-top: 1rem !important;
+  border-bottom: 0 !important;
+}
+
+.icon-button,
+.row-delete-button {
+  border: 1px solid var(--border-strong);
+  background: #f6fafc;
+  color: var(--accent-dark);
+  cursor: pointer;
+}
+
+.icon-button {
+  width: 2.4rem;
+  height: 2.4rem;
+  border-radius: 999px;
+  font-size: 1.45rem;
+  line-height: 1;
+  font-weight: 700;
+}
+
+.row-delete-button {
+  width: 2rem;
+  height: 2rem;
+  border-radius: 10px;
+  font-size: 1.2rem;
+  line-height: 1;
+}
+
+.icon-button:hover,
+.icon-button:focus-visible,
+.row-delete-button:hover,
+.row-delete-button:focus-visible {
+  background: #e6f0f5;
+}
+
 .schedule-table td.pre {
   white-space: pre-line;
   min-width: 210px;
