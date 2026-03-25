@@ -1,0 +1,201 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Prednisone Taper Calendar Generator</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <div class="app-shell">
+    <header class="hero">
+      <div>
+        <p class="eyebrow">Prednisone Taper Planner</p>
+        <h1>Prednisone Taper Calendar Generator</h1>
+        <p class="hero-copy">
+          Build a day-by-day prednisone schedule, see tablet breakdowns, review exact-dose warnings,
+          and print a clean monthly calendar.
+        </p>
+      </div>
+      <div class="hero-actions no-print">
+        <button id="print-button" type="button" class="button button-secondary">Print</button>
+      </div>
+    </header>
+
+    <main>
+      <section id="print-summary" class="card print-summary print-only">
+        <h2>Prednisone Taper Print Summary</h2>
+        <div id="print-summary-grid" class="summary-grid"></div>
+      </section>
+
+      <section class="card form-card">
+        <div class="section-heading">
+          <div>
+            <p class="section-kicker">Inputs</p>
+            <h2>Taper Settings</h2>
+          </div>
+          <div class="form-actions no-print">
+            <button id="generate-button" type="submit" form="taper-form" class="button">Generate Schedule</button>
+            <button id="reset-button" type="reset" form="taper-form" class="button button-secondary">Reset</button>
+          </div>
+        </div>
+
+        <form id="taper-form" novalidate>
+          <div class="form-grid">
+            <fieldset class="group">
+              <legend>Primary Taper</legend>
+              <label>
+                <span>Display Month</span>
+                <input id="display-month" name="displayMonth" type="month" required>
+              </label>
+              <label>
+                <span>Taper Start Date</span>
+                <input id="taper-start-date" name="taperStartDate" type="date" required>
+              </label>
+              <label>
+                <span>Starting Daily Dose (mg)</span>
+                <input id="starting-dose" name="startingDose" type="number" step="0.1" min="0" required>
+              </label>
+              <label>
+                <span>Dose Change Per Step (mg)</span>
+                <input id="dose-change-per-step" name="doseChangePerStep" type="number" step="0.1" required>
+              </label>
+              <label>
+                <span>Days Per Step</span>
+                <input id="days-per-step" name="daysPerStep" type="number" min="1" step="1" required>
+              </label>
+              <label>
+                <span>Total Taper Steps</span>
+                <input id="total-steps" name="totalSteps" type="number" min="0" step="1" required>
+              </label>
+            </fieldset>
+
+            <fieldset class="group">
+              <legend>Tablet Strengths</legend>
+              <label>
+                <span>Tablet Strength A (mg)</span>
+                <input id="tablet-strength-a" name="tabletStrengthA" type="number" step="0.1" min="0.1" required>
+              </label>
+              <label>
+                <span>Tablet Strength B (mg)</span>
+                <input id="tablet-strength-b" name="tabletStrengthB" type="number" step="0.1" min="0.1">
+              </label>
+              <label>
+                <span>Tablet Strength C (mg)</span>
+                <input id="tablet-strength-c" name="tabletStrengthC" type="number" step="0.1" min="0.1">
+              </label>
+              <label>
+                <span>Minimum Dose Clamp (mg)</span>
+                <input id="min-dose-clamp" name="minDoseClamp" type="number" step="0.1" value="0" required>
+              </label>
+              <label>
+                <span>Maximum Dose Clamp (mg)</span>
+                <input id="max-dose-clamp" name="maxDoseClamp" type="number" step="0.1" value="1000" required>
+              </label>
+              <label class="checkbox-row">
+                <input id="use-custom-override" name="useCustomOverride" type="checkbox">
+                <span>Use custom taper override</span>
+              </label>
+            </fieldset>
+
+            <fieldset class="group group-wide">
+              <legend>Custom Taper Override</legend>
+              <p class="help-text">
+                Row 1 starts on the taper start date. Use 0 mg in the first row if you want to hold the starting dose first.
+              </p>
+              <div class="table-scroll">
+                <table class="input-table">
+                  <thead>
+                    <tr>
+                      <th>Segment</th>
+                      <th>Dose Change (mg)</th>
+                      <th>Days Per Step</th>
+                      <th>Repeats</th>
+                    </tr>
+                  </thead>
+                  <tbody id="custom-segment-body"></tbody>
+                </table>
+              </div>
+            </fieldset>
+          </div>
+        </form>
+
+        <div id="validation-summary" class="validation-summary" aria-live="polite"></div>
+      </section>
+
+      <section id="results" class="results-stack">
+        <section class="card summary-card">
+          <div class="section-heading">
+            <div>
+              <p class="section-kicker">Summary</p>
+              <h2>Schedule Overview</h2>
+            </div>
+          </div>
+          <div id="summary-grid" class="summary-grid"></div>
+        </section>
+
+        <section class="card calendar-card">
+          <div class="section-heading">
+            <div>
+              <p class="section-kicker">Calendar</p>
+              <h2 id="calendar-title">Month Calendar</h2>
+            </div>
+            <div class="calendar-toolbar no-print">
+              <div class="toggle-group" role="group" aria-label="Calendar view mode">
+                <label><input type="radio" name="calendarView" value="calendar" checked> Calendar</label>
+                <label><input type="radio" name="calendarView" value="list"> List</label>
+                <label><input type="radio" name="calendarView" value="both"> Both</label>
+              </div>
+              <label class="checkbox-row compact-toggle">
+                <input id="compact-print-toggle" type="checkbox">
+                <span>Compact print layout</span>
+              </label>
+            </div>
+          </div>
+          <div id="calendar-status" class="calendar-status"></div>
+          <div id="calendar-months" class="calendar-months"></div>
+          <div id="calendar-list" class="calendar-list"></div>
+        </section>
+
+        <section id="table-card" class="card table-card">
+          <div class="section-heading">
+            <div>
+              <p class="section-kicker">Fallback View</p>
+              <h2>Detailed Schedule Table</h2>
+            </div>
+          </div>
+          <div class="table-scroll">
+            <table class="schedule-table">
+              <thead>
+                <tr>
+                  <th>Date</th>
+                  <th>Day</th>
+                  <th>Step</th>
+                  <th>Dose (mg)</th>
+                  <th>Tablet A</th>
+                  <th>Tablet B</th>
+                  <th>Tablet C</th>
+                  <th>Warning</th>
+                  <th>Schedule Text</th>
+                </tr>
+              </thead>
+              <tbody id="schedule-body"></tbody>
+            </table>
+          </div>
+        </section>
+      </section>
+    </main>
+  </div>
+
+  <template id="segment-row-template">
+    <tr>
+      <td class="segment-label"></td>
+      <td><input type="number" step="0.1" min="-1000" max="1000"></td>
+      <td><input type="number" step="1" min="1" max="365"></td>
+      <td><input type="number" step="1" min="1" max="100"></td>
+    </tr>
+  </template>
+
+  <script src="script.js"></script>
+</body>
+</html>
