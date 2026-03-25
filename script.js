@@ -11,7 +11,6 @@ const APP_CONFIG = {
   },
   messages: {
     exactDoseWarning: "Dose not exact with selected tablet strengths",
-    discontinued: "Discontinued",
     noSchedule: "No taper days to display yet.",
     customMode: "Custom taper override",
     standardMode: "Standard step taper",
@@ -69,10 +68,6 @@ const DateUtils = {
 
   gridStartDate(date) {
     return DateUtils.addDays(date, -DateUtils.sundayOffset(date));
-  },
-
-  toMonthInputValue(date) {
-    return `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, "0")}`;
   },
 
   toDateInputValue(date) {
@@ -146,10 +141,6 @@ const Formatters = {
 const Messages = {
   exactDoseWarning() {
     return APP_CONFIG.messages.exactDoseWarning;
-  },
-
-  discontinued() {
-    return APP_CONFIG.messages.discontinued;
   },
 
   modeLabel(useCustomOverride) {
@@ -432,6 +423,10 @@ const CalendarLogic = {
     return Boolean(row) && !NumberUtils.isNearZero(row.doseMg);
   },
 
+  cellHasVisibleMonthDose(cell) {
+    return cell.inCurrentMonth && CalendarLogic.hasVisibleCalendarDose(cell.scheduleRow);
+  },
+
   generateCalendarDateCells(monthStart) {
     const gridStart = DateUtils.gridStartDate(monthStart);
     return Array.from({ length: 42 }, (_, index) => DateUtils.addDays(gridStart, index));
@@ -458,7 +453,7 @@ const CalendarLogic = {
   },
 
   monthHasVisibleContent(calendar) {
-    return calendar.weeks.flat().some((cell) => CalendarLogic.hasVisibleCalendarDose(cell.scheduleRow));
+    return calendar.weeks.flat().some((cell) => CalendarLogic.cellHasVisibleMonthDose(cell));
   },
 
   generateCalendarRange(inputs, scheduleRows) {
@@ -526,7 +521,6 @@ const DOMRefs = {
   segmentRowTemplate: document.getElementById("segment-row-template"),
   validationSummary: document.getElementById("validation-summary"),
   summaryGrid: document.getElementById("summary-grid"),
-  printSummaryGrid: document.getElementById("print-summary-grid"),
   printCalendarRoot: document.getElementById("print-calendar-root"),
   calendarTitle: document.getElementById("calendar-title"),
   calendarStatus: document.getElementById("calendar-status"),
@@ -603,12 +597,6 @@ const InputFactory = {
     return { inputs, errors };
   },
 
-  parseMonth(value) {
-    if (!value) return null;
-    const [year, month] = value.split("-").map(Number);
-    return year && month ? new Date(year, month - 1, 1) : null;
-  },
-
   parseDate(value) {
     if (!value) return null;
     const [year, month, day] = value.split("-").map(Number);
@@ -651,7 +639,7 @@ const DOMBuilders = {
   },
 
   monthMarkup(calendar) {
-    const activeDayCount = calendar.weeks.flat().filter((cell) => cell.scheduleRow).length;
+    const activeDayCount = calendar.weeks.flat().filter(CalendarLogic.cellHasVisibleMonthDose).length;
 
     return `
       <section class="calendar-month">
@@ -846,7 +834,6 @@ const DOMRenderer = {
 
   clearResults() {
     DOMRefs.summaryGrid.innerHTML = "";
-    DOMRefs.printSummaryGrid.innerHTML = "";
     DOMRefs.printCalendarRoot.innerHTML = "";
     DOMRefs.calendarTitle.textContent = "Month Calendar";
     DOMRefs.calendarStatus.innerHTML = "";
@@ -858,7 +845,6 @@ const DOMRenderer = {
   render(viewModel) {
     const summaryMarkup = DOMBuilders.summaryMarkup(viewModel.summaryItems);
     DOMRefs.summaryGrid.innerHTML = summaryMarkup;
-    DOMRefs.printSummaryGrid.innerHTML = summaryMarkup;
     DOMRefs.calendarTitle.textContent = viewModel.calendarTitle;
     DOMRefs.calendarStatus.textContent = viewModel.calendarStatus;
     DOMRefs.calendarMonths.innerHTML = viewModel.calendars.map(DOMBuilders.monthMarkup).join("");
