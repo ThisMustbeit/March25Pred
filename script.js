@@ -507,6 +507,7 @@ const DOMRefs = {
   validationSummary: document.getElementById("validation-summary"),
   summaryGrid: document.getElementById("summary-grid"),
   printSummaryGrid: document.getElementById("print-summary-grid"),
+  printCalendarRoot: document.getElementById("print-calendar-root"),
   calendarTitle: document.getElementById("calendar-title"),
   calendarStatus: document.getElementById("calendar-status"),
   calendarMonths: document.getElementById("calendar-months"),
@@ -705,6 +706,125 @@ const DOMBuilders = {
       })
       .join("");
   },
+
+  printCalendarMarkup(calendars) {
+    return calendars.map(DOMBuilders.printMonthMarkup).join("");
+  },
+
+  printMonthMarkup(calendar) {
+    const monthLabel = Formatters.monthYear(calendar.monthStart);
+
+    return `
+      <section class="print-month">
+        <table class="tg" aria-label="${Html.escape(monthLabel)} printable calendar">
+          <thead>
+            <tr>
+              <th class="tg-lboi"></th>
+              <th class="tg-za14"></th>
+              <th class="tg-za14"></th>
+              <th class="tg-za14"></th>
+              <th class="tg-uzvj" colspan="6" rowspan="3">${Html.escape(monthLabel)}</th>
+              <th class="tg-za14"></th>
+              <th class="tg-za14"></th>
+              <th class="tg-za14"></th>
+              <th class="tg-za14"></th>
+            </tr>
+            <tr>
+              <th class="tg-lboi"></th>
+              <th class="tg-za14"></th>
+              <th class="tg-za14"></th>
+              <th class="tg-za14"></th>
+              <th class="tg-za14"></th>
+              <th class="tg-za14"></th>
+              <th class="tg-za14"></th>
+              <th class="tg-za14"></th>
+            </tr>
+            <tr>
+              <th class="tg-lboi"></th>
+              <th class="tg-za14"></th>
+              <th class="tg-za14"></th>
+              <th class="tg-za14"></th>
+              <th class="tg-za14"></th>
+              <th class="tg-za14"></th>
+              <th class="tg-za14"></th>
+              <th class="tg-za14"></th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td class="tg-u7nq" colspan="2" rowspan="4">Sunday</td>
+              <td class="tg-u7nq" colspan="2" rowspan="4">Monday</td>
+              <td class="tg-u7nq" colspan="2" rowspan="4">Tuesday</td>
+              <td class="tg-u7nq" colspan="2" rowspan="4">Wednesday</td>
+              <td class="tg-u7nq" colspan="2" rowspan="4">Thursday</td>
+              <td class="tg-u7nq" colspan="2" rowspan="4">Friday</td>
+              <td class="tg-u7nq" colspan="2" rowspan="4">Saturday</td>
+            </tr>
+            <tr></tr>
+            <tr></tr>
+            <tr></tr>
+            ${calendar.weeks.map(DOMBuilders.printWeekMarkup).join("")}
+          </tbody>
+        </table>
+      </section>
+    `;
+  },
+
+  printWeekMarkup(week) {
+    const dateRow = week
+      .map(
+        (cell) => `
+          <td class="tg-lboi"></td>
+          <td class="tg-uzvj print-day-date" rowspan="2">${Html.escape(
+            DOMBuilders.printDateLabel(cell)
+          )}</td>
+        `
+      )
+      .join("");
+
+    const spacerRow = week.map(() => `<td class="tg-lboi"></td>`).join("");
+
+    const bodyRow = week
+      .map(
+        (cell) => `
+          <td class="tg-9wq8 print-day-body" colspan="2" rowspan="4">${DOMBuilders.printDayBody(cell)}</td>
+        `
+      )
+      .join("");
+
+    return `
+      <tr>${dateRow}</tr>
+      <tr>${spacerRow}</tr>
+      <tr>${bodyRow}</tr>
+      <tr></tr>
+      <tr></tr>
+      <tr></tr>
+    `;
+  },
+
+  printDateLabel(cell) {
+    if (!cell.inCurrentMonth) return "";
+    return `${cell.date.toLocaleDateString(undefined, { month: "long" })} ${cell.date.getDate()}`;
+  },
+
+  printDayBody(cell) {
+    if (!cell.inCurrentMonth || !cell.scheduleRow) {
+      return "&nbsp;<br>&nbsp;<br>&nbsp;<br>&nbsp;";
+    }
+
+    const lines = [
+      Html.escape(Formatters.dose(cell.scheduleRow.doseMg)),
+      Html.escape(cell.scheduleRow.compactTabletSummary).replace(/\n/g, "<br>"),
+    ];
+
+    if (cell.scheduleRow.warning) {
+      lines.push(
+        `<span class="print-day-warning">${Html.escape(cell.scheduleRow.warning)}</span>`
+      );
+    }
+
+    return lines.filter(Boolean).join("<br><br>");
+  },
 };
 
 const DOMRenderer = {
@@ -724,6 +844,7 @@ const DOMRenderer = {
   clearResults() {
     DOMRefs.summaryGrid.innerHTML = "";
     DOMRefs.printSummaryGrid.innerHTML = "";
+    DOMRefs.printCalendarRoot.innerHTML = "";
     DOMRefs.calendarTitle.textContent = "Month Calendar";
     DOMRefs.calendarStatus.innerHTML = "";
     DOMRefs.calendarMonths.innerHTML = "";
@@ -738,6 +859,7 @@ const DOMRenderer = {
     DOMRefs.calendarTitle.textContent = viewModel.calendarTitle;
     DOMRefs.calendarStatus.textContent = viewModel.calendarStatus;
     DOMRefs.calendarMonths.innerHTML = viewModel.calendars.map(DOMBuilders.monthMarkup).join("");
+    DOMRefs.printCalendarRoot.innerHTML = DOMBuilders.printCalendarMarkup(viewModel.calendars);
     DOMRefs.calendarList.innerHTML = DOMBuilders.listMarkup(viewModel.scheduleRows);
     DOMRefs.scheduleBody.innerHTML = DOMBuilders.scheduleTableMarkup(viewModel.scheduleRows);
   },

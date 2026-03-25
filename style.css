@@ -92,6 +92,10 @@ textarea {
   display: none;
 }
 
+.print-calendar-root {
+  display: none;
+}
+
 .card {
   padding: 1.5rem;
 }
@@ -592,6 +596,10 @@ textarea {
     display: block !important;
   }
 
+  #print-calendar-root {
+    display: block !important;
+  }
+
   .print-summary {
     margin-bottom: 0.6rem;
   }
@@ -697,5 +705,89 @@ textarea {
 
   body.printing .form-card {
     display: none !important;
+  }
+
+  body.printing .calendar-card,
+  body.printing .table-card {
+    display: none !important;
+  }
+
+  .print-month {
+    margin-bottom: 12mm;
+    page-break-after: always;
+    break-after: page;
+  }
+
+  .print-month:last-child {
+    page-break-after: auto;
+    break-after: auto;
+  }
+
+  .tg {
+    border-collapse: collapse;
+    border-spacing: 0;
+    width: 100%;
+    table-layout: fixed;
+  }
+
+  .tg td,
+  .tg th {
+    border-color: black;
+    border-style: solid;
+    border-width: 1px;
+    font-family: Arial, sans-serif;
+    font-size: 12px;
+    overflow: hidden;
+    padding: 6px 4px;
+    word-break: normal;
+  }
+
+  .tg .tg-lboi {
+    border-color: inherit;
+    text-align: left;
+    vertical-align: middle;
+  }
+
+  .tg .tg-9wq8 {
+    border-color: inherit;
+    text-align: center;
+    vertical-align: middle;
+  }
+
+  .tg .tg-u7nq {
+    background-color: #dfdfdf;
+    border-color: inherit;
+    font-weight: bold;
+    text-align: center;
+    vertical-align: middle;
+  }
+
+  .tg .tg-za14 {
+    border-color: inherit;
+    text-align: left;
+    vertical-align: bottom;
+  }
+
+  .tg .tg-uzvj {
+    border-color: inherit;
+    font-weight: bold;
+    text-align: center;
+    vertical-align: middle;
+  }
+
+  .tg .print-day-date {
+    font-weight: bold;
+    font-size: 11px;
+  }
+
+  .tg .print-day-body {
+    white-space: pre-line;
+    font-size: 10px;
+    line-height: 1.25;
+    font-weight: normal;
+  }
+
+  .tg .print-day-warning {
+    font-weight: bold;
   }
 }
