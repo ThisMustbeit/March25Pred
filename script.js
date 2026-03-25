@@ -558,7 +558,12 @@ const InputFactory = {
 
   readCustomSegments(errors) {
     return [...DOMRefs.customSegmentBody.querySelectorAll("tr")].map((row, index) => {
-      const values = [...row.querySelectorAll("input")].map((input) => input.value.trim());
+      const fields = UISetup.getCustomRowFields(row);
+      const values = [
+        fields.doseChangeInput.value.trim(),
+        fields.daysPerStepInput.value.trim(),
+        fields.repeatsInput.value.trim(),
+      ];
       const allBlank = values.every((value) => value === "");
       if (allBlank) return null;
 
@@ -874,30 +879,39 @@ const UISetup = {
     DOMRefs.customOverridePanel.setAttribute("aria-hidden", String(!isVisible));
   },
 
+  getCustomRowFields(row) {
+    return {
+      doseChangeInput: row.querySelector(".segment-dose-change"),
+      daysPerStepInput: row.querySelector(".segment-days-per-step"),
+      repeatsInput: row.querySelector(".segment-repeats"),
+      startDoseEl: row.querySelector(".helper-dose-start"),
+      endDoseEl: row.querySelector(".helper-dose-end"),
+      deleteButton: row.querySelector(".row-delete-button"),
+    };
+  },
+
   createCustomSegmentRow() {
     return DOMRefs.segmentRowTemplate.content.firstElementChild.cloneNode(true);
   },
 
   appendCustomSegmentRow(values = ["", "", ""]) {
     const row = UISetup.createCustomSegmentRow();
-    const inputs = row.querySelectorAll("input");
+    const fields = UISetup.getCustomRowFields(row);
 
-    values.forEach((value, index) => {
-      if (inputs[index]) {
-        inputs[index].value = value;
-      }
-    });
+    fields.doseChangeInput.value = values[0] ?? "";
+    fields.daysPerStepInput.value = values[1] ?? "";
+    fields.repeatsInput.value = values[2] ?? "";
 
     DOMRefs.customSegmentBody.appendChild(row);
   },
 
   reindexCustomSegmentRows() {
     [...DOMRefs.customSegmentBody.querySelectorAll("tr")].forEach((row, index) => {
-      row.querySelector(".segment-label").textContent = `Step ${index + 1}`;
-      const inputs = row.querySelectorAll("input");
-      inputs[0].name = `customDoseChange${index}`;
-      inputs[1].name = `customDaysPerStep${index}`;
-      inputs[2].name = `customRepeats${index}`;
+      const fields = UISetup.getCustomRowFields(row);
+      row.querySelector(".segment-label").textContent = `Segment ${index + 1}`;
+      fields.doseChangeInput.name = `customDoseChange${index}`;
+      fields.daysPerStepInput.name = `customDaysPerStep${index}`;
+      fields.repeatsInput.name = `customRepeats${index}`;
     });
   },
 
@@ -920,16 +934,13 @@ const UISetup = {
     );
 
     rows.forEach((row) => {
-      const [doseChangeInput, , repeatsInput] = row.querySelectorAll("input");
-      const startDoseEl = row.querySelector(".helper-dose-start");
-      const endDoseEl = row.querySelector(".helper-dose-end");
-
-      const doseChange = NumberUtils.parseOptionalNumber(doseChangeInput.value.trim());
-      const repeats = NumberUtils.parseOptionalInteger(repeatsInput.value.trim());
+      const fields = UISetup.getCustomRowFields(row);
+      const doseChange = NumberUtils.parseOptionalNumber(fields.doseChangeInput.value.trim());
+      const repeats = NumberUtils.parseOptionalInteger(fields.repeatsInput.value.trim());
 
       if (doseChange == null || repeats == null) {
-        startDoseEl.textContent = "";
-        endDoseEl.textContent = "";
+        fields.startDoseEl.textContent = "";
+        fields.endDoseEl.textContent = "";
         return;
       }
 
@@ -940,8 +951,8 @@ const UISetup = {
         Number(APP_CONFIG.defaults.taper.maxDoseClamp)
       );
 
-      startDoseEl.textContent = Formatters.dose(startDose);
-      endDoseEl.textContent = Formatters.dose(endDose);
+      fields.startDoseEl.textContent = Formatters.dose(startDose);
+      fields.endDoseEl.textContent = Formatters.dose(endDose);
       runningDose = endDose;
     });
   },
