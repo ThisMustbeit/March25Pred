@@ -221,8 +221,8 @@ textarea {
 }
 
 .custom-override-panel {
-  overflow: hidden;
-  max-height: 800px;
+  overflow: visible;
+  max-height: 1400px;
   opacity: 1;
   transition: max-height 0.22s ease, opacity 0.18s ease;
 }
@@ -231,6 +231,7 @@ textarea {
   max-height: 0;
   opacity: 0;
   pointer-events: none;
+  overflow: hidden;
 }
 
 .validation-summary {
