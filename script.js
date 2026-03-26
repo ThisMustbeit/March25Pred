@@ -134,6 +134,14 @@ const Formatters = {
     return `${text} mg`;
   },
 
+  tabletCount(value) {
+    const normalized = Number(value);
+    if (Number.isInteger(normalized)) {
+      return String(normalized);
+    }
+    return normalized.toFixed(1).replace(/\.0$/, "");
+  },
+
   plural(word, count) {
     return count === 1 ? word : `${word}s`;
   },
@@ -163,9 +171,21 @@ const Html = {
 const Strengths = {
   create(inputValues) {
     return [
-      { key: "A", value: inputValues.tabletStrengthA ?? null },
-      { key: "B", value: inputValues.tabletStrengthB ?? null },
-      { key: "C", value: inputValues.tabletStrengthC ?? null },
+      {
+        key: "A",
+        value: inputValues.tabletStrengthA ?? null,
+        allowPartial: Boolean(inputValues.allowPartialTablets),
+      },
+      {
+        key: "B",
+        value: inputValues.tabletStrengthB ?? null,
+        allowPartial: Boolean(inputValues.allowPartialTablets),
+      },
+      {
+        key: "C",
+        value: inputValues.tabletStrengthC ?? null,
+        allowPartial: Boolean(inputValues.allowPartialTablets),
+      },
     ].filter((strength) => strength.value != null && strength.value > 0);
   },
 
@@ -181,23 +201,121 @@ const Strengths = {
     return errors;
   },
 
-  allocateDose(doseMg, strengths) {
-    let remaining = NumberUtils.isNearZero(doseMg) ? 0 : doseMg;
+  getTabletStep(strength) {
+    return strength.allowPartial ? 0.5 : 1;
+  },
 
-    const allocations = strengths.map((strength) => {
-      const count = Math.floor(remaining / strength.value);
-      remaining -= count * strength.value;
-      return {
+  buildEmptyAllocationResult(strengths) {
+    return {
+      allocations: strengths.map((strength) => ({
         key: strength.key,
         strength: strength.value,
-        count,
-      };
-    });
+        count: 0,
+        usedPartial: false,
+      })),
+      finalRemainder: 0,
+      usedPartialTablet: false,
+    };
+  },
+
+  buildAllocationResult(strengths, counts, finalRemainder) {
+    const allocations = strengths.map((strength, index) => ({
+      key: strength.key,
+      strength: strength.value,
+      count: counts[index] ?? 0,
+      usedPartial: !Number.isInteger(counts[index] ?? 0),
+    }));
 
     return {
       allocations,
-      finalRemainder: NumberUtils.sanitizeRemainder(remaining),
+      finalRemainder: NumberUtils.sanitizeRemainder(finalRemainder),
+      usedPartialTablet: allocations.some((item) => item.usedPartial),
     };
+  },
+
+  allocateDoseWholeOnly(doseMg, strengths) {
+    let remaining = NumberUtils.isNearZero(doseMg) ? 0 : doseMg;
+    const counts = strengths.map((strength) => {
+      const count = Math.floor(remaining / strength.value);
+      remaining -= count * strength.value;
+      return count;
+    });
+
+    return Strengths.buildAllocationResult(strengths, counts, remaining);
+  },
+
+  compareCandidates(candidateA, candidateB) {
+    if (!candidateA) return candidateB;
+    if (!candidateB) return candidateA;
+
+    if (candidateA.partialUnits !== candidateB.partialUnits) {
+      return candidateA.partialUnits < candidateB.partialUnits ? candidateA : candidateB;
+    }
+
+    if (candidateA.totalTablets !== candidateB.totalTablets) {
+      return candidateA.totalTablets < candidateB.totalTablets ? candidateA : candidateB;
+    }
+
+    for (let index = 0; index < candidateA.counts.length; index += 1) {
+      if (candidateA.counts[index] !== candidateB.counts[index]) {
+        return candidateA.counts[index] > candidateB.counts[index] ? candidateA : candidateB;
+      }
+    }
+
+    return candidateA;
+  },
+
+  createCandidate(counts) {
+    return {
+      counts,
+      partialUnits: counts.filter((count) => !Number.isInteger(count)).length,
+      totalTablets: counts.reduce((sum, count) => sum + count, 0),
+    };
+  },
+
+  findExactAllocationWithPartials(doseMg, strengths) {
+    const targetDose = NumberUtils.isNearZero(doseMg) ? 0 : doseMg;
+    let bestCandidate = null;
+
+    const search = (index, remaining, counts) => {
+      if (index === strengths.length) {
+        if (NumberUtils.isNearZero(remaining)) {
+          bestCandidate = Strengths.compareCandidates(bestCandidate, Strengths.createCandidate(counts));
+        }
+        return;
+      }
+
+      const strength = strengths[index];
+      const step = Strengths.getTabletStep(strength);
+      const maxCount = Math.floor(targetDose / strength.value / step) * step;
+
+      for (let count = maxCount; count >= 0; count -= step) {
+        const doseUsed = count * strength.value;
+        const nextRemaining = NumberUtils.sanitizeRemainder(remaining - doseUsed);
+        if (nextRemaining < -APP_CONFIG.epsilon) {
+          continue;
+        }
+
+        search(index + 1, nextRemaining, [...counts, Number(NumberUtils.sanitizeRemainder(count))]);
+      }
+    };
+
+    search(0, targetDose, []);
+    return bestCandidate ? Strengths.buildAllocationResult(strengths, bestCandidate.counts, 0) : null;
+  },
+
+  allocateDose(doseMg, strengths, options = {}) {
+    if (NumberUtils.isNearZero(doseMg)) {
+      return Strengths.buildEmptyAllocationResult(strengths);
+    }
+
+    const wholeOnlyResult = Strengths.allocateDoseWholeOnly(doseMg, strengths);
+    if (!options.allowPartialTablets || NumberUtils.isNearZero(wholeOnlyResult.finalRemainder)) {
+      return wholeOnlyResult;
+    }
+
+    const exactPartialResult = Strengths.findExactAllocationWithPartials(doseMg, strengths);
+    return exactPartialResult || wholeOnlyResult;
   },
 
   buildTabletLines(allocations) {
@@ -205,14 +323,16 @@ const Strengths = {
       .filter((item) => item.count > 0)
       .map(
         (item) =>
-          `${item.count} ${Formatters.plural("tablet", item.count)} of ${Formatters.dose(item.strength)}`
+          `${Formatters.tabletCount(item.count)} ${Formatters.plural("tablet", item.count)} of ${Formatters.dose(
+            item.strength
+          )}`
       );
   },
 
   buildCompactSummary(allocations, doseMg) {
     const parts = allocations
       .filter((item) => item.count > 0)
-      .map((item) => `${item.count} x ${Formatters.dose(item.strength)}`);
+      .map((item) => `${Formatters.tabletCount(item.count)} x ${Formatters.dose(item.strength)}`);
 
     if (parts.length === 0 && NumberUtils.isNearZero(doseMg)) {
       return "";
@@ -355,7 +475,9 @@ const ScheduleLogic = {
   buildScheduleRow(date, dayIndex, inputs) {
     const doseMg = Templates.doseForDay(dayIndex, inputs);
     const stepIndex = Templates.standardStepIndex(dayIndex, inputs.daysPerStep);
-    const allocation = Strengths.allocateDose(doseMg, inputs.strengths);
+    const allocation = Strengths.allocateDose(doseMg, inputs.strengths, {
+      allowPartialTablets: inputs.allowPartialTablets,
+    });
     const warning = ScheduleLogic.getExactnessWarning(doseMg, allocation);
     const printableText = ScheduleLogic.buildPrintableText(doseMg, allocation, warning);
 
@@ -496,9 +618,9 @@ const ViewModelFactory = {
         ["Taper End", summary.taperEndDate ? Formatters.date(summary.taperEndDate) : "-"],
         ["Total Taper Days", String(summary.totalTaperDays)],
         ["Last Daily Dose", summary.lastDailyDose == null ? "-" : Formatters.dose(summary.lastDailyDose)],
-        ["Tablet A Total", String(summary.tabletTotals.A)],
-        ["Tablet B Total", String(summary.tabletTotals.B)],
-        ["Tablet C Total", String(summary.tabletTotals.C)],
+        ["Tablet A Total", Formatters.tabletCount(summary.tabletTotals.A)],
+        ["Tablet B Total", Formatters.tabletCount(summary.tabletTotals.B)],
+        ["Tablet C Total", Formatters.tabletCount(summary.tabletTotals.C)],
         ["Total mg Dispensed", Formatters.dose(summary.totalMgDispensed)],
         ["Warning Days", String(summary.warningDays)],
         ["Mode", mode],
@@ -590,6 +712,7 @@ const InputFactory = {
       ...InputFactory.readDateInputs(),
       ...InputFactory.readNumericInputs(),
       useCustomOverride: DOMRefs.form.useCustomOverride.checked,
+      allowPartialTablets: DOMRefs.form.allowPartialTablets.checked,
     };
 
     const customSegments = InputFactory.readCustomSegments(errors);
@@ -720,9 +843,9 @@ const DOMBuilders = {
             <td>${row.dayIndex}</td>
             <td>${row.stepIndex}</td>
             <td>${Html.escape(Formatters.dose(row.doseMg))}</td>
-            <td>${counts.A ?? 0}</td>
-            <td>${counts.B ?? 0}</td>
-            <td>${counts.C ?? 0}</td>
+            <td>${Html.escape(Formatters.tabletCount(counts.A ?? 0))}</td>
+            <td>${Html.escape(Formatters.tabletCount(counts.B ?? 0))}</td>
+            <td>${Html.escape(Formatters.tabletCount(counts.C ?? 0))}</td>
             <td>${warningBadge}</td>
             <td class="pre">${Html.escape(row.printableText)}</td>
           </tr>
