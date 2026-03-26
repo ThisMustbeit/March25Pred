@@ -603,6 +603,66 @@ const CalendarLogic = {
 };
 
 const ViewModelFactory = {
+  buildTabletSummaryItems(inputs, summary) {
+    const tabletItems = [];
+
+    if (inputs.tabletStrengthA != null) {
+      tabletItems.push({
+        label: `${Formatters.dose(inputs.tabletStrengthA)} tablets used`,
+        value: Formatters.tabletCount(summary.tabletTotals.A),
+        level: "secondary",
+      });
+    }
+
+    if (inputs.tabletStrengthB != null) {
+      tabletItems.push({
+        label: `${Formatters.dose(inputs.tabletStrengthB)} tablets used`,
+        value: Formatters.tabletCount(summary.tabletTotals.B),
+        level: "secondary",
+      });
+    }
+
+    if (inputs.tabletStrengthC != null) {
+      tabletItems.push({
+        label: `${Formatters.dose(inputs.tabletStrengthC)} tablets used`,
+        value: Formatters.tabletCount(summary.tabletTotals.C),
+        level: "secondary",
+      });
+    }
+
+    return tabletItems;
+  },
+
+  buildSummaryItems(inputs, summary, mode) {
+    return {
+      primary: [
+        { label: "Start Date", value: Formatters.date(inputs.taperStartDate), level: "primary" },
+        {
+          label: "End Date",
+          value: summary.taperEndDate ? Formatters.date(summary.taperEndDate) : "-",
+          level: "primary",
+        },
+        { label: "Total Days", value: String(summary.totalTaperDays), level: "primary" },
+        {
+          label: "Final Daily Dose",
+          value: summary.lastDailyDose == null ? "-" : Formatters.dose(summary.lastDailyDose),
+          level: "primary",
+        },
+      ],
+      secondary: [
+        ...ViewModelFactory.buildTabletSummaryItems(inputs, summary),
+        { label: "Total Dispensed", value: Formatters.dose(summary.totalMgDispensed), level: "secondary" },
+        {
+          label: "Warning Count",
+          value: String(summary.warningDays),
+          level: "secondary",
+          tone: summary.warningDays > 0 ? "warning" : "success",
+        },
+        { label: "Schedule Type", value: mode, level: "secondary", badge: true, tone: "neutral" },
+      ],
+    };
+  },
+
   create(inputs, scheduleRows, summary, calendars) {
     const mode = Messages.modeLabel(inputs.useCustomOverride);
     const calendarStatus =
@@ -613,18 +673,7 @@ const ViewModelFactory = {
           )} through ${Formatters.monthYear(calendars[calendars.length - 1].monthStart)}.`;
 
     return {
-      summaryItems: [
-        ["Taper Start", Formatters.date(inputs.taperStartDate)],
-        ["Taper End", summary.taperEndDate ? Formatters.date(summary.taperEndDate) : "-"],
-        ["Total Taper Days", String(summary.totalTaperDays)],
-        ["Last Daily Dose", summary.lastDailyDose == null ? "-" : Formatters.dose(summary.lastDailyDose)],
-        ["Tablet A Total", Formatters.tabletCount(summary.tabletTotals.A)],
-        ["Tablet B Total", Formatters.tabletCount(summary.tabletTotals.B)],
-        ["Tablet C Total", Formatters.tabletCount(summary.tabletTotals.C)],
-        ["Total mg Dispensed", Formatters.dose(summary.totalMgDispensed)],
-        ["Warning Days", String(summary.warningDays)],
-        ["Mode", mode],
-      ],
+      summaryItems: ViewModelFactory.buildSummaryItems(inputs, summary, mode),
       calendarTitle:
         calendars.length === 0
           ? "Month Calendar"
@@ -735,17 +784,39 @@ const InputFactory = {
 };
 
 const DOMBuilders = {
-  summaryMarkup(items) {
-    return items
-      .map(
-        ([label, value]) => `
-          <dl class="summary-item">
-            <dt>${Html.escape(label)}</dt>
-            <dd>${Html.escape(value)}</dd>
-          </dl>
-        `
-      )
-      .join("");
+  summaryValueMarkup(item) {
+    if (item.badge) {
+      return `<span class="summary-value-badge summary-value-badge--${Html.escape(item.tone || "neutral")}">${Html.escape(
+        item.value
+      )}</span>`;
+    }
+
+    return Html.escape(item.value);
+  },
+
+  summaryItemMarkup(item) {
+    const classes = ["summary-item", `summary-item--${item.level || "secondary"}`];
+    if (item.tone) {
+      classes.push(`summary-item--${item.tone}`);
+    }
+
+    return `
+      <dl class="${classes.join(" ")}">
+        <dt>${Html.escape(item.label)}</dt>
+        <dd>${DOMBuilders.summaryValueMarkup(item)}</dd>
+      </dl>
+    `;
+  },
+
+  summaryMarkup(groups) {
+    return `
+      <div class="summary-group summary-group--primary">
+        ${groups.primary.map(DOMBuilders.summaryItemMarkup).join("")}
+      </div>
+      <div class="summary-group summary-group--secondary">
+        ${groups.secondary.map(DOMBuilders.summaryItemMarkup).join("")}
+      </div>
+    `;
   },
 
   calendarCellMarkup(cell) {
