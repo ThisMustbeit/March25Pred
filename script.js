@@ -459,17 +459,27 @@ const ScheduleLogic = {
     return NumberUtils.isNearZero(allocation.finalRemainder) ? "" : Messages.exactDoseWarning();
   },
 
-  buildPrintableText(doseMg, allocation, warning) {
+  buildInstructionParts(doseMg, allocation, warning) {
     if (NumberUtils.isNearZero(doseMg)) {
-      return "";
+      return {
+        totalLine: "",
+        tabletLines: [],
+        warningLine: "",
+      };
     }
 
-    if (warning) {
-      return `${warning}\nTotal = ${Formatters.dose(doseMg)}`;
-    }
+    return {
+      totalLine: `Total = ${Formatters.dose(doseMg)}`,
+      tabletLines: Strengths.buildTabletLines(allocation.allocations),
+      warningLine: warning || "",
+    };
+  },
 
-    const tabletLines = Strengths.buildTabletLines(allocation.allocations);
-    return [...tabletLines, `Total = ${Formatters.dose(doseMg)}`].join("\n");
+  buildPrintableText(doseMg, allocation, warning) {
+    const instructionParts = ScheduleLogic.buildInstructionParts(doseMg, allocation, warning);
+    return [instructionParts.totalLine, ...instructionParts.tabletLines, instructionParts.warningLine]
+      .filter(Boolean)
+      .join("\n");
   },
 
   buildScheduleRow(date, dayIndex, inputs) {
@@ -479,6 +489,7 @@ const ScheduleLogic = {
       allowPartialTablets: inputs.allowPartialTablets,
     });
     const warning = ScheduleLogic.getExactnessWarning(doseMg, allocation);
+    const instructionParts = ScheduleLogic.buildInstructionParts(doseMg, allocation, warning);
     const printableText = ScheduleLogic.buildPrintableText(doseMg, allocation, warning);
 
     return {
@@ -489,6 +500,7 @@ const ScheduleLogic = {
       strengths: inputs.strengths,
       allocations: allocation.allocations,
       warning,
+      instructionParts,
       printableText,
       compactTabletSummary: Strengths.buildCompactSummary(allocation.allocations, doseMg),
     };
@@ -825,15 +837,15 @@ const DOMBuilders = {
     if (cell.scheduleRow?.warning) classes.push("warning");
 
     const hasVisibleDose = cell.scheduleRow && !NumberUtils.isNearZero(cell.scheduleRow.doseMg);
-    const dose = hasVisibleDose ? Formatters.dose(cell.scheduleRow.doseMg) : "";
-    const combo = hasVisibleDose ? cell.scheduleRow.compactTabletSummary : "";
-    const warning = hasVisibleDose ? cell.scheduleRow?.warning ?? "" : "";
+    const totalLine = hasVisibleDose ? cell.scheduleRow.instructionParts.totalLine : "";
+    const tabletLines = hasVisibleDose ? cell.scheduleRow.instructionParts.tabletLines.join("\n") : "";
+    const warning = hasVisibleDose ? cell.scheduleRow.instructionParts.warningLine : "";
 
     return `
       <article class="${classes.join(" ")}">
         <div class="calendar-date">${cell.date.getDate()}</div>
-        <div class="calendar-dose">${Html.escape(dose)}</div>
-        <div class="calendar-combo">${Html.escape(combo)}</div>
+        <div class="calendar-dose">${Html.escape(totalLine)}</div>
+        <div class="calendar-combo">${Html.escape(tabletLines)}</div>
         ${warning ? `<div class="calendar-warning">${Html.escape(warning)}</div>` : ""}
       </article>
     `;
@@ -997,21 +1009,21 @@ const DOMBuilders = {
     }
 
     const lines = [
-      `<div class="print-dose-line">${Html.escape(Formatters.dose(cell.scheduleRow.doseMg))}</div>`,
+      `<div class="print-dose-line">${Html.escape(cell.scheduleRow.instructionParts.totalLine)}</div>`,
     ];
 
-    if (cell.scheduleRow.compactTabletSummary) {
+    if (cell.scheduleRow.instructionParts.tabletLines.length > 0) {
       lines.push(
-        `<div class="print-tablet-line">${Html.escape(cell.scheduleRow.compactTabletSummary).replace(
+        `<div class="print-tablet-line">${Html.escape(cell.scheduleRow.instructionParts.tabletLines.join("\n")).replace(
           /\n/g,
           "<br>"
         )}</div>`
       );
     }
 
-    if (cell.scheduleRow.warning) {
+    if (cell.scheduleRow.instructionParts.warningLine) {
       lines.push(
-        `<div class="print-day-warning">${Html.escape(cell.scheduleRow.warning)}</div>`
+        `<div class="print-day-warning">${Html.escape(cell.scheduleRow.instructionParts.warningLine)}</div>`
       );
     }
 

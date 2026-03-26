@@ -491,7 +491,8 @@ main {
 
 .calendar-dose {
   font-weight: 700;
-  font-size: 0.86rem;
+  font-size: 0.97rem;
+  line-height: 1.2;
   color: var(--accent-dark);
 }
 
@@ -503,9 +504,14 @@ main {
   color: var(--text);
 }
 
+.calendar-combo {
+  color: #365064;
+}
+
 .calendar-warning {
   color: #8a4d00;
   font-weight: 600;
+  margin-top: 0.1rem;
 }
 
 .outside-month .calendar-combo,
@@ -661,6 +667,7 @@ main {
 .schedule-table td.pre {
   white-space: pre-line;
   min-width: 210px;
+  line-height: 1.45;
 }
 
 .schedule-table tr,
