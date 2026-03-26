@@ -654,7 +654,6 @@ const DOMRefs = {
   tableCard: document.getElementById("table-card"),
   scheduleBody: document.getElementById("schedule-body"),
   printButton: document.getElementById("print-button"),
-  compactPrintToggle: document.getElementById("compact-print-toggle"),
   calendarViewInputs: [...document.querySelectorAll('input[name="calendarView"]')],
 };
 
@@ -988,7 +987,6 @@ const DOMRenderer = {
     const selectedView =
       DOMRefs.calendarViewInputs.find((input) => input.checked)?.value || "calendar";
 
-    document.body.classList.toggle("compact-print", DOMRefs.compactPrintToggle.checked);
     document.body.classList.toggle("printing", false);
     DOMRefs.calendarMonths.classList.toggle("hidden", selectedView === "list");
     DOMRefs.calendarList.classList.toggle("hidden", selectedView === "calendar");
@@ -1137,7 +1135,6 @@ const AppController = {
     DOMRefs.customSegmentBody.addEventListener("click", AppController.handleCustomRowDelete);
     DOMRefs.addSegmentRowButton.addEventListener("click", AppController.handleAddCustomRow);
     DOMRefs.printButton.addEventListener("click", AppController.handlePrint);
-    DOMRefs.compactPrintToggle.addEventListener("change", DOMRenderer.syncLayoutControls);
     DOMRefs.calendarViewInputs.forEach((input) =>
       input.addEventListener("change", DOMRenderer.syncLayoutControls)
     );

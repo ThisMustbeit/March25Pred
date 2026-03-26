@@ -43,6 +43,11 @@ textarea {
   padding: 2.5rem 0 3.75rem;
 }
 
+main {
+  display: grid;
+  gap: 2rem;
+}
+
 .hero,
 .card {
   background: var(--surface);
@@ -151,6 +156,7 @@ textarea {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
   gap: 1.25rem;
+  align-items: start;
 }
 
 .group {
@@ -158,6 +164,7 @@ textarea {
   border-radius: var(--radius-sm);
   padding: 1.2rem;
   min-width: 0;
+  align-self: start;
 }
 
 .group-wide {
@@ -299,10 +306,6 @@ textarea {
 }
 
 .toggle-group input {
-  margin: 0;
-}
-
-.compact-toggle {
   margin: 0;
 }
 
@@ -878,37 +881,4 @@ textarea {
     color: transparent;
   }
 
-  body.compact-print .print-page {
-    width: 6.9in;
-    padding-top: 0.18in;
-  }
-
-  body.compact-print .print-title-block {
-    font-size: 15px;
-  }
-
-  body.compact-print .print-label-box {
-    width: 2.2in;
-    height: 1.28in;
-  }
-
-  body.compact-print .print-month-banner {
-    width: 2in;
-    font-size: 11px;
-  }
-
-  body.compact-print .print-day-cell {
-    height: 0.8in;
-  }
-
-  body.compact-print .print-date-tab {
-    font-size: 6px;
-    min-height: 0.16in;
-  }
-
-  body.compact-print .print-day-body {
-    font-size: 6px;
-    line-height: 1.02;
-    padding-top: 0.2in;
-  }
 }
