@@ -944,6 +944,8 @@ const DOMBuilders = {
     const monthLabel = Formatters.monthYear(calendar.monthStart);
     const weekdayLabels = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
     const printableWeeks = DOMBuilders.getPrintableWeeks(calendar);
+    const printDisclaimer =
+      "Disclaimer: This tool generates medication taper calendars based on user-entered information. Output should be reviewed and verified by the prescribing clinician before use. Confirm dosing, duration, and patient instructions according to clinical judgment, product labeling, and institutional protocols.";
 
     return `
       <section class="print-month">
@@ -967,6 +969,15 @@ const DOMBuilders = {
             <div class="print-calendar-grid">
               ${printableWeeks.flat().map(DOMBuilders.printCalendarCellMarkup).join("")}
             </div>
+          </div>
+
+          <div class="print-signoff">
+            <div class="print-signature-line"></div>
+            <div class="print-signature-label">Licensed Healthcare Professional Signature</div>
+          </div>
+
+          <div class="print-disclaimer">
+            ${Html.escape(printDisclaimer)}
           </div>
         </div>
       </section>

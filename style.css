@@ -548,6 +548,27 @@ main {
   color: var(--muted);
 }
 
+.disclaimer-card {
+  display: grid;
+  gap: 0.75rem;
+}
+
+.disclaimer-card .section-heading {
+  margin-bottom: 0.35rem;
+}
+
+.disclaimer-copy {
+  display: grid;
+  gap: 0.75rem;
+  color: var(--muted);
+  line-height: 1.6;
+  font-size: 0.96rem;
+}
+
+.disclaimer-copy p {
+  margin: 0;
+}
+
 .table-scroll {
   overflow-x: auto;
 }
@@ -816,6 +837,8 @@ main {
     min-height: 9.55in;
     margin: 0 auto;
     padding: 0.28in 0 0;
+    display: flex;
+    flex-direction: column;
   }
 
   .print-header {
@@ -852,6 +875,33 @@ main {
     position: relative;
     width: 100%;
     padding-top: 0.18in;
+  }
+
+  .print-signoff {
+    margin-top: 0.14in;
+    padding: 0 0.04in;
+  }
+
+  .print-signature-line {
+    height: 0;
+    border-bottom: 1px solid #000;
+  }
+
+  .print-signature-label {
+    margin-top: 0.06in;
+    font-family: Arial, sans-serif;
+    font-size: 10px;
+    font-weight: 700;
+    color: #000;
+  }
+
+  .print-disclaimer {
+    margin-top: auto;
+    padding: 0.16in 0.04in 0;
+    font-family: Arial, sans-serif;
+    font-size: 8.5px;
+    line-height: 1.28;
+    color: #333;
   }
 
   .print-month-banner {
