@@ -2,22 +2,16 @@ const APP_CONFIG = {
   epsilon: 1e-6,
   defaultCustomSegmentCount: 3,
   maxCustomSegmentCount: 8,
-  drugs: {
-    prednisone: {
-      id: "prednisone",
-      name: "Prednisone",
-      units: "mg",
-      strengths: ["A", "B", "C"],
-    },
-  },
   messages: {
-    exactDoseWarning: "Dose not exact with selected tablet strengths",
+    exactDoseWarning: "Dose not exact with selected medication strengths",
     noSchedule: "No taper days to display yet.",
     customMode: "Custom taper override",
     standardMode: "Standard step taper",
   },
   defaults: {
     taper: {
+      drugName: "Prednisone",
+      dosageForm: "tablet",
       startingDose: "50",
       doseChangePerStep: "-4",
       daysPerStep: "2",
@@ -33,6 +27,46 @@ const APP_CONFIG = {
       ["-10", "7", "1"],
       ["-5", "14", "10"],
     ],
+  },
+};
+
+const MedicationTerms = {
+  normalizeDosageForm(value) {
+    return value === "capsule" ? "capsule" : "tablet";
+  },
+
+  singular(dosageForm) {
+    return MedicationTerms.normalizeDosageForm(dosageForm);
+  },
+
+  plural(dosageForm) {
+    return `${MedicationTerms.singular(dosageForm)}s`;
+  },
+
+  titleSingular(dosageForm) {
+    const singular = MedicationTerms.singular(dosageForm);
+    return singular.charAt(0).toUpperCase() + singular.slice(1);
+  },
+
+  strengthLabel(key, dosageForm) {
+    return `${MedicationTerms.titleSingular(dosageForm)} Strength ${key} (mg)`;
+  },
+
+  scheduleColumnLabel(key, dosageForm) {
+    return `${MedicationTerms.titleSingular(dosageForm)} ${key}`;
+  },
+
+  partialLabel(dosageForm) {
+    return `Allow partial ${MedicationTerms.plural(dosageForm)}`;
+  },
+
+  usageLabel(strengthValue, dosageForm) {
+    return `${Formatters.dose(strengthValue)} ${MedicationTerms.plural(dosageForm)} used`;
+  },
+
+  printableTitle(drugName) {
+    const normalized = String(drugName || "").trim();
+    return normalized || APP_CONFIG.defaults.taper.drugName;
   },
 };
 
@@ -194,7 +228,7 @@ const Strengths = {
     for (let index = 0; index < strengths.length - 1; index += 1) {
       if (strengths[index].value < strengths[index + 1].value) {
         errors.push(
-          `Tablet strength ${strengths[index].key} should be greater than or equal to tablet strength ${strengths[index + 1].key}.`
+          `Strength ${strengths[index].key} should be greater than or equal to strength ${strengths[index + 1].key}.`
         );
       }
     }
@@ -318,14 +352,15 @@ const Strengths = {
     return exactPartialResult || wholeOnlyResult;
   },
 
-  buildTabletLines(allocations) {
+  buildTabletLines(allocations, dosageForm = "tablet") {
     return allocations
       .filter((item) => item.count > 0)
       .map(
         (item) =>
-          `${Formatters.tabletCount(item.count)} ${Formatters.plural("tablet", item.count)} of ${Formatters.dose(
-            item.strength
-          )}`
+          `${Formatters.tabletCount(item.count)} ${Formatters.plural(
+            MedicationTerms.singular(dosageForm),
+            item.count
+          )} of ${Formatters.dose(item.strength)}`
       );
   },
 
@@ -365,13 +400,13 @@ const Validation = {
       errors.push("Minimum dose clamp cannot be greater than maximum dose clamp.");
     }
     if (inputs.tabletStrengthA == null || inputs.tabletStrengthA <= 0) {
-      errors.push("Tablet strength A is required and must be greater than 0.");
+      errors.push("Strength A is required and must be greater than 0.");
     }
     if (inputs.tabletStrengthB != null && inputs.tabletStrengthB <= 0) {
-      errors.push("Tablet strength B must be greater than 0 if provided.");
+      errors.push("Strength B must be greater than 0 if provided.");
     }
     if (inputs.tabletStrengthC != null && inputs.tabletStrengthC <= 0) {
-      errors.push("Tablet strength C must be greater than 0 if provided.");
+      errors.push("Strength C must be greater than 0 if provided.");
     }
 
     errors.push(...Strengths.validateOrder(inputs.strengths));
@@ -459,7 +494,7 @@ const ScheduleLogic = {
     return NumberUtils.isNearZero(allocation.finalRemainder) ? "" : Messages.exactDoseWarning();
   },
 
-  buildInstructionParts(doseMg, allocation, warning) {
+  buildInstructionParts(doseMg, allocation, warning, dosageForm = "tablet") {
     if (NumberUtils.isNearZero(doseMg)) {
       return {
         totalLine: "",
@@ -470,13 +505,18 @@ const ScheduleLogic = {
 
     return {
       totalLine: `Total = ${Formatters.dose(doseMg)}`,
-      tabletLines: Strengths.buildTabletLines(allocation.allocations),
+      tabletLines: Strengths.buildTabletLines(allocation.allocations, dosageForm),
       warningLine: warning || "",
     };
   },
 
-  buildPrintableText(doseMg, allocation, warning) {
-    const instructionParts = ScheduleLogic.buildInstructionParts(doseMg, allocation, warning);
+  buildPrintableText(doseMg, allocation, warning, dosageForm = "tablet") {
+    const instructionParts = ScheduleLogic.buildInstructionParts(
+      doseMg,
+      allocation,
+      warning,
+      dosageForm
+    );
     return [instructionParts.totalLine, ...instructionParts.tabletLines, instructionParts.warningLine]
       .filter(Boolean)
       .join("\n");
@@ -489,8 +529,18 @@ const ScheduleLogic = {
       allowPartialTablets: inputs.allowPartialTablets,
     });
     const warning = ScheduleLogic.getExactnessWarning(doseMg, allocation);
-    const instructionParts = ScheduleLogic.buildInstructionParts(doseMg, allocation, warning);
-    const printableText = ScheduleLogic.buildPrintableText(doseMg, allocation, warning);
+    const instructionParts = ScheduleLogic.buildInstructionParts(
+      doseMg,
+      allocation,
+      warning,
+      inputs.dosageForm
+    );
+    const printableText = ScheduleLogic.buildPrintableText(
+      doseMg,
+      allocation,
+      warning,
+      inputs.dosageForm
+    );
 
     return {
       date,
@@ -620,7 +670,7 @@ const ViewModelFactory = {
 
     if (inputs.tabletStrengthA != null) {
       tabletItems.push({
-        label: `${Formatters.dose(inputs.tabletStrengthA)} tablets used`,
+        label: MedicationTerms.usageLabel(inputs.tabletStrengthA, inputs.dosageForm),
         value: Formatters.tabletCount(summary.tabletTotals.A),
         level: "secondary",
       });
@@ -628,7 +678,7 @@ const ViewModelFactory = {
 
     if (inputs.tabletStrengthB != null) {
       tabletItems.push({
-        label: `${Formatters.dose(inputs.tabletStrengthB)} tablets used`,
+        label: MedicationTerms.usageLabel(inputs.tabletStrengthB, inputs.dosageForm),
         value: Formatters.tabletCount(summary.tabletTotals.B),
         level: "secondary",
       });
@@ -636,7 +686,7 @@ const ViewModelFactory = {
 
     if (inputs.tabletStrengthC != null) {
       tabletItems.push({
-        label: `${Formatters.dose(inputs.tabletStrengthC)} tablets used`,
+        label: MedicationTerms.usageLabel(inputs.tabletStrengthC, inputs.dosageForm),
         value: Formatters.tabletCount(summary.tabletTotals.C),
         level: "secondary",
       });
@@ -716,6 +766,13 @@ const DOMRefs = {
   scheduleBody: document.getElementById("schedule-body"),
   printButton: document.getElementById("print-button"),
   calendarViewInputs: [...document.querySelectorAll('input[name="calendarView"]')],
+  strengthLabelA: document.getElementById("strength-label-a"),
+  strengthLabelB: document.getElementById("strength-label-b"),
+  strengthLabelC: document.getElementById("strength-label-c"),
+  partialUnitsLabel: document.getElementById("partial-units-label"),
+  scheduleStrengthColA: document.getElementById("schedule-strength-col-a"),
+  scheduleStrengthColB: document.getElementById("schedule-strength-col-b"),
+  scheduleStrengthColC: document.getElementById("schedule-strength-col-c"),
 };
 
 const InputFactory = {
@@ -773,6 +830,8 @@ const InputFactory = {
       ...InputFactory.readNumericInputs(),
       useCustomOverride: DOMRefs.form.useCustomOverride.checked,
       allowPartialTablets: DOMRefs.form.allowPartialTablets.checked,
+      drugName: (DOMRefs.form.drugName.value || APP_CONFIG.defaults.taper.drugName).trim(),
+      dosageForm: MedicationTerms.normalizeDosageForm(DOMRefs.form.dosageForm.value),
     };
 
     const customSegments = InputFactory.readCustomSegments(errors);
@@ -781,7 +840,6 @@ const InputFactory = {
       ...baseInputs,
       customSegments,
       strengths,
-      drugId: APP_CONFIG.drugs.prednisone.id,
     };
 
     errors.push(...Validation.validateInputs(inputs));
@@ -894,7 +952,7 @@ const DOMBuilders = {
                 ${
                   hasVisibleDose
                     ? `<p><strong>Total dose:</strong> ${Html.escape(Formatters.dose(row.doseMg))}</p>
-                <p><strong>Tablet combination:</strong><br>${Html.escape(row.compactTabletSummary).replace(
+                <p><strong>Strength breakdown:</strong><br>${Html.escape(row.compactTabletSummary).replace(
                   /\n/g,
                   "<br>"
                 )}</p>
@@ -946,13 +1004,16 @@ const DOMBuilders = {
     const printableWeeks = DOMBuilders.getPrintableWeeks(calendar);
     const printDisclaimer =
       "Disclaimer: This tool generates medication taper calendars based on user-entered information. Output should be reviewed and verified by the prescribing clinician before use. Confirm dosing, duration, and patient instructions according to clinical judgment, product labeling, and institutional protocols.";
+    const printableDrugName = MedicationTerms.printableTitle(
+      DOMRefs.form?.drugName?.value || APP_CONFIG.defaults.taper.drugName
+    );
 
     return `
       <section class="print-month">
         <div class="print-page">
           <div class="print-header">
             <div class="print-title-block">
-              <div>PREDNISONE</div>
+              <div>${Html.escape(printableDrugName.toUpperCase())}</div>
               <div>DOSAGE</div>
               <div>CALENDAR</div>
             </div>
@@ -1089,6 +1150,18 @@ const DOMRenderer = {
 };
 
 const UISetup = {
+  syncMedicationLabels() {
+    const dosageForm = MedicationTerms.normalizeDosageForm(DOMRefs.form.dosageForm.value);
+
+    DOMRefs.strengthLabelA.textContent = MedicationTerms.strengthLabel("A", dosageForm);
+    DOMRefs.strengthLabelB.textContent = MedicationTerms.strengthLabel("B", dosageForm);
+    DOMRefs.strengthLabelC.textContent = MedicationTerms.strengthLabel("C", dosageForm);
+    DOMRefs.partialUnitsLabel.textContent = MedicationTerms.partialLabel(dosageForm);
+    DOMRefs.scheduleStrengthColA.textContent = MedicationTerms.scheduleColumnLabel("A", dosageForm);
+    DOMRefs.scheduleStrengthColB.textContent = MedicationTerms.scheduleColumnLabel("B", dosageForm);
+    DOMRefs.scheduleStrengthColC.textContent = MedicationTerms.scheduleColumnLabel("C", dosageForm);
+  },
+
   syncCustomOverrideVisibility() {
     const isVisible = DOMRefs.form.useCustomOverride.checked;
     DOMRefs.customOverridePanel.classList.toggle("is-hidden", !isVisible);
@@ -1214,6 +1287,7 @@ const UISetup = {
     });
 
     UISetup.rebuildCustomSegmentRows(APP_CONFIG.defaults.customSegments);
+    UISetup.syncMedicationLabels();
     UISetup.syncCustomOverrideVisibility();
   },
 };
@@ -1224,6 +1298,7 @@ const AppController = {
     DOMRefs.form.addEventListener("submit", AppController.handleGenerate);
     DOMRefs.form.addEventListener("reset", AppController.handleReset);
     DOMRefs.form.useCustomOverride.addEventListener("change", UISetup.syncCustomOverrideVisibility);
+    DOMRefs.form.dosageForm.addEventListener("change", UISetup.syncMedicationLabels);
     DOMRefs.form.startingDose.addEventListener("input", UISetup.syncCustomSegmentDoseHelpers);
     DOMRefs.customSegmentBody.addEventListener("input", UISetup.syncCustomSegmentDoseHelpers);
     DOMRefs.customSegmentBody.addEventListener("click", AppController.handleCustomRowDelete);
