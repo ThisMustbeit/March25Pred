@@ -13,7 +13,8 @@ const APP_CONFIG = {
       drugName: "Prednisone",
       dosageForm: "tablet",
       startingDose: "50",
-      doseChangePerStep: "-4",
+      doseChangePerStep: "4",
+      doseChangeDirection: "reduce",
       daysPerStep: "2",
       totalSteps: "30",
       minDoseClamp: "0",
@@ -423,13 +424,18 @@ const Validation = {
 
   validateCustomSegment(segment, index) {
     const errors = [];
+    if (segment.repeats < 0 || segment.repeats > 100) {
+      errors.push(`Custom row ${index + 1} repeats must be between 0 and 100.`);
+    }
+
+    if (segment.repeats === 0) {
+      return errors;
+    }
+
     if (segment.daysPerStep < 1 || segment.daysPerStep > 365) {
       errors.push(`Custom row ${index + 1} days per step must be between 1 and 365.`);
     }
-    if (segment.repeats < 1 || segment.repeats > 100) {
-      errors.push(`Custom row ${index + 1} repeats must be between 1 and 100.`);
-    }
-    if (segment.doseChange < -1000 || segment.doseChange > 1000) {
+    if (index !== 0 && (segment.doseChange < -1000 || segment.doseChange > 1000)) {
       errors.push(`Custom row ${index + 1} dose change must be between -1000 and 1000 mg.`);
     }
     return errors;
@@ -452,6 +458,7 @@ const Templates = {
   },
 
   startedRepeatCount(dayIndex, segmentStartDay, daysPerStep, repeats) {
+    if (daysPerStep <= 0 || repeats <= 0) return 0;
     if (dayIndex < segmentStartDay) return 0;
     return Math.min(repeats, Math.floor((dayIndex - segmentStartDay) / daysPerStep) + 1);
   },
@@ -467,7 +474,7 @@ const Templates = {
     let segmentStartDay = 0;
 
     for (const segment of inputs.customSegments) {
-      if (!segment) continue;
+      if (!segment || segment.repeats <= 0 || segment.daysPerStep <= 0) continue;
       const startedCount = Templates.startedRepeatCount(
         dayIndex,
         segmentStartDay,
@@ -773,9 +780,17 @@ const DOMRefs = {
   scheduleStrengthColA: document.getElementById("schedule-strength-col-a"),
   scheduleStrengthColB: document.getElementById("schedule-strength-col-b"),
   scheduleStrengthColC: document.getElementById("schedule-strength-col-c"),
+  doseChangeDirectionInput: document.getElementById("dose-change-direction"),
+  doseDirectionButtons: [...document.querySelectorAll("[data-dose-direction]")],
 };
 
 const InputFactory = {
+  signedDoseChange(value, direction) {
+    if (value == null) return null;
+    const magnitude = Math.abs(value);
+    return direction === "increase" ? magnitude : -magnitude;
+  },
+
   readDateInputs() {
     return {
       taperStartDate: InputFactory.parseDate(DOMRefs.form.taperStartDate.value),
@@ -785,7 +800,7 @@ const InputFactory = {
   readNumericInputs() {
     return {
       startingDose: NumberUtils.parseOptionalNumber(DOMRefs.form.startingDose.value),
-      doseChangePerStep: NumberUtils.parseOptionalNumber(DOMRefs.form.doseChangePerStep.value),
+      doseChangeMagnitude: NumberUtils.parseOptionalNumber(DOMRefs.form.doseChangePerStep.value),
       daysPerStep: NumberUtils.parseOptionalInteger(DOMRefs.form.daysPerStep.value),
       totalSteps: NumberUtils.parseOptionalInteger(DOMRefs.form.totalSteps.value),
       tabletStrengthA: NumberUtils.parseOptionalNumber(DOMRefs.form.tabletStrengthA.value),
@@ -799,21 +814,26 @@ const InputFactory = {
   readCustomSegments(errors) {
     return [...DOMRefs.customSegmentBody.querySelectorAll("tr")].map((row, index) => {
       const fields = UISetup.getCustomRowFields(row);
-      const values = [
-        fields.doseChangeInput.value.trim(),
-        fields.daysPerStepInput.value.trim(),
-        fields.repeatsInput.value.trim(),
-      ];
-      const allBlank = values.every((value) => value === "");
+      const doseChangeValue = index === 0 ? "0" : fields.doseChangeInput.value.trim();
+      const daysValue = fields.daysPerStepInput.value.trim();
+      const repeatsValue = fields.repeatsInput.value.trim();
+      const allBlank = index === 0
+        ? daysValue === "" && repeatsValue === ""
+        : doseChangeValue === "" && daysValue === "" && repeatsValue === "";
+
       if (allBlank) return null;
 
       const segment = {
-        doseChange: NumberUtils.parseOptionalNumber(values[0]),
-        daysPerStep: NumberUtils.parseOptionalInteger(values[1]),
-        repeats: NumberUtils.parseOptionalInteger(values[2]),
+        doseChange: index === 0 ? 0 : NumberUtils.parseOptionalNumber(doseChangeValue),
+        daysPerStep: daysValue === "" ? 0 : NumberUtils.parseOptionalInteger(daysValue),
+        repeats: repeatsValue === "" ? 0 : NumberUtils.parseOptionalInteger(repeatsValue),
       };
 
-      if (segment.doseChange == null || segment.daysPerStep == null || segment.repeats == null) {
+      if (
+        segment.doseChange == null ||
+        segment.daysPerStep == null ||
+        segment.repeats == null
+      ) {
         errors.push(`Custom row ${index + 1} must have dose change, days per step, and repeats.`);
         return null;
       }
@@ -832,7 +852,13 @@ const InputFactory = {
       allowPartialTablets: DOMRefs.form.allowPartialTablets.checked,
       drugName: (DOMRefs.form.drugName.value || APP_CONFIG.defaults.taper.drugName).trim(),
       dosageForm: MedicationTerms.normalizeDosageForm(DOMRefs.form.dosageForm.value),
+      doseChangeDirection: DOMRefs.form.doseChangeDirection.value || APP_CONFIG.defaults.taper.doseChangeDirection,
     };
+
+    baseInputs.doseChangePerStep = InputFactory.signedDoseChange(
+      baseInputs.doseChangeMagnitude,
+      baseInputs.doseChangeDirection
+    );
 
     const customSegments = InputFactory.readCustomSegments(errors);
     const strengths = Strengths.create(baseInputs);
@@ -1150,6 +1176,17 @@ const DOMRenderer = {
 };
 
 const UISetup = {
+  syncDoseChangeDirectionButtons() {
+    const activeDirection =
+      DOMRefs.doseChangeDirectionInput.value || APP_CONFIG.defaults.taper.doseChangeDirection;
+
+    DOMRefs.doseDirectionButtons.forEach((button) => {
+      const isActive = button.dataset.doseDirection === activeDirection;
+      button.classList.toggle("is-active", isActive);
+      button.setAttribute("aria-pressed", String(isActive));
+    });
+  },
+
   syncMedicationLabels() {
     const dosageForm = MedicationTerms.normalizeDosageForm(DOMRefs.form.dosageForm.value);
 
@@ -1202,10 +1239,18 @@ const UISetup = {
   reindexCustomSegmentRows() {
     [...DOMRefs.customSegmentBody.querySelectorAll("tr")].forEach((row, index) => {
       const fields = UISetup.getCustomRowFields(row);
+      const isFirstSegment = index === 0;
+
       row.querySelector(".segment-label").textContent = `Segment ${index + 1}`;
+      row.classList.toggle("is-first-segment", isFirstSegment);
       fields.doseChangeInput.name = `customDoseChange${index}`;
       fields.daysPerStepInput.name = `customDaysPerStep${index}`;
       fields.repeatsInput.name = `customRepeats${index}`;
+      fields.doseChangeInput.disabled = isFirstSegment;
+
+      if (isFirstSegment) {
+        fields.doseChangeInput.value = "0";
+      }
     });
   },
 
@@ -1229,8 +1274,12 @@ const UISetup = {
 
     rows.forEach((row) => {
       const fields = UISetup.getCustomRowFields(row);
-      const doseChange = NumberUtils.parseOptionalNumber(fields.doseChangeInput.value.trim());
-      const repeats = NumberUtils.parseOptionalInteger(fields.repeatsInput.value.trim());
+      const isFirstSegment = row.classList.contains("is-first-segment");
+      const doseChange = isFirstSegment
+        ? 0
+        : NumberUtils.parseOptionalNumber(fields.doseChangeInput.value.trim());
+      const repeatsValue = fields.repeatsInput.value.trim();
+      const repeats = repeatsValue === "" ? 0 : NumberUtils.parseOptionalInteger(repeatsValue);
 
       if (doseChange == null || repeats == null) {
         fields.startDoseEl.textContent = "";
@@ -1287,6 +1336,7 @@ const UISetup = {
     });
 
     UISetup.rebuildCustomSegmentRows(APP_CONFIG.defaults.customSegments);
+    UISetup.syncDoseChangeDirectionButtons();
     UISetup.syncMedicationLabels();
     UISetup.syncCustomOverrideVisibility();
   },
@@ -1299,6 +1349,9 @@ const AppController = {
     DOMRefs.form.addEventListener("reset", AppController.handleReset);
     DOMRefs.form.useCustomOverride.addEventListener("change", UISetup.syncCustomOverrideVisibility);
     DOMRefs.form.dosageForm.addEventListener("change", UISetup.syncMedicationLabels);
+    DOMRefs.doseDirectionButtons.forEach((button) =>
+      button.addEventListener("click", AppController.handleDoseDirectionClick)
+    );
     DOMRefs.form.startingDose.addEventListener("input", UISetup.syncCustomSegmentDoseHelpers);
     DOMRefs.customSegmentBody.addEventListener("input", UISetup.syncCustomSegmentDoseHelpers);
     DOMRefs.customSegmentBody.addEventListener("click", AppController.handleCustomRowDelete);
@@ -1330,6 +1383,14 @@ const AppController = {
     UISetup.reindexCustomSegmentRows();
     UISetup.syncCustomSegmentDoseHelpers();
     UISetup.syncCustomSegmentControls();
+  },
+
+  handleDoseDirectionClick(event) {
+    const direction = event.currentTarget.dataset.doseDirection;
+    if (!direction) return;
+
+    DOMRefs.doseChangeDirectionInput.value = direction;
+    UISetup.syncDoseChangeDirectionButtons();
   },
 
   handleCustomRowDelete(event) {

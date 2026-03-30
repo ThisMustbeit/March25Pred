@@ -55,7 +55,28 @@
               </label>
               <label>
                 <span>Dose Change Per Step (mg)</span>
-                <input id="dose-change-per-step" name="doseChangePerStep" type="number" step="0.1" required>
+                <div class="step-change-control">
+                  <div class="direction-toggle" role="group" aria-label="Dose change direction">
+                    <button
+                      id="dose-direction-reduce"
+                      type="button"
+                      class="direction-toggle-button is-active"
+                      data-dose-direction="reduce"
+                    >
+                      Reduce by
+                    </button>
+                    <button
+                      id="dose-direction-increase"
+                      type="button"
+                      class="direction-toggle-button"
+                      data-dose-direction="increase"
+                    >
+                      Increase by
+                    </button>
+                  </div>
+                  <input id="dose-change-per-step" name="doseChangePerStep" type="number" step="0.1" min="0" required>
+                  <input id="dose-change-direction" name="doseChangeDirection" type="hidden" value="reduce">
+                </div>
               </label>
               <label>
                 <span>Days Per Step</span>
@@ -102,7 +123,7 @@
               <fieldset class="group group-wide">
                 <legend>Custom Taper Override</legend>
                 <p class="help-text">
-                  Row 1 starts on the taper start date. Use 0 mg in the first row if you want to hold the starting dose first.
+                  Segment 1 starts on the taper start date and always uses the starting dose. Leave repeats blank if you want that segment to count as 0.
                 </p>
                 <div class="table-scroll">
                   <table class="input-table">
@@ -254,12 +275,15 @@
   </div>
 
   <template id="segment-row-template">
-    <tr>
+    <tr class="custom-segment-row">
       <td class="segment-label"></td>
       <td class="dose-helper"><span class="helper-dose helper-dose-start"></span></td>
-      <td><input class="segment-dose-change" type="number" step="0.1" min="-1000" max="1000"></td>
+      <td class="segment-dose-change-cell">
+        <input class="segment-dose-change" type="number" step="0.1" min="-1000" max="1000">
+        <span class="segment-dose-static">Starting dose</span>
+      </td>
       <td><input class="segment-days-per-step" type="number" step="1" min="1" max="365"></td>
-      <td><input class="segment-repeats" type="number" step="1" min="1" max="100"></td>
+      <td><input class="segment-repeats" type="number" step="1" min="0" max="100"></td>
       <td class="dose-helper"><span class="helper-dose helper-dose-end"></span></td>
       <td class="row-action-cell">
         <button type="button" class="row-delete-button" aria-label="Delete custom taper row" data-icon="×">&times;</button>

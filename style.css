@@ -211,6 +211,46 @@ main {
   border-color: var(--accent);
 }
 
+.step-change-control {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr);
+  gap: 0.65rem;
+  align-items: center;
+}
+
+.direction-toggle {
+  display: inline-flex;
+  gap: 0.3rem;
+  padding: 0.25rem;
+  border: 1px solid var(--border);
+  border-radius: 999px;
+  background: #f5f9fb;
+  width: fit-content;
+}
+
+.direction-toggle-button {
+  border: none;
+  border-radius: 999px;
+  padding: 0.5rem 0.85rem;
+  background: transparent;
+  color: var(--muted);
+  font: inherit;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 140ms ease, color 140ms ease, box-shadow 140ms ease;
+}
+
+.direction-toggle-button.is-active {
+  background: #ffffff;
+  color: var(--accent-dark);
+  box-shadow: 0 2px 8px rgba(18, 59, 86, 0.08);
+}
+
+.direction-toggle-button:focus-visible {
+  outline: 2px solid rgba(29, 106, 140, 0.22);
+  outline-offset: 1px;
+}
+
 .checkbox-row {
   grid-template-columns: auto 1fr;
   align-items: center;
@@ -620,6 +660,22 @@ main {
   white-space: nowrap;
 }
 
+.segment-dose-static {
+  display: none;
+  color: var(--muted);
+  font-weight: 600;
+}
+
+.custom-segment-row.is-first-segment .segment-dose-change {
+  display: none;
+}
+
+.custom-segment-row.is-first-segment .segment-dose-static {
+  display: inline-flex;
+  align-items: center;
+  min-height: 44px;
+}
+
 .helper-dose:empty::before {
   content: "-";
   color: #9fb0b8;
@@ -758,6 +814,10 @@ main {
   .summary-group--primary,
   .summary-group--secondary {
     grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .step-change-control {
+    grid-template-columns: 1fr;
   }
 
   .month-grid {
