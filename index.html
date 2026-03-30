@@ -40,7 +40,7 @@
         <form id="taper-form" novalidate>
           <div class="form-grid">
             <fieldset class="group">
-              <legend>Primary Taper</legend>
+              <legend>Medication &amp; Start</legend>
               <label>
                 <span>Medication Name</span>
                 <input id="drug-name" name="drugName" type="text" maxlength="80" required>
@@ -49,6 +49,10 @@
                 <span>Taper Start Date</span>
                 <input id="taper-start-date" name="taperStartDate" type="date" required>
               </label>
+            </fieldset>
+
+            <fieldset class="group">
+              <legend>Primary Taper</legend>
               <label>
                 <span>Starting Daily Dose (mg)</span>
                 <input id="starting-dose" name="startingDose" type="number" step="0.1" min="0" required>
@@ -84,7 +88,13 @@
               </label>
               <label>
                 <span>Total Taper Steps</span>
-                <input id="total-steps" name="totalSteps" type="number" min="0" step="1" required>
+                <div class="inline-action-control">
+                  <input id="total-steps" name="totalSteps" type="number" min="0" step="1" required>
+                  <button id="total-steps-discontinuation" type="button" class="inline-action-button">
+                    Til Discontinuation
+                  </button>
+                  <input id="total-steps-mode" name="totalStepsMode" type="hidden" value="manual">
+                </div>
               </label>
               <label class="checkbox-row">
                 <input id="use-custom-override" name="useCustomOverride" type="checkbox">

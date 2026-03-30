@@ -17,6 +17,7 @@ const APP_CONFIG = {
       doseChangeDirection: "reduce",
       daysPerStep: "2",
       totalSteps: "30",
+      totalStepsMode: "manual",
       minDoseClamp: "0",
       maxDoseClamp: "1000",
       tabletStrengthA: "5",
@@ -392,7 +393,13 @@ const Validation = {
     if (inputs.daysPerStep == null || inputs.daysPerStep < 1) {
       errors.push("Days per step must be at least 1.");
     }
-    if (inputs.totalSteps == null || inputs.totalSteps < 0) {
+    if (inputs.totalStepsMode === "discontinuation") {
+      if (inputs.doseChangePerStep == null || inputs.doseChangePerStep >= 0) {
+        errors.push("Til discontinuation requires a reducing dose change greater than 0.");
+      } else if (inputs.totalSteps == null || inputs.totalSteps < 0) {
+        errors.push("Unable to calculate total taper steps til discontinuation.");
+      }
+    } else if (inputs.totalSteps == null || inputs.totalSteps < 0) {
       errors.push("Total taper steps must be 0 or greater.");
     }
     if (inputs.minDoseClamp == null || inputs.maxDoseClamp == null) {
@@ -782,6 +789,8 @@ const DOMRefs = {
   scheduleStrengthColC: document.getElementById("schedule-strength-col-c"),
   doseChangeDirectionInput: document.getElementById("dose-change-direction"),
   doseDirectionButtons: [...document.querySelectorAll("[data-dose-direction]")],
+  totalStepsModeInput: document.getElementById("total-steps-mode"),
+  totalStepsDiscontinuationButton: document.getElementById("total-steps-discontinuation"),
 };
 
 const InputFactory = {
@@ -789,6 +798,13 @@ const InputFactory = {
     if (value == null) return null;
     const magnitude = Math.abs(value);
     return direction === "increase" ? magnitude : -magnitude;
+  },
+
+  stepsTilDiscontinuation(startingDose, signedDoseChange) {
+    if (startingDose == null || signedDoseChange == null) return null;
+    if (startingDose <= 0) return 0;
+    if (signedDoseChange >= 0) return null;
+    return Math.ceil(Math.abs(startingDose / signedDoseChange));
   },
 
   readDateInputs() {
@@ -802,7 +818,7 @@ const InputFactory = {
       startingDose: NumberUtils.parseOptionalNumber(DOMRefs.form.startingDose.value),
       doseChangeMagnitude: NumberUtils.parseOptionalNumber(DOMRefs.form.doseChangePerStep.value),
       daysPerStep: NumberUtils.parseOptionalInteger(DOMRefs.form.daysPerStep.value),
-      totalSteps: NumberUtils.parseOptionalInteger(DOMRefs.form.totalSteps.value),
+      manualTotalSteps: NumberUtils.parseOptionalInteger(DOMRefs.form.totalSteps.value),
       tabletStrengthA: NumberUtils.parseOptionalNumber(DOMRefs.form.tabletStrengthA.value),
       tabletStrengthB: NumberUtils.parseOptionalNumber(DOMRefs.form.tabletStrengthB.value),
       tabletStrengthC: NumberUtils.parseOptionalNumber(DOMRefs.form.tabletStrengthC.value),
@@ -853,12 +869,17 @@ const InputFactory = {
       drugName: (DOMRefs.form.drugName.value || APP_CONFIG.defaults.taper.drugName).trim(),
       dosageForm: MedicationTerms.normalizeDosageForm(DOMRefs.form.dosageForm.value),
       doseChangeDirection: DOMRefs.form.doseChangeDirection.value || APP_CONFIG.defaults.taper.doseChangeDirection,
+      totalStepsMode: DOMRefs.form.totalStepsMode.value || APP_CONFIG.defaults.taper.totalStepsMode,
     };
 
     baseInputs.doseChangePerStep = InputFactory.signedDoseChange(
       baseInputs.doseChangeMagnitude,
       baseInputs.doseChangeDirection
     );
+    baseInputs.totalSteps =
+      baseInputs.totalStepsMode === "discontinuation"
+        ? InputFactory.stepsTilDiscontinuation(baseInputs.startingDose, baseInputs.doseChangePerStep)
+        : baseInputs.manualTotalSteps;
 
     const customSegments = InputFactory.readCustomSegments(errors);
     const strengths = Strengths.create(baseInputs);
@@ -1187,6 +1208,32 @@ const UISetup = {
     });
   },
 
+  syncTotalStepsMode() {
+    const isDiscontinuationMode =
+      (DOMRefs.totalStepsModeInput.value || APP_CONFIG.defaults.taper.totalStepsMode) ===
+      "discontinuation";
+
+    DOMRefs.totalStepsDiscontinuationButton.classList.toggle("is-active", isDiscontinuationMode);
+    DOMRefs.totalStepsDiscontinuationButton.setAttribute(
+      "aria-pressed",
+      String(isDiscontinuationMode)
+    );
+
+    if (isDiscontinuationMode) {
+      if (!DOMRefs.form.totalSteps.disabled) {
+        DOMRefs.form.totalSteps.dataset.manualValue = DOMRefs.form.totalSteps.value;
+      }
+      DOMRefs.form.totalSteps.value = "";
+      DOMRefs.form.totalSteps.disabled = true;
+      return;
+    }
+
+    DOMRefs.form.totalSteps.disabled = false;
+    if (DOMRefs.form.totalSteps.value === "" && DOMRefs.form.totalSteps.dataset.manualValue) {
+      DOMRefs.form.totalSteps.value = DOMRefs.form.totalSteps.dataset.manualValue;
+    }
+  },
+
   syncMedicationLabels() {
     const dosageForm = MedicationTerms.normalizeDosageForm(DOMRefs.form.dosageForm.value);
 
@@ -1337,6 +1384,7 @@ const UISetup = {
 
     UISetup.rebuildCustomSegmentRows(APP_CONFIG.defaults.customSegments);
     UISetup.syncDoseChangeDirectionButtons();
+    UISetup.syncTotalStepsMode();
     UISetup.syncMedicationLabels();
     UISetup.syncCustomOverrideVisibility();
   },
@@ -1351,6 +1399,10 @@ const AppController = {
     DOMRefs.form.dosageForm.addEventListener("change", UISetup.syncMedicationLabels);
     DOMRefs.doseDirectionButtons.forEach((button) =>
       button.addEventListener("click", AppController.handleDoseDirectionClick)
+    );
+    DOMRefs.totalStepsDiscontinuationButton.addEventListener(
+      "click",
+      AppController.handleTotalStepsModeToggle
     );
     DOMRefs.form.startingDose.addEventListener("input", UISetup.syncCustomSegmentDoseHelpers);
     DOMRefs.customSegmentBody.addEventListener("input", UISetup.syncCustomSegmentDoseHelpers);
@@ -1391,6 +1443,12 @@ const AppController = {
 
     DOMRefs.doseChangeDirectionInput.value = direction;
     UISetup.syncDoseChangeDirectionButtons();
+  },
+
+  handleTotalStepsModeToggle() {
+    DOMRefs.totalStepsModeInput.value =
+      DOMRefs.totalStepsModeInput.value === "discontinuation" ? "manual" : "discontinuation";
+    UISetup.syncTotalStepsMode();
   },
 
   handleCustomRowDelete(event) {

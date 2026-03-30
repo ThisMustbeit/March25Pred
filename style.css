@@ -37,6 +37,17 @@ textarea {
   font: inherit;
 }
 
+input[type="number"]::-webkit-outer-spin-button,
+input[type="number"]::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+
+input[type="number"] {
+  -moz-appearance: textfield;
+  appearance: textfield;
+}
+
 .app-shell {
   width: min(1200px, calc(100% - 2rem));
   margin: 0 auto;
@@ -211,9 +222,22 @@ main {
   border-color: var(--accent);
 }
 
+.group input:disabled {
+  background: #f3f7f9;
+  color: #8fa0a8;
+  cursor: not-allowed;
+}
+
 .step-change-control {
   display: grid;
   grid-template-columns: auto minmax(0, 1fr);
+  gap: 0.65rem;
+  align-items: center;
+}
+
+.inline-action-control {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
   gap: 0.65rem;
   align-items: center;
 }
@@ -247,6 +271,29 @@ main {
 }
 
 .direction-toggle-button:focus-visible {
+  outline: 2px solid rgba(29, 106, 140, 0.22);
+  outline-offset: 1px;
+}
+
+.inline-action-button {
+  border: 1px solid var(--border-strong);
+  border-radius: 999px;
+  padding: 0.75rem 0.95rem;
+  background: #f6fafc;
+  color: var(--accent-dark);
+  font: inherit;
+  font-weight: 600;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: background 140ms ease, color 140ms ease, box-shadow 140ms ease;
+}
+
+.inline-action-button.is-active {
+  background: #ffffff;
+  box-shadow: 0 2px 8px rgba(18, 59, 86, 0.08);
+}
+
+.inline-action-button:focus-visible {
   outline: 2px solid rgba(29, 106, 140, 0.22);
   outline-offset: 1px;
 }
@@ -817,6 +864,10 @@ main {
   }
 
   .step-change-control {
+    grid-template-columns: 1fr;
+  }
+
+  .inline-action-control {
     grid-template-columns: 1fr;
   }
 
