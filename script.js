@@ -12,11 +12,28 @@ const APP_CONFIG = {
     taper: {
       drugName: "Prednisone",
       dosageForm: "tablet",
+      startingDose: "",
+      doseChangePerStep: "",
+      doseChangeDirection: "reduce",
+      daysPerStep: "",
+      totalSteps: "",
+      finalDose: "",
+      totalStepsMode: "manual",
+      minDoseClamp: "0",
+      maxDoseClamp: "1000",
+      tabletStrengthA: "",
+      tabletStrengthB: "",
+      tabletStrengthC: "",
+    },
+    exampleTaper: {
+      drugName: "Prednisone",
+      dosageForm: "tablet",
       startingDose: "50",
       doseChangePerStep: "4",
       doseChangeDirection: "reduce",
       daysPerStep: "2",
       totalSteps: "30",
+      finalDose: "",
       totalStepsMode: "manual",
       minDoseClamp: "0",
       maxDoseClamp: "1000",
@@ -24,7 +41,7 @@ const APP_CONFIG = {
       tabletStrengthB: "",
       tabletStrengthC: "1",
     },
-    customSegments: [
+    exampleCustomSegments: [
       ["0", "7", "1"],
       ["-10", "7", "1"],
       ["-5", "14", "10"],
@@ -779,6 +796,7 @@ const DOMRefs = {
   tableCard: document.getElementById("table-card"),
   scheduleBody: document.getElementById("schedule-body"),
   printButton: document.getElementById("print-button"),
+  loadExampleButton: document.getElementById("load-example-button"),
   calendarViewInputs: [...document.querySelectorAll('input[name="calendarView"]')],
   strengthLabelA: document.getElementById("strength-label-a"),
   strengthLabelB: document.getElementById("strength-label-b"),
@@ -1437,7 +1455,7 @@ const UISetup = {
     });
   },
 
-  rebuildCustomSegmentRows(valuesList = APP_CONFIG.defaults.customSegments) {
+  rebuildCustomSegmentRows(valuesList = []) {
     DOMRefs.customSegmentBody.innerHTML = "";
 
     valuesList.slice(0, APP_CONFIG.maxCustomSegmentCount).forEach((values) => UISetup.appendCustomSegmentRow(values));
@@ -1462,22 +1480,31 @@ const UISetup = {
     DOMRefs.addSegmentRowButton.disabled = rowCount >= APP_CONFIG.maxCustomSegmentCount;
   },
 
-  applyDefaults() {
+  applyFormDefaults(taperDefaults, customSegments = []) {
     const now = new Date();
     DOMRefs.form.taperStartDate.value = DateUtils.toDateInputValue(now);
+    DOMRefs.form.totalSteps.dataset.manualValue = "";
 
-    Object.entries(APP_CONFIG.defaults.taper).forEach(([key, value]) => {
+    Object.entries(taperDefaults).forEach(([key, value]) => {
       if (DOMRefs.form[key]) {
         DOMRefs.form[key].value = value;
       }
     });
 
-    UISetup.rebuildCustomSegmentRows(APP_CONFIG.defaults.customSegments);
+    UISetup.rebuildCustomSegmentRows(customSegments);
     UISetup.syncDoseChangeDirectionButtons();
     UISetup.syncTotalStepsMode();
     UISetup.syncStandardTaperDerivedFields("steps");
     UISetup.syncMedicationLabels();
     UISetup.syncCustomOverrideVisibility();
+  },
+
+  applyDefaults() {
+    UISetup.applyFormDefaults(APP_CONFIG.defaults.taper, []);
+  },
+
+  loadExample() {
+    UISetup.applyFormDefaults(APP_CONFIG.defaults.exampleTaper, APP_CONFIG.defaults.exampleCustomSegments);
   },
 };
 
@@ -1495,6 +1522,7 @@ const AppController = {
       "click",
       AppController.handleTotalStepsModeToggle
     );
+    DOMRefs.loadExampleButton.addEventListener("click", AppController.handleLoadExample);
     DOMRefs.form.startingDose.addEventListener("input", UISetup.syncCustomSegmentDoseHelpers);
     DOMRefs.form.startingDose.addEventListener("input", () => UISetup.syncStandardTaperDerivedFields("steps"));
     DOMRefs.form.doseChangePerStep.addEventListener("input", () => UISetup.syncStandardTaperDerivedFields("steps"));
@@ -1522,6 +1550,11 @@ const AppController = {
       UISetup.applyDefaults();
       AppController.render();
     }, 0);
+  },
+
+  handleLoadExample() {
+    UISetup.loadExample();
+    AppController.render();
   },
 
   handleAddCustomRow() {

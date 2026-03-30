@@ -33,6 +33,7 @@
           </div>
           <div class="form-actions no-print">
             <button id="generate-button" type="submit" form="taper-form" class="button">Generate Schedule</button>
+            <button id="load-example-button" type="button" class="button button-secondary">Load an Example</button>
             <button id="reset-button" type="reset" form="taper-form" class="button button-secondary">Reset</button>
           </div>
         </div>
@@ -89,18 +90,18 @@
               <div class="paired-field-grid">
                 <label>
                   <span>Total Taper Steps</span>
-                  <div class="inline-action-control">
-                    <input id="total-steps" name="totalSteps" type="number" min="0" step="1" required>
-                    <button id="total-steps-discontinuation" type="button" class="inline-action-button">
-                      Til Discontinuation
-                    </button>
-                    <input id="total-steps-mode" name="totalStepsMode" type="hidden" value="manual">
-                  </div>
+                  <input id="total-steps" name="totalSteps" type="number" min="0" step="1" required>
                 </label>
                 <label>
                   <span>Final Dose (mg)</span>
                   <input id="final-dose" name="finalDose" type="number" min="0" step="0.1">
                 </label>
+                <div class="paired-field-action">
+                  <button id="total-steps-discontinuation" type="button" class="inline-action-button">
+                    Til Discontinuation
+                  </button>
+                  <input id="total-steps-mode" name="totalStepsMode" type="hidden" value="manual">
+                </div>
               </div>
               <label class="checkbox-row">
                 <input id="use-custom-override" name="useCustomOverride" type="checkbox">
