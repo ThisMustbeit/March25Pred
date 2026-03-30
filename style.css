@@ -166,6 +166,9 @@ main {
 .form-grid {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
+  grid-template-areas:
+    "med-start primary"
+    "strengths primary";
   gap: 1.25rem;
   align-items: start;
 }
@@ -184,6 +187,19 @@ main {
 
 .group-wide-panel {
   grid-column: 1 / -1;
+}
+
+.group-med-start {
+  grid-area: med-start;
+}
+
+.group-primary-taper {
+  grid-area: primary;
+  height: 100%;
+}
+
+.group-strengths {
+  grid-area: strengths;
 }
 
 .group legend {
@@ -240,6 +256,17 @@ main {
   grid-template-columns: minmax(0, 1fr) auto;
   gap: 0.65rem;
   align-items: center;
+}
+
+.paired-field-grid {
+  display: grid;
+  grid-template-columns: minmax(0, 1.25fr) minmax(0, 0.85fr);
+  gap: 0.85rem;
+  margin-bottom: 1rem;
+}
+
+.paired-field-grid label {
+  margin-bottom: 0;
 }
 
 .direction-toggle {
@@ -835,6 +862,10 @@ main {
 
   .form-grid {
     grid-template-columns: 1fr;
+    grid-template-areas:
+      "med-start"
+      "primary"
+      "strengths";
   }
 
   .calendar-cell {
@@ -868,6 +899,10 @@ main {
   }
 
   .inline-action-control {
+    grid-template-columns: 1fr;
+  }
+
+  .paired-field-grid {
     grid-template-columns: 1fr;
   }
 

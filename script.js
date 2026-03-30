@@ -789,6 +789,7 @@ const DOMRefs = {
   scheduleStrengthColC: document.getElementById("schedule-strength-col-c"),
   doseChangeDirectionInput: document.getElementById("dose-change-direction"),
   doseDirectionButtons: [...document.querySelectorAll("[data-dose-direction]")],
+  finalDoseInput: document.getElementById("final-dose"),
   totalStepsModeInput: document.getElementById("total-steps-mode"),
   totalStepsDiscontinuationButton: document.getElementById("total-steps-discontinuation"),
 };
@@ -800,11 +801,45 @@ const InputFactory = {
     return direction === "increase" ? magnitude : -magnitude;
   },
 
+  finalDoseForSteps(startingDose, signedDoseChange, totalSteps) {
+    if (startingDose == null || signedDoseChange == null || totalSteps == null || totalSteps < 1) {
+      return null;
+    }
+
+    let effectiveSteps = totalSteps;
+
+    if (signedDoseChange < 0) {
+      const discontinuationSteps = InputFactory.stepsTilDiscontinuation(startingDose, signedDoseChange);
+      if (discontinuationSteps != null) {
+        effectiveSteps = Math.min(totalSteps, discontinuationSteps);
+      }
+    }
+
+    const lastStepIndex = Math.max(effectiveSteps - 1, 0);
+    return NumberUtils.clamp(
+      startingDose + lastStepIndex * signedDoseChange,
+      Number(APP_CONFIG.defaults.taper.minDoseClamp),
+      Number(APP_CONFIG.defaults.taper.maxDoseClamp)
+    );
+  },
+
   stepsTilDiscontinuation(startingDose, signedDoseChange) {
     if (startingDose == null || signedDoseChange == null) return null;
     if (startingDose <= 0) return 0;
     if (signedDoseChange >= 0) return null;
     return Math.ceil(Math.abs(startingDose / signedDoseChange));
+  },
+
+  stepsForFinalDose(startingDose, signedDoseChange, finalDose) {
+    if (startingDose == null || signedDoseChange == null || finalDose == null) return null;
+    if (signedDoseChange === 0) return finalDose === startingDose ? 1 : null;
+    if (signedDoseChange < 0 && finalDose <= 0) {
+      return InputFactory.stepsTilDiscontinuation(startingDose, signedDoseChange);
+    }
+
+    const rawSteps = (finalDose - startingDose) / signedDoseChange + 1;
+    if (!Number.isFinite(rawSteps)) return null;
+    return Math.max(1, Math.round(rawSteps));
   },
 
   readDateInputs() {
@@ -819,6 +854,7 @@ const InputFactory = {
       doseChangeMagnitude: NumberUtils.parseOptionalNumber(DOMRefs.form.doseChangePerStep.value),
       daysPerStep: NumberUtils.parseOptionalInteger(DOMRefs.form.daysPerStep.value),
       manualTotalSteps: NumberUtils.parseOptionalInteger(DOMRefs.form.totalSteps.value),
+      requestedFinalDose: NumberUtils.parseOptionalNumber(DOMRefs.form.finalDose.value),
       tabletStrengthA: NumberUtils.parseOptionalNumber(DOMRefs.form.tabletStrengthA.value),
       tabletStrengthB: NumberUtils.parseOptionalNumber(DOMRefs.form.tabletStrengthB.value),
       tabletStrengthC: NumberUtils.parseOptionalNumber(DOMRefs.form.tabletStrengthC.value),
@@ -880,6 +916,14 @@ const InputFactory = {
       baseInputs.totalStepsMode === "discontinuation"
         ? InputFactory.stepsTilDiscontinuation(baseInputs.startingDose, baseInputs.doseChangePerStep)
         : baseInputs.manualTotalSteps;
+    baseInputs.finalDose =
+      baseInputs.totalStepsMode === "discontinuation"
+        ? InputFactory.finalDoseForSteps(
+            baseInputs.startingDose,
+            baseInputs.doseChangePerStep,
+            baseInputs.totalSteps
+          )
+        : baseInputs.requestedFinalDose;
 
     const customSegments = InputFactory.readCustomSegments(errors);
     const strengths = Strengths.create(baseInputs);
@@ -1197,6 +1241,15 @@ const DOMRenderer = {
 };
 
 const UISetup = {
+  writeNumericInputValue(input, value) {
+    input.value =
+      value == null || Number.isNaN(value)
+        ? ""
+        : Number.isInteger(value)
+        ? String(value)
+        : value.toFixed(1).replace(/\.0$/, "");
+  },
+
   syncDoseChangeDirectionButtons() {
     const activeDirection =
       DOMRefs.doseChangeDirectionInput.value || APP_CONFIG.defaults.taper.doseChangeDirection;
@@ -1206,6 +1259,41 @@ const UISetup = {
       button.classList.toggle("is-active", isActive);
       button.setAttribute("aria-pressed", String(isActive));
     });
+  },
+
+  syncStandardTaperDerivedFields(source = "steps") {
+    const startingDose = NumberUtils.parseOptionalNumber(DOMRefs.form.startingDose.value);
+    const signedDoseChange = InputFactory.signedDoseChange(
+      NumberUtils.parseOptionalNumber(DOMRefs.form.doseChangePerStep.value),
+      DOMRefs.doseChangeDirectionInput.value || APP_CONFIG.defaults.taper.doseChangeDirection
+    );
+    const isDiscontinuationMode =
+      (DOMRefs.totalStepsModeInput.value || APP_CONFIG.defaults.taper.totalStepsMode) ===
+      "discontinuation";
+
+    if (isDiscontinuationMode) {
+      const discontinuationSteps = InputFactory.stepsTilDiscontinuation(startingDose, signedDoseChange);
+      const discontinuationFinalDose = InputFactory.finalDoseForSteps(
+        startingDose,
+        signedDoseChange,
+        discontinuationSteps
+      );
+      UISetup.writeNumericInputValue(DOMRefs.finalDoseInput, discontinuationFinalDose);
+      return;
+    }
+
+    if (source === "finalDose") {
+      const finalDose = NumberUtils.parseOptionalNumber(DOMRefs.finalDoseInput.value);
+      const totalSteps = InputFactory.stepsForFinalDose(startingDose, signedDoseChange, finalDose);
+      UISetup.writeNumericInputValue(DOMRefs.form.totalSteps, totalSteps);
+      const syncedFinalDose = InputFactory.finalDoseForSteps(startingDose, signedDoseChange, totalSteps);
+      UISetup.writeNumericInputValue(DOMRefs.finalDoseInput, syncedFinalDose);
+      return;
+    }
+
+    const totalSteps = NumberUtils.parseOptionalInteger(DOMRefs.form.totalSteps.value);
+    const finalDose = InputFactory.finalDoseForSteps(startingDose, signedDoseChange, totalSteps);
+    UISetup.writeNumericInputValue(DOMRefs.finalDoseInput, finalDose);
   },
 
   syncTotalStepsMode() {
@@ -1225,6 +1313,7 @@ const UISetup = {
       }
       DOMRefs.form.totalSteps.value = "";
       DOMRefs.form.totalSteps.disabled = true;
+      UISetup.syncStandardTaperDerivedFields("steps");
       return;
     }
 
@@ -1232,6 +1321,7 @@ const UISetup = {
     if (DOMRefs.form.totalSteps.value === "" && DOMRefs.form.totalSteps.dataset.manualValue) {
       DOMRefs.form.totalSteps.value = DOMRefs.form.totalSteps.dataset.manualValue;
     }
+    UISetup.syncStandardTaperDerivedFields("steps");
   },
 
   syncMedicationLabels() {
@@ -1385,6 +1475,7 @@ const UISetup = {
     UISetup.rebuildCustomSegmentRows(APP_CONFIG.defaults.customSegments);
     UISetup.syncDoseChangeDirectionButtons();
     UISetup.syncTotalStepsMode();
+    UISetup.syncStandardTaperDerivedFields("steps");
     UISetup.syncMedicationLabels();
     UISetup.syncCustomOverrideVisibility();
   },
@@ -1405,6 +1496,10 @@ const AppController = {
       AppController.handleTotalStepsModeToggle
     );
     DOMRefs.form.startingDose.addEventListener("input", UISetup.syncCustomSegmentDoseHelpers);
+    DOMRefs.form.startingDose.addEventListener("input", () => UISetup.syncStandardTaperDerivedFields("steps"));
+    DOMRefs.form.doseChangePerStep.addEventListener("input", () => UISetup.syncStandardTaperDerivedFields("steps"));
+    DOMRefs.form.totalSteps.addEventListener("input", () => UISetup.syncStandardTaperDerivedFields("steps"));
+    DOMRefs.finalDoseInput.addEventListener("input", AppController.handleFinalDoseInput);
     DOMRefs.customSegmentBody.addEventListener("input", UISetup.syncCustomSegmentDoseHelpers);
     DOMRefs.customSegmentBody.addEventListener("click", AppController.handleCustomRowDelete);
     DOMRefs.addSegmentRowButton.addEventListener("click", AppController.handleAddCustomRow);
@@ -1443,12 +1538,22 @@ const AppController = {
 
     DOMRefs.doseChangeDirectionInput.value = direction;
     UISetup.syncDoseChangeDirectionButtons();
+    UISetup.syncStandardTaperDerivedFields("steps");
   },
 
   handleTotalStepsModeToggle() {
     DOMRefs.totalStepsModeInput.value =
       DOMRefs.totalStepsModeInput.value === "discontinuation" ? "manual" : "discontinuation";
     UISetup.syncTotalStepsMode();
+  },
+
+  handleFinalDoseInput() {
+    if (DOMRefs.totalStepsModeInput.value === "discontinuation") {
+      DOMRefs.totalStepsModeInput.value = "manual";
+      UISetup.syncTotalStepsMode();
+    }
+
+    UISetup.syncStandardTaperDerivedFields("finalDose");
   },
 
   handleCustomRowDelete(event) {
