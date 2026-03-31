@@ -1198,16 +1198,18 @@ const DOMBuilders = {
       return "";
     }
 
+    const hasThreeStrengths = cell.scheduleRow.instructionParts.tabletLines.length >= 3;
     const lines = [
-      `<div class="print-dose-line">${Html.escape(cell.scheduleRow.instructionParts.totalLine)}</div>`,
+      `<div class="print-dose-line${hasThreeStrengths ? " print-dose-line--dense" : ""}">${Html.escape(
+        cell.scheduleRow.instructionParts.totalLine
+      )}</div>`,
     ];
 
     if (cell.scheduleRow.instructionParts.tabletLines.length > 0) {
       lines.push(
-        `<div class="print-tablet-line">${Html.escape(cell.scheduleRow.instructionParts.tabletLines.join("\n")).replace(
-          /\n/g,
-          "<br>"
-        )}</div>`
+        `<div class="print-tablet-line${hasThreeStrengths ? " print-tablet-line--dense" : ""}">${Html.escape(
+          cell.scheduleRow.instructionParts.tabletLines.join("\n")
+        ).replace(/\n/g, "<br>")}</div>`
       );
     }
 

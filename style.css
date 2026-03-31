@@ -1291,6 +1291,16 @@ main {
     font-size: 12px;
   }
 
+  body.print-layout-landscape .print-dose-line--dense {
+    font-size: 11px;
+    margin-bottom: 0.02in;
+  }
+
+  body.print-layout-landscape .print-tablet-line--dense {
+    font-size: 9.6px;
+    line-height: 1.08;
+  }
+
   body.print-layout-landscape .print-day-warning {
     font-size: 9.6px;
   }
