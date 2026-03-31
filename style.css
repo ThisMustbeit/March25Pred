@@ -1163,7 +1163,10 @@ main {
 
   .print-day-body {
     height: 100%;
-    padding: 0.22in 0.05in 0.05in;
+    padding: 0.18in 0.06in 0.06in;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
     font-family: Arial, sans-serif;
     font-size: 8.4px;
     line-height: 1.22;
@@ -1174,7 +1177,7 @@ main {
 
   .print-dose-line {
     font-weight: 700;
-    margin-bottom: 0.02in;
+    margin-bottom: 0.03in;
     text-align: center;
     font-size: 8.9px;
   }
@@ -1231,7 +1234,7 @@ main {
   }
 
   body.print-layout-landscape .print-day-cell {
-    height: 0.72in;
+    height: 0.82in;
   }
 
   body.print-layout-landscape .print-date-tab {
@@ -1240,17 +1243,17 @@ main {
   }
 
   body.print-layout-landscape .print-day-body {
-    padding: 0.19in 0.06in 0.04in;
-    font-size: 8px;
-    line-height: 1.16;
+    padding: 0.17in 0.06in 0.05in;
+    font-size: 10.4px;
+    line-height: 1.2;
   }
 
   body.print-layout-landscape .print-dose-line {
-    font-size: 8.4px;
+    font-size: 11.2px;
   }
 
   body.print-layout-landscape .print-day-warning {
-    font-size: 7.4px;
+    font-size: 9.4px;
   }
 
   body.print-layout-landscape .print-signoff {
