@@ -1199,12 +1199,12 @@ main {
 
   body.print-layout-landscape .print-page {
     width: 10.25in;
-    min-height: 7.4in;
-    padding-top: 0.28in;
+    min-height: 7.2in;
+    padding-top: 0.18in;
   }
 
   body.print-layout-landscape .print-header {
-    margin-bottom: 0.32in;
+    margin-bottom: 0.18in;
   }
 
   body.print-layout-landscape .print-title-block {
@@ -1219,7 +1219,7 @@ main {
   }
 
   body.print-layout-landscape .print-calendar-shell {
-    padding-top: 0.26in;
+    padding-top: 0.12in;
   }
 
   body.print-layout-landscape .print-month-banner {
@@ -1228,42 +1228,42 @@ main {
   }
 
   body.print-layout-landscape .print-weekday-cell {
-    height: 0.31in;
-    font-size: 8.5px;
-    padding-top: 0.09in;
+    height: 0.29in;
+    font-size: 8px;
+    padding-top: 0.08in;
   }
 
   body.print-layout-landscape .print-day-cell {
-    height: 0.9in;
+    height: 0.78in;
   }
 
   body.print-layout-landscape .print-date-tab {
     min-height: 0.17in;
-    font-size: 8.8px;
+    font-size: 8.2px;
   }
 
   body.print-layout-landscape .print-day-body {
-    padding: 0.18in 0.07in 0.06in;
-    font-size: 12.4px;
-    line-height: 1.22;
+    padding: 0.15in 0.06in 0.05in;
+    font-size: 10.8px;
+    line-height: 1.16;
   }
 
   body.print-layout-landscape .print-dose-line {
-    font-size: 13.6px;
+    font-size: 12px;
   }
 
   body.print-layout-landscape .print-day-warning {
-    font-size: 11px;
+    font-size: 9.6px;
   }
 
   body.print-layout-landscape .print-signoff {
-    margin-top: 0.18in;
+    margin-top: 0.08in;
   }
 
   body.print-layout-landscape .print-disclaimer {
-    padding-top: 0.12in;
-    font-size: 8px;
-    line-height: 1.22;
+    padding-top: 0.05in;
+    font-size: 7.2px;
+    line-height: 1.14;
   }
 
 }
