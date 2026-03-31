@@ -1016,6 +1016,10 @@ main {
     margin: 0 0 0.22in;
   }
 
+  .print-header-left {
+    display: block;
+  }
+
   .print-title-block {
     font-family: Arial, sans-serif;
     font-size: 17px;
@@ -1024,6 +1028,10 @@ main {
     letter-spacing: 0;
     margin-top: 0.14in;
     margin-left: 0.02in;
+  }
+
+  .print-signature-box {
+    display: none;
   }
 
   .print-label-box {
@@ -1207,9 +1215,40 @@ main {
     margin-bottom: 0.18in;
   }
 
+  body.print-layout-landscape .print-header-left {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.14in;
+  }
+
   body.print-layout-landscape .print-title-block {
     font-size: 18px;
     margin-top: 0.04in;
+  }
+
+  body.print-layout-landscape .print-signature-box {
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-end;
+    width: 2.75in;
+    min-height: 0.9in;
+    padding: 0.1in 0.12in 0.08in;
+    border: 1px solid #000;
+    background: #fff;
+  }
+
+  body.print-layout-landscape .print-signature-box-line {
+    height: 0;
+    border-bottom: 1px solid #000;
+  }
+
+  body.print-layout-landscape .print-signature-box-label {
+    margin-top: 0.05in;
+    font-family: Arial, sans-serif;
+    font-size: 9px;
+    font-weight: 700;
+    color: #000;
   }
 
   body.print-layout-landscape .print-label-box {
@@ -1257,11 +1296,12 @@ main {
   }
 
   body.print-layout-landscape .print-signoff {
-    margin-top: 0.08in;
+    display: none;
   }
 
   body.print-layout-landscape .print-disclaimer {
-    padding-top: 0.05in;
+    margin-top: 0.08in;
+    padding: 0 0.04in 0;
     font-size: 7.2px;
     line-height: 1.14;
   }

@@ -1124,10 +1124,16 @@ const DOMBuilders = {
       <section class="print-month">
         <div class="print-page">
           <div class="print-header">
-            <div class="print-title-block">
-              <div>${Html.escape(printableDrugName.toUpperCase())}</div>
-              <div>DOSAGE</div>
-              <div>CALENDAR</div>
+            <div class="print-header-left">
+              <div class="print-title-block">
+                <div>${Html.escape(printableDrugName.toUpperCase())}</div>
+                <div>DOSAGE</div>
+                <div>CALENDAR</div>
+              </div>
+              <div class="print-signature-box">
+                <div class="print-signature-box-line"></div>
+                <div class="print-signature-box-label">Licensed Healthcare Professional Signature</div>
+              </div>
             </div>
             <div class="print-label-box">Place Prescription Label Here</div>
           </div>
