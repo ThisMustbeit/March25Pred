@@ -404,20 +404,22 @@ const Validation = {
     if (inputs.startingDose == null || inputs.startingDose < 0) {
       errors.push("Starting daily dose must be 0 or greater.");
     }
-    if (inputs.doseChangePerStep == null) {
-      errors.push("Dose change per step is required.");
-    }
-    if (inputs.daysPerStep == null || inputs.daysPerStep < 1) {
-      errors.push("Days per step must be at least 1.");
-    }
-    if (inputs.totalStepsMode === "discontinuation") {
-      if (inputs.doseChangePerStep == null || inputs.doseChangePerStep >= 0) {
-        errors.push("Til discontinuation requires a reducing dose change greater than 0.");
-      } else if (inputs.totalSteps == null || inputs.totalSteps < 0) {
-        errors.push("Unable to calculate total taper steps til discontinuation.");
+    if (!inputs.useCustomOverride) {
+      if (inputs.doseChangePerStep == null) {
+        errors.push("Dose change per step is required.");
       }
-    } else if (inputs.totalSteps == null || inputs.totalSteps < 0) {
-      errors.push("Total taper steps must be 0 or greater.");
+      if (inputs.daysPerStep == null || inputs.daysPerStep < 1) {
+        errors.push("Days per step must be at least 1.");
+      }
+      if (inputs.totalStepsMode === "discontinuation") {
+        if (inputs.doseChangePerStep == null || inputs.doseChangePerStep >= 0) {
+          errors.push("Til discontinuation requires a reducing dose change greater than 0.");
+        } else if (inputs.totalSteps == null || inputs.totalSteps < 0) {
+          errors.push("Unable to calculate total taper steps til discontinuation.");
+        }
+      } else if (inputs.totalSteps == null || inputs.totalSteps < 0) {
+        errors.push("Total taper steps must be 0 or greater.");
+      }
     }
     if (inputs.minDoseClamp == null || inputs.maxDoseClamp == null) {
       errors.push("Minimum and maximum dose clamps are required.");
