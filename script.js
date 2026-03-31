@@ -798,6 +798,7 @@ const DOMRefs = {
   tableCard: document.getElementById("table-card"),
   scheduleBody: document.getElementById("schedule-body"),
   printButton: document.getElementById("print-button"),
+  printLayoutSelect: document.getElementById("print-layout"),
   loadExampleButton: document.getElementById("load-example-button"),
   calendarViewInputs: [...document.querySelectorAll('input[name="calendarView"]')],
   strengthLabelA: document.getElementById("strength-label-a"),
@@ -1253,10 +1254,27 @@ const DOMRenderer = {
     const selectedView =
       DOMRefs.calendarViewInputs.find((input) => input.checked)?.value || "calendar";
 
+    DOMRenderer.syncPrintLayout();
     document.body.classList.toggle("printing", false);
     DOMRefs.calendarMonths.classList.toggle("hidden", selectedView === "list");
     DOMRefs.calendarList.classList.toggle("hidden", selectedView === "calendar");
     DOMRefs.tableCard.classList.toggle("hidden", selectedView === "calendar");
+  },
+
+  syncPrintLayout() {
+    const layout = DOMRefs.printLayoutSelect?.value === "landscape" ? "landscape" : "portrait";
+    const pageStyleId = "dynamic-print-page-style";
+    let pageStyle = document.getElementById(pageStyleId);
+
+    if (!pageStyle) {
+      pageStyle = document.createElement("style");
+      pageStyle.id = pageStyleId;
+      document.head.appendChild(pageStyle);
+    }
+
+    pageStyle.textContent = `@media print { @page { size: letter ${layout}; margin: 0.35in; } }`;
+    document.body.classList.toggle("print-layout-landscape", layout === "landscape");
+    document.body.classList.toggle("print-layout-portrait", layout !== "landscape");
   },
 };
 
@@ -1525,6 +1543,7 @@ const AppController = {
       AppController.handleTotalStepsModeToggle
     );
     DOMRefs.loadExampleButton.addEventListener("click", AppController.handleLoadExample);
+    DOMRefs.printLayoutSelect.addEventListener("change", DOMRenderer.syncPrintLayout);
     DOMRefs.form.startingDose.addEventListener("input", UISetup.syncCustomSegmentDoseHelpers);
     DOMRefs.form.startingDose.addEventListener("input", () => UISetup.syncStandardTaperDerivedFields("steps"));
     DOMRefs.form.doseChangePerStep.addEventListener("input", () => UISetup.syncStandardTaperDerivedFields("steps"));
@@ -1602,6 +1621,7 @@ const AppController = {
   },
 
   handlePrint() {
+    DOMRenderer.syncPrintLayout();
     document.body.classList.add("printing");
     window.print();
   },
