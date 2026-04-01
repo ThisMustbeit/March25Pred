@@ -132,6 +132,10 @@ main {
   flex-wrap: wrap;
 }
 
+.hero-actions {
+  align-items: flex-end;
+}
+
 .calendar-toolbar {
   align-items: center;
   justify-content: flex-end;
@@ -157,6 +161,7 @@ main {
   padding: 0.68rem 0.8rem;
   background: #fbfdfe;
   color: var(--text);
+  min-height: 54px;
 }
 
 .button {
@@ -183,6 +188,11 @@ main {
 .button-secondary:hover,
 .button-secondary:focus-visible {
   background: #dfeaf0;
+}
+
+.hero-actions .button {
+  min-height: 54px;
+  padding: 0.68rem 1.35rem;
 }
 
 .form-grid {
