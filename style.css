@@ -191,8 +191,8 @@ main {
 }
 
 .hero-actions .button {
-  min-height: 54px;
-  padding: 0.68rem 1.35rem;
+  min-height: 50px;
+  padding: 0.58rem 1.18rem;
 }
 
 .form-grid {
