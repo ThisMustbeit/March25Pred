@@ -754,8 +754,20 @@ main {
 
 .input-table .action-col,
 .input-table .row-action-cell {
-  width: 56px;
+  width: 128px;
   text-align: center;
+}
+
+.row-action-cell {
+  position: relative;
+}
+
+.row-action-stack {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.45rem;
+  position: relative;
 }
 
 .dose-helper {
@@ -790,6 +802,89 @@ main {
   text-align: center !important;
   padding-top: 1rem !important;
   border-bottom: 0 !important;
+}
+
+.segment-settings-button {
+  border: 1px solid var(--border-strong);
+  border-radius: 999px;
+  padding: 0.42rem 0.72rem;
+  background: #f6fafc;
+  color: var(--accent-dark);
+  font: inherit;
+  font-size: 0.78rem;
+  font-weight: 600;
+  cursor: pointer;
+  white-space: nowrap;
+}
+
+.segment-settings-button:hover,
+.segment-settings-button:focus-visible {
+  background: #e6f0f5;
+}
+
+.segment-settings-button.is-active {
+  background: #e6f0f5;
+  box-shadow: 0 2px 8px rgba(18, 59, 86, 0.08);
+}
+
+.segment-settings-popover {
+  position: absolute;
+  top: calc(100% + 0.45rem);
+  right: 2.4rem;
+  z-index: 20;
+  width: 210px;
+  padding: 0.85rem 0.9rem;
+  border: 1px solid rgba(170, 192, 203, 0.8);
+  border-radius: 14px;
+  background: #ffffff;
+  box-shadow: 0 16px 36px rgba(20, 52, 65, 0.14);
+  text-align: left;
+}
+
+.segment-settings-popover[hidden] {
+  display: none;
+}
+
+.segment-settings-title {
+  margin-bottom: 0.6rem;
+  font-size: 0.8rem;
+  font-weight: 700;
+  color: var(--accent-dark);
+}
+
+.segment-settings-options {
+  display: grid;
+  gap: 0.45rem;
+}
+
+.segment-strength-option {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  gap: 0.55rem;
+  align-items: center;
+  margin: 0;
+  font-size: 0.84rem;
+  color: var(--text);
+}
+
+.segment-strength-option.is-hidden {
+  display: none;
+}
+
+.segment-strength-option input {
+  width: 1rem;
+  height: 1rem;
+  margin: 0;
+}
+
+.segment-strength-option-label {
+  line-height: 1.3;
+}
+
+.segment-settings-empty {
+  font-size: 0.78rem;
+  line-height: 1.4;
+  color: var(--muted);
 }
 
 .icon-button,

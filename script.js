@@ -1380,12 +1380,16 @@ const UISetup = {
     DOMRefs.scheduleStrengthColA.textContent = MedicationTerms.scheduleColumnLabel("A", dosageForm);
     DOMRefs.scheduleStrengthColB.textContent = MedicationTerms.scheduleColumnLabel("B", dosageForm);
     DOMRefs.scheduleStrengthColC.textContent = MedicationTerms.scheduleColumnLabel("C", dosageForm);
+    UISetup.syncCustomSegmentStrengthSelectors();
   },
 
   syncCustomOverrideVisibility() {
     const isVisible = DOMRefs.form.useCustomOverride.checked;
     DOMRefs.customOverridePanel.classList.toggle("is-hidden", !isVisible);
     DOMRefs.customOverridePanel.setAttribute("aria-hidden", String(!isVisible));
+    if (!isVisible) {
+      UISetup.closeCustomSegmentSettings();
+    }
   },
 
   getCustomRowFields(row) {
@@ -1395,6 +1399,11 @@ const UISetup = {
       repeatsInput: row.querySelector(".segment-repeats"),
       startDoseEl: row.querySelector(".helper-dose-start"),
       endDoseEl: row.querySelector(".helper-dose-end"),
+      settingsButton: row.querySelector(".segment-settings-button"),
+      settingsPopover: row.querySelector(".segment-settings-popover"),
+      settingsTitle: row.querySelector(".segment-settings-title"),
+      settingsEmpty: row.querySelector(".segment-settings-empty"),
+      strengthOptions: [...row.querySelectorAll(".segment-strength-option")],
       deleteButton: row.querySelector(".row-delete-button"),
     };
   },
@@ -1416,6 +1425,7 @@ const UISetup = {
     fields.repeatsInput.value = values[2] ?? "";
 
     DOMRefs.customSegmentBody.appendChild(row);
+    UISetup.syncCustomSegmentStrengthSelectors();
     return true;
   },
 
@@ -1426,6 +1436,8 @@ const UISetup = {
 
       row.querySelector(".segment-label").textContent = `Segment ${index + 1}`;
       row.classList.toggle("is-first-segment", isFirstSegment);
+      fields.settingsButton.setAttribute("aria-label", `Settings for Segment ${index + 1}`);
+      fields.deleteButton.setAttribute("aria-label", `Delete Segment ${index + 1}`);
       fields.doseChangeInput.name = `customDoseChange${index}`;
       fields.daysPerStepInput.name = `customDaysPerStep${index}`;
       fields.repeatsInput.name = `customRepeats${index}`;
@@ -1434,6 +1446,58 @@ const UISetup = {
       if (isFirstSegment) {
         fields.doseChangeInput.value = "0";
       }
+    });
+  },
+
+  syncCustomSegmentStrengthSelectors() {
+    const dosageForm = MedicationTerms.normalizeDosageForm(DOMRefs.form.dosageForm.value);
+    const settingsTitle = `${MedicationTerms.titleSingular(dosageForm)} strengths used`;
+    const strengthValues = {
+      A: NumberUtils.parseOptionalNumber(DOMRefs.form.tabletStrengthA.value),
+      B: NumberUtils.parseOptionalNumber(DOMRefs.form.tabletStrengthB.value),
+      C: NumberUtils.parseOptionalNumber(DOMRefs.form.tabletStrengthC.value),
+    };
+
+    [...DOMRefs.customSegmentBody.querySelectorAll("tr")].forEach((row) => {
+      const fields = UISetup.getCustomRowFields(row);
+      fields.settingsTitle.textContent = settingsTitle;
+      let visibleOptionCount = 0;
+
+      fields.strengthOptions.forEach((option) => {
+        const checkbox = option.querySelector(".segment-strength-toggle");
+        const label = option.querySelector(".segment-strength-option-label");
+        const strengthKey = option.dataset.strengthKey;
+        const strengthValue = strengthValues[strengthKey];
+        const hasStrength = strengthValue != null;
+
+        option.classList.toggle("is-hidden", !hasStrength);
+        checkbox.disabled = !hasStrength;
+
+        if (!hasStrength) {
+          checkbox.checked = false;
+          label.textContent = "";
+          return;
+        }
+
+        label.textContent = Formatters.dose(strengthValue);
+        visibleOptionCount += 1;
+
+        if (!checkbox.dataset.userSet) {
+          checkbox.checked = true;
+        }
+      });
+
+      fields.settingsEmpty.hidden = visibleOptionCount > 0;
+    });
+  },
+
+  closeCustomSegmentSettings(exceptRow = null) {
+    [...DOMRefs.customSegmentBody.querySelectorAll("tr")].forEach((row) => {
+      if (exceptRow && row === exceptRow) return;
+      const fields = UISetup.getCustomRowFields(row);
+      fields.settingsPopover.hidden = true;
+      fields.settingsButton.classList.remove("is-active");
+      fields.settingsButton.setAttribute("aria-expanded", "false");
     });
   },
 
@@ -1551,22 +1615,27 @@ const AppController = {
       AppController.handleTotalStepsModeToggle
     );
     DOMRefs.loadExampleButton.addEventListener("click", AppController.handleLoadExample);
-    DOMRefs.printLayoutSelect.addEventListener("change", DOMRenderer.syncPrintLayout);
-    DOMRefs.form.startingDose.addEventListener("input", UISetup.syncCustomSegmentDoseHelpers);
-    DOMRefs.form.startingDose.addEventListener("input", () => UISetup.syncStandardTaperDerivedFields("steps"));
-    DOMRefs.form.doseChangePerStep.addEventListener("input", () => UISetup.syncStandardTaperDerivedFields("steps"));
-    DOMRefs.form.totalSteps.addEventListener("input", () => UISetup.syncStandardTaperDerivedFields("steps"));
-    DOMRefs.finalDoseInput.addEventListener("input", AppController.handleFinalDoseInput);
-    DOMRefs.customSegmentBody.addEventListener("input", UISetup.syncCustomSegmentDoseHelpers);
-    DOMRefs.customSegmentBody.addEventListener("click", AppController.handleCustomRowDelete);
-    DOMRefs.addSegmentRowButton.addEventListener("click", AppController.handleAddCustomRow);
-    DOMRefs.printButton.addEventListener("click", AppController.handlePrint);
-    DOMRefs.calendarViewInputs.forEach((input) =>
-      input.addEventListener("change", DOMRenderer.syncLayoutControls)
-    );
-    window.addEventListener("beforeprint", () => document.body.classList.add("printing"));
-    window.addEventListener("afterprint", () => document.body.classList.remove("printing"));
-    AppController.render();
+      DOMRefs.printLayoutSelect.addEventListener("change", DOMRenderer.syncPrintLayout);
+      DOMRefs.form.startingDose.addEventListener("input", UISetup.syncCustomSegmentDoseHelpers);
+      DOMRefs.form.startingDose.addEventListener("input", () => UISetup.syncStandardTaperDerivedFields("steps"));
+      DOMRefs.form.tabletStrengthA.addEventListener("input", UISetup.syncCustomSegmentStrengthSelectors);
+      DOMRefs.form.tabletStrengthB.addEventListener("input", UISetup.syncCustomSegmentStrengthSelectors);
+      DOMRefs.form.tabletStrengthC.addEventListener("input", UISetup.syncCustomSegmentStrengthSelectors);
+      DOMRefs.form.doseChangePerStep.addEventListener("input", () => UISetup.syncStandardTaperDerivedFields("steps"));
+      DOMRefs.form.totalSteps.addEventListener("input", () => UISetup.syncStandardTaperDerivedFields("steps"));
+      DOMRefs.finalDoseInput.addEventListener("input", AppController.handleFinalDoseInput);
+      DOMRefs.customSegmentBody.addEventListener("input", UISetup.syncCustomSegmentDoseHelpers);
+      DOMRefs.customSegmentBody.addEventListener("click", AppController.handleCustomSegmentRowClick);
+      DOMRefs.customSegmentBody.addEventListener("change", AppController.handleCustomSegmentSettingsChange);
+      DOMRefs.addSegmentRowButton.addEventListener("click", AppController.handleAddCustomRow);
+      DOMRefs.printButton.addEventListener("click", AppController.handlePrint);
+      DOMRefs.calendarViewInputs.forEach((input) =>
+        input.addEventListener("change", DOMRenderer.syncLayoutControls)
+      );
+      document.addEventListener("click", AppController.handleDocumentClick);
+      window.addEventListener("beforeprint", () => document.body.classList.add("printing"));
+      window.addEventListener("afterprint", () => document.body.classList.remove("printing"));
+      AppController.render();
   },
 
   handleGenerate(event) {
@@ -1618,7 +1687,20 @@ const AppController = {
     UISetup.syncStandardTaperDerivedFields("finalDose");
   },
 
-  handleCustomRowDelete(event) {
+  handleCustomSegmentRowClick(event) {
+    const settingsButton = event.target.closest(".segment-settings-button");
+    if (settingsButton) {
+      const row = settingsButton.closest("tr");
+      const fields = UISetup.getCustomRowFields(row);
+      const shouldOpen = fields.settingsPopover.hidden;
+
+      UISetup.closeCustomSegmentSettings(shouldOpen ? row : null);
+      fields.settingsPopover.hidden = !shouldOpen;
+      fields.settingsButton.classList.toggle("is-active", shouldOpen);
+      fields.settingsButton.setAttribute("aria-expanded", String(shouldOpen));
+      return;
+    }
+
     const deleteButton = event.target.closest(".row-delete-button");
     if (!deleteButton) return;
 
@@ -1626,6 +1708,18 @@ const AppController = {
     UISetup.reindexCustomSegmentRows();
     UISetup.syncCustomSegmentDoseHelpers();
     UISetup.syncCustomSegmentControls();
+    UISetup.closeCustomSegmentSettings();
+  },
+
+  handleCustomSegmentSettingsChange(event) {
+    const toggle = event.target.closest(".segment-strength-toggle");
+    if (!toggle) return;
+    toggle.dataset.userSet = "true";
+  },
+
+  handleDocumentClick(event) {
+    if (event.target.closest(".row-action-cell")) return;
+    UISetup.closeCustomSegmentSettings();
   },
 
   handlePrint() {

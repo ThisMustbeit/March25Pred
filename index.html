@@ -162,7 +162,7 @@
                         <th class="action-col"> </th>
                       </tr>
                     </thead>
-                    <tbody id="custom-segment-body"></tbody>
+    <tbody id="custom-segment-body"></tbody>
                     <tfoot>
                       <tr>
                         <td colspan="7" class="custom-table-footer">
@@ -310,7 +310,28 @@
       <td><input class="segment-repeats" type="number" step="1" min="0" max="100"></td>
       <td class="dose-helper"><span class="helper-dose helper-dose-end"></span></td>
       <td class="row-action-cell">
-        <button type="button" class="row-delete-button" aria-label="Delete custom taper row" data-icon="×">&times;</button>
+          <div class="row-action-stack">
+            <button type="button" class="segment-settings-button">Settings</button>
+            <div class="segment-settings-popover" hidden>
+              <div class="segment-settings-title">Tablet strengths used</div>
+              <div class="segment-settings-options">
+                <label class="segment-strength-option" data-strength-key="A">
+                  <input class="segment-strength-toggle" type="checkbox" data-strength-key="A" checked>
+                  <span class="segment-strength-option-label"></span>
+                </label>
+                <label class="segment-strength-option" data-strength-key="B">
+                  <input class="segment-strength-toggle" type="checkbox" data-strength-key="B" checked>
+                  <span class="segment-strength-option-label"></span>
+                </label>
+                <label class="segment-strength-option" data-strength-key="C">
+                  <input class="segment-strength-toggle" type="checkbox" data-strength-key="C" checked>
+                  <span class="segment-strength-option-label"></span>
+                </label>
+              </div>
+              <div class="segment-settings-empty" hidden>Enter medication strengths above to choose options.</div>
+            </div>
+            <button type="button" class="row-delete-button" aria-label="Delete custom taper row" data-icon="×">&times;</button>
+          </div>
       </td>
     </tr>
   </template>
