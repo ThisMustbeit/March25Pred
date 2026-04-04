@@ -888,6 +888,7 @@ const DOMRefs = {
   doseChangeDirectionInput: document.getElementById("dose-change-direction"),
   doseDirectionButtons: [...document.querySelectorAll("[data-dose-direction]")],
   taperModeButtons: [...document.querySelectorAll("[data-taper-mode]")],
+  useCustomOverrideInput: document.getElementById("use-custom-override"),
   primaryTaperGroup: document.querySelector(".group-primary-taper"),
   finalDoseInput: document.getElementById("final-dose"),
   totalStepsModeInput: document.getElementById("total-steps-mode"),
@@ -1022,7 +1023,7 @@ const InputFactory = {
     const baseInputs = {
       ...InputFactory.readDateInputs(),
       ...InputFactory.readNumericInputs(),
-      useCustomOverride: DOMRefs.form.useCustomOverride.value === "true",
+      useCustomOverride: DOMRefs.useCustomOverrideInput.value === "true",
       allowPartialTablets: DOMRefs.form.allowPartialTablets.checked,
       drugName: (DOMRefs.form.drugName.value || APP_CONFIG.defaults.taper.drugName).trim(),
       dosageForm: MedicationTerms.normalizeDosageForm(DOMRefs.form.dosageForm.value),
@@ -1430,7 +1431,7 @@ const UISetup = {
   },
 
   syncTaperModeButtons() {
-    const activeMode = DOMRefs.form.useCustomOverride.value === "true" ? "advanced" : "standard";
+    const activeMode = DOMRefs.useCustomOverrideInput.value === "true" ? "advanced" : "standard";
 
     DOMRefs.taperModeButtons.forEach((button) => {
       const isActive = button.dataset.taperMode === activeMode;
@@ -1520,7 +1521,7 @@ const UISetup = {
   },
 
   syncCustomOverrideVisibility() {
-    const isVisible = DOMRefs.form.useCustomOverride.value === "true";
+    const isVisible = DOMRefs.useCustomOverrideInput.value === "true";
     DOMRefs.customOverridePanel.classList.toggle("is-hidden", !isVisible);
     DOMRefs.customOverridePanel.setAttribute("aria-hidden", String(!isVisible));
     DOMRefs.primaryTaperGroup.classList.toggle("is-hidden", isVisible);
@@ -1816,7 +1817,7 @@ const AppController = {
 
     handleTaperModeClick(event) {
       const mode = event.currentTarget.dataset.taperMode === "advanced" ? "true" : "false";
-      DOMRefs.form.useCustomOverride.value = mode;
+      DOMRefs.useCustomOverrideInput.value = mode;
       UISetup.syncCustomOverrideVisibility();
     },
 
