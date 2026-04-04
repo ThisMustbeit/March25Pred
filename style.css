@@ -124,6 +124,11 @@ main {
   margin-bottom: 1.5rem;
 }
 
+.section-heading-main {
+  display: grid;
+  gap: 0.85rem;
+}
+
 .form-actions,
 .hero-actions,
 .calendar-toolbar {
@@ -208,8 +213,8 @@ main {
 .taper-mode-strip {
   display: flex;
   justify-content: flex-start;
-  margin: 0 0 1.65rem;
-  padding: 0.1rem 0 0.15rem;
+  margin: 0;
+  padding: 0.05rem 0 0;
 }
 
 .taper-mode-strip .taper-mode-control {

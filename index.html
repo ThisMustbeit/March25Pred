@@ -34,39 +34,38 @@
 
       <section class="card form-card">
         <div class="section-heading">
-          <div>
+          <div class="section-heading-main">
             <p class="section-kicker">Inputs</p>
             <h2>Taper Settings</h2>
+            <div class="taper-mode-strip" aria-label="Taper mode">
+              <div class="taper-mode-control">
+                <span class="taper-mode-label">Taper Mode</span>
+                <div class="direction-toggle" role="group" aria-label="Taper mode">
+                  <button
+                    id="taper-mode-standard"
+                    type="button"
+                    class="direction-toggle-button is-active"
+                    data-taper-mode="standard"
+                  >
+                    Standard Taper
+                  </button>
+                  <button
+                    id="taper-mode-advanced"
+                    type="button"
+                    class="direction-toggle-button"
+                    data-taper-mode="advanced"
+                  >
+                    Advanced Multi-Taper
+                  </button>
+                </div>
+                <input id="use-custom-override" name="useCustomOverride" type="hidden" value="false">
+              </div>
+            </div>
           </div>
           <div class="form-actions no-print">
             <button id="generate-button" type="submit" form="taper-form" class="button">Generate Schedule</button>
             <button id="load-example-button" type="button" class="button button-secondary">Load an Example</button>
             <button id="reset-button" type="reset" form="taper-form" class="button button-secondary">Reset</button>
-          </div>
-        </div>
-
-        <div class="taper-mode-strip no-print" aria-label="Taper mode">
-          <div class="taper-mode-control">
-            <span class="taper-mode-label">Taper Mode</span>
-            <div class="direction-toggle" role="group" aria-label="Taper mode">
-              <button
-                id="taper-mode-standard"
-                type="button"
-                class="direction-toggle-button is-active"
-                data-taper-mode="standard"
-              >
-                Standard Taper
-              </button>
-              <button
-                id="taper-mode-advanced"
-                type="button"
-                class="direction-toggle-button"
-                data-taper-mode="advanced"
-              >
-                Advanced Multi-Taper
-              </button>
-            </div>
-            <input id="use-custom-override" name="useCustomOverride" type="hidden" value="false">
           </div>
         </div>
 
