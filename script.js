@@ -514,6 +514,17 @@ const Templates = {
 
   standardDose(dayIndex, inputs) {
     const stepIndex = Templates.standardStepIndex(dayIndex, inputs.daysPerStep);
+    const isZeroFinalDoseStop =
+      inputs.totalStepsMode !== "discontinuation" &&
+      inputs.standardTaperDriver === "finalDose" &&
+      inputs.finalDose != null &&
+      inputs.finalDose <= 0 &&
+      inputs.doseChangePerStep < 0;
+
+    if (isZeroFinalDoseStop) {
+      const rawDose = inputs.startingDose + stepIndex * inputs.doseChangePerStep;
+      return NumberUtils.clamp(rawDose, inputs.minDoseClamp, inputs.maxDoseClamp);
+    }
 
     if (
       inputs.totalStepsMode !== "discontinuation" &&
