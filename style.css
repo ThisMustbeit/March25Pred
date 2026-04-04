@@ -356,6 +356,16 @@ main {
   outline-offset: 1px;
 }
 
+.taper-mode-control {
+  display: grid;
+  gap: 0.45rem;
+}
+
+.taper-mode-label {
+  font-size: 0.92rem;
+  color: var(--muted);
+}
+
 .checkbox-row {
   grid-template-columns: auto 1fr;
   align-items: center;

@@ -887,6 +887,7 @@ const DOMRefs = {
   scheduleStrengthColC: document.getElementById("schedule-strength-col-c"),
   doseChangeDirectionInput: document.getElementById("dose-change-direction"),
   doseDirectionButtons: [...document.querySelectorAll("[data-dose-direction]")],
+  taperModeButtons: [...document.querySelectorAll("[data-taper-mode]")],
   finalDoseInput: document.getElementById("final-dose"),
   totalStepsModeInput: document.getElementById("total-steps-mode"),
   totalStepsDiscontinuationButton: document.getElementById("total-steps-discontinuation"),
@@ -1020,7 +1021,7 @@ const InputFactory = {
     const baseInputs = {
       ...InputFactory.readDateInputs(),
       ...InputFactory.readNumericInputs(),
-      useCustomOverride: DOMRefs.form.useCustomOverride.checked,
+      useCustomOverride: DOMRefs.form.useCustomOverride.value === "true",
       allowPartialTablets: DOMRefs.form.allowPartialTablets.checked,
       drugName: (DOMRefs.form.drugName.value || APP_CONFIG.defaults.taper.drugName).trim(),
       dosageForm: MedicationTerms.normalizeDosageForm(DOMRefs.form.dosageForm.value),
@@ -1427,6 +1428,16 @@ const UISetup = {
     });
   },
 
+  syncTaperModeButtons() {
+    const activeMode = DOMRefs.form.useCustomOverride.value === "true" ? "advanced" : "standard";
+
+    DOMRefs.taperModeButtons.forEach((button) => {
+      const isActive = button.dataset.taperMode === activeMode;
+      button.classList.toggle("is-active", isActive);
+      button.setAttribute("aria-pressed", String(isActive));
+    });
+  },
+
   syncStandardTaperDerivedFields(source = "steps") {
     const startingDose = NumberUtils.parseOptionalNumber(DOMRefs.form.startingDose.value);
     const signedDoseChange = InputFactory.signedDoseChange(
@@ -1508,9 +1519,10 @@ const UISetup = {
   },
 
   syncCustomOverrideVisibility() {
-    const isVisible = DOMRefs.form.useCustomOverride.checked;
+    const isVisible = DOMRefs.form.useCustomOverride.value === "true";
     DOMRefs.customOverridePanel.classList.toggle("is-hidden", !isVisible);
     DOMRefs.customOverridePanel.setAttribute("aria-hidden", String(!isVisible));
+    UISetup.syncTaperModeButtons();
     if (!isVisible) {
       UISetup.closeCustomSegmentSettings();
     }
@@ -1708,13 +1720,14 @@ const UISetup = {
       }
     });
 
-    UISetup.rebuildCustomSegmentRows(customSegments);
-    UISetup.syncDoseChangeDirectionButtons();
-    UISetup.syncTotalStepsMode();
-    UISetup.syncStandardTaperDerivedFields("steps");
-    UISetup.syncMedicationLabels();
-    UISetup.syncCustomOverrideVisibility();
-  },
+      UISetup.rebuildCustomSegmentRows(customSegments);
+      UISetup.syncDoseChangeDirectionButtons();
+      UISetup.syncTotalStepsMode();
+      UISetup.syncStandardTaperDerivedFields("steps");
+      UISetup.syncTaperModeButtons();
+      UISetup.syncMedicationLabels();
+      UISetup.syncCustomOverrideVisibility();
+    },
 
   applyDefaults() {
     UISetup.applyFormDefaults(APP_CONFIG.defaults.taper, []);
@@ -1727,11 +1740,13 @@ const UISetup = {
 
 const AppController = {
   initialize() {
-    UISetup.applyDefaults();
-    DOMRefs.form.addEventListener("submit", AppController.handleGenerate);
-    DOMRefs.form.addEventListener("reset", AppController.handleReset);
-    DOMRefs.form.useCustomOverride.addEventListener("change", UISetup.syncCustomOverrideVisibility);
-    DOMRefs.form.dosageForm.addEventListener("change", UISetup.syncMedicationLabels);
+      UISetup.applyDefaults();
+      DOMRefs.form.addEventListener("submit", AppController.handleGenerate);
+      DOMRefs.form.addEventListener("reset", AppController.handleReset);
+      DOMRefs.taperModeButtons.forEach((button) =>
+        button.addEventListener("click", AppController.handleTaperModeClick)
+      );
+      DOMRefs.form.dosageForm.addEventListener("change", UISetup.syncMedicationLabels);
     DOMRefs.doseDirectionButtons.forEach((button) =>
       button.addEventListener("click", AppController.handleDoseDirectionClick)
     );
@@ -1795,6 +1810,12 @@ const AppController = {
       DOMRefs.doseChangeDirectionInput.value = direction;
       UISetup.syncDoseChangeDirectionButtons();
       UISetup.syncStandardTaperDerivedFields("auto");
+    },
+
+    handleTaperModeClick(event) {
+      const mode = event.currentTarget.dataset.taperMode === "advanced" ? "true" : "false";
+      DOMRefs.form.useCustomOverride.value = mode;
+      UISetup.syncCustomOverrideVisibility();
     },
 
     handleTotalStepsInput() {
