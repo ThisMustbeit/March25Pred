@@ -888,6 +888,7 @@ const DOMRefs = {
   doseChangeDirectionInput: document.getElementById("dose-change-direction"),
   doseDirectionButtons: [...document.querySelectorAll("[data-dose-direction]")],
   taperModeButtons: [...document.querySelectorAll("[data-taper-mode]")],
+  primaryTaperGroup: document.querySelector(".group-primary-taper"),
   finalDoseInput: document.getElementById("final-dose"),
   totalStepsModeInput: document.getElementById("total-steps-mode"),
   totalStepsDiscontinuationButton: document.getElementById("total-steps-discontinuation"),
@@ -1522,6 +1523,7 @@ const UISetup = {
     const isVisible = DOMRefs.form.useCustomOverride.value === "true";
     DOMRefs.customOverridePanel.classList.toggle("is-hidden", !isVisible);
     DOMRefs.customOverridePanel.setAttribute("aria-hidden", String(!isVisible));
+    DOMRefs.primaryTaperGroup.classList.toggle("is-hidden", isVisible);
     UISetup.syncTaperModeButtons();
     if (!isVisible) {
       UISetup.closeCustomSegmentSettings();

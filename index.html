@@ -45,6 +45,31 @@
           </div>
         </div>
 
+        <div class="taper-mode-strip no-print">
+          <div class="taper-mode-control">
+            <span class="taper-mode-label">Taper Mode</span>
+            <div class="direction-toggle" role="group" aria-label="Taper mode">
+              <button
+                id="taper-mode-standard"
+                type="button"
+                class="direction-toggle-button is-active"
+                data-taper-mode="standard"
+              >
+                Standard Taper
+              </button>
+              <button
+                id="taper-mode-advanced"
+                type="button"
+                class="direction-toggle-button"
+                data-taper-mode="advanced"
+              >
+                Advanced Multi-Taper
+              </button>
+            </div>
+            <input id="use-custom-override" name="useCustomOverride" type="hidden" value="false">
+          </div>
+        </div>
+
         <form id="taper-form" novalidate>
           <div class="form-grid">
             <fieldset class="group group-med-start">
@@ -109,28 +134,6 @@
                   </button>
                   <input id="total-steps-mode" name="totalStepsMode" type="hidden" value="manual">
                 </div>
-              </div>
-              <div class="taper-mode-control">
-                <span class="taper-mode-label">Taper Mode</span>
-                <div class="direction-toggle" role="group" aria-label="Taper mode">
-                  <button
-                    id="taper-mode-standard"
-                    type="button"
-                    class="direction-toggle-button is-active"
-                    data-taper-mode="standard"
-                  >
-                    Standard Taper
-                  </button>
-                  <button
-                    id="taper-mode-advanced"
-                    type="button"
-                    class="direction-toggle-button"
-                    data-taper-mode="advanced"
-                  >
-                    Advanced Multi-Taper
-                  </button>
-                </div>
-                <input id="use-custom-override" name="useCustomOverride" type="hidden" value="false">
               </div>
             </fieldset>
 

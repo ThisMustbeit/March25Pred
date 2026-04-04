@@ -205,6 +205,14 @@ main {
   align-items: start;
 }
 
+.taper-mode-strip {
+  margin: 0 0 1.3rem;
+}
+
+.taper-mode-strip .taper-mode-control {
+  width: fit-content;
+}
+
 .group {
   border: 1px solid var(--border);
   border-radius: var(--radius-sm);
@@ -227,6 +235,10 @@ main {
 
 .group-primary-taper {
   grid-area: primary;
+}
+
+.group-primary-taper.is-hidden {
+  display: none;
 }
 
 .group-strengths {
