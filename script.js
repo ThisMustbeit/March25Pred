@@ -239,7 +239,16 @@ const Strengths = {
         value: inputValues.tabletStrengthC ?? null,
         allowPartial: Boolean(inputValues.allowPartialTablets),
       },
-    ].filter((strength) => strength.value != null && strength.value > 0);
+      ].filter((strength) => strength.value != null && strength.value > 0);
+  },
+
+  filterByKeys(strengths, allowedKeys = null) {
+    if (!Array.isArray(allowedKeys)) {
+      return strengths;
+    }
+
+    const allowed = new Set(allowedKeys);
+    return strengths.filter((strength) => allowed.has(strength.key));
   },
 
   validateOrder(strengths) {
@@ -514,6 +523,23 @@ const Templates = {
     return NumberUtils.clamp(dose, inputs.minDoseClamp, inputs.maxDoseClamp);
   },
 
+  activeCustomSegment(dayIndex, customSegments) {
+    let segmentStartDay = 0;
+
+    for (const segment of customSegments) {
+      if (!segment || segment.repeats <= 0 || segment.daysPerStep <= 0) continue;
+
+      const segmentDuration = segment.daysPerStep * segment.repeats;
+      if (dayIndex >= segmentStartDay && dayIndex < segmentStartDay + segmentDuration) {
+        return segment;
+      }
+
+      segmentStartDay += segmentDuration;
+    }
+
+    return null;
+  },
+
   doseForDay(dayIndex, inputs) {
     return inputs.useCustomOverride
       ? Templates.customDose(dayIndex, inputs)
@@ -522,6 +548,19 @@ const Templates = {
 };
 
 const ScheduleLogic = {
+  strengthsForDay(dayIndex, inputs) {
+    if (!inputs.useCustomOverride) {
+      return inputs.strengths;
+    }
+
+    const activeSegment = Templates.activeCustomSegment(dayIndex, inputs.customSegments);
+    if (!activeSegment) {
+      return inputs.strengths;
+    }
+
+    return Strengths.filterByKeys(inputs.strengths, activeSegment.allowedStrengthKeys);
+  },
+
   getExactnessWarning(doseMg, allocation) {
     if (NumberUtils.isNearZero(doseMg)) return "";
     return NumberUtils.isNearZero(allocation.finalRemainder) ? "" : Messages.exactDoseWarning();
@@ -558,7 +597,8 @@ const ScheduleLogic = {
   buildScheduleRow(date, dayIndex, inputs) {
     const doseMg = Templates.doseForDay(dayIndex, inputs);
     const stepIndex = Templates.standardStepIndex(dayIndex, inputs.daysPerStep);
-    const allocation = Strengths.allocateDose(doseMg, inputs.strengths, {
+    const strengthsForDay = ScheduleLogic.strengthsForDay(dayIndex, inputs);
+    const allocation = Strengths.allocateDose(doseMg, strengthsForDay, {
       allowPartialTablets: inputs.allowPartialTablets,
     });
     const warning = ScheduleLogic.getExactnessWarning(doseMg, allocation);
@@ -580,7 +620,7 @@ const ScheduleLogic = {
       dayIndex,
       stepIndex,
       doseMg,
-      strengths: inputs.strengths,
+      strengths: strengthsForDay,
       allocations: allocation.allocations,
       warning,
       instructionParts,
@@ -900,6 +940,10 @@ const InputFactory = {
         doseChange: index === 0 ? 0 : NumberUtils.parseOptionalNumber(doseChangeValue),
         daysPerStep: daysValue === "" ? 0 : NumberUtils.parseOptionalInteger(daysValue),
         repeats: repeatsValue === "" ? 0 : NumberUtils.parseOptionalInteger(repeatsValue),
+        allowedStrengthKeys: fields.strengthOptions
+          .map((option) => option.querySelector(".segment-strength-toggle"))
+          .filter((toggle) => toggle && !toggle.disabled && toggle.checked)
+          .map((toggle) => toggle.dataset.strengthKey),
       };
 
       if (
