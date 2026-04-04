@@ -19,6 +19,7 @@ const APP_CONFIG = {
       totalSteps: "",
       finalDose: "",
       totalStepsMode: "manual",
+      standardTaperDriver: "steps",
       minDoseClamp: "0",
       maxDoseClamp: "1000",
       tabletStrengthA: "",
@@ -35,6 +36,7 @@ const APP_CONFIG = {
       totalSteps: "30",
       finalDose: "",
       totalStepsMode: "manual",
+      standardTaperDriver: "steps",
       minDoseClamp: "0",
       maxDoseClamp: "1000",
       tabletStrengthA: "5",
@@ -426,6 +428,18 @@ const Validation = {
         } else if (inputs.totalSteps == null || inputs.totalSteps < 0) {
           errors.push("Unable to calculate total taper steps til discontinuation.");
         }
+      } else if (inputs.standardTaperDriver === "finalDose") {
+        if (inputs.finalDose == null || inputs.finalDose < 0) {
+          errors.push("Final dose must be 0 or greater.");
+        } else if (inputs.doseChangePerStep === 0 && inputs.finalDose !== inputs.startingDose) {
+          errors.push("A zero dose change can only support a final dose equal to the starting dose.");
+        } else if (inputs.doseChangePerStep < 0 && inputs.finalDose > inputs.startingDose) {
+          errors.push("For a reducing taper, final dose cannot be greater than the starting dose.");
+        } else if (inputs.doseChangePerStep > 0 && inputs.finalDose < inputs.startingDose) {
+          errors.push("For an increasing taper, final dose cannot be less than the starting dose.");
+        } else if (inputs.totalSteps == null || inputs.totalSteps < 1) {
+          errors.push("Unable to calculate total taper steps for the requested final dose.");
+        }
       } else if (inputs.totalSteps == null || inputs.totalSteps < 0) {
         errors.push("Total taper steps must be 0 or greater.");
       }
@@ -500,6 +514,18 @@ const Templates = {
 
   standardDose(dayIndex, inputs) {
     const stepIndex = Templates.standardStepIndex(dayIndex, inputs.daysPerStep);
+
+    if (
+      inputs.totalStepsMode !== "discontinuation" &&
+      inputs.standardTaperDriver === "finalDose" &&
+      inputs.finalDose != null &&
+      inputs.totalSteps != null &&
+      inputs.totalSteps > 0 &&
+      stepIndex >= Math.max(inputs.totalSteps - 1, 0)
+    ) {
+      return NumberUtils.clamp(inputs.finalDose, inputs.minDoseClamp, inputs.maxDoseClamp);
+    }
+
     const rawDose = inputs.startingDose + stepIndex * inputs.doseChangePerStep;
     return NumberUtils.clamp(rawDose, inputs.minDoseClamp, inputs.maxDoseClamp);
   },
@@ -891,6 +917,24 @@ const InputFactory = {
     return Math.ceil(Math.abs(startingDose / signedDoseChange));
   },
 
+  stepsForRequestedFinalDose(startingDose, signedDoseChange, finalDose) {
+    if (startingDose == null || signedDoseChange == null || finalDose == null) return null;
+    if (signedDoseChange === 0) {
+      return finalDose === startingDose ? 1 : null;
+    }
+
+    const isReducing = signedDoseChange < 0;
+    if (isReducing && finalDose > startingDose) return null;
+    if (!isReducing && finalDose < startingDose) return null;
+
+    if (isReducing && finalDose <= 0) {
+      return InputFactory.stepsTilDiscontinuation(startingDose, signedDoseChange);
+    }
+
+    const doseDistance = Math.abs(finalDose - startingDose);
+    return Math.max(1, Math.ceil(doseDistance / Math.abs(signedDoseChange)) + 1);
+  },
+
   stepsForFinalDose(startingDose, signedDoseChange, finalDose) {
     if (startingDose == null || signedDoseChange == null || finalDose == null) return null;
     if (signedDoseChange === 0) return finalDose === startingDose ? 1 : null;
@@ -971,6 +1015,7 @@ const InputFactory = {
       dosageForm: MedicationTerms.normalizeDosageForm(DOMRefs.form.dosageForm.value),
       doseChangeDirection: DOMRefs.form.doseChangeDirection.value || APP_CONFIG.defaults.taper.doseChangeDirection,
       totalStepsMode: DOMRefs.form.totalStepsMode.value || APP_CONFIG.defaults.taper.totalStepsMode,
+      standardTaperDriver: UISetup.getStandardTaperDriver(),
     };
 
     baseInputs.doseChangePerStep = InputFactory.signedDoseChange(
@@ -980,6 +1025,12 @@ const InputFactory = {
     baseInputs.totalSteps =
       baseInputs.totalStepsMode === "discontinuation"
         ? InputFactory.stepsTilDiscontinuation(baseInputs.startingDose, baseInputs.doseChangePerStep)
+        : baseInputs.standardTaperDriver === "finalDose"
+        ? InputFactory.stepsForRequestedFinalDose(
+            baseInputs.startingDose,
+            baseInputs.doseChangePerStep,
+            baseInputs.requestedFinalDose
+          )
         : baseInputs.manualTotalSteps;
     baseInputs.finalDose =
       baseInputs.totalStepsMode === "discontinuation"
@@ -988,7 +1039,13 @@ const InputFactory = {
             baseInputs.doseChangePerStep,
             baseInputs.totalSteps
           )
-        : baseInputs.requestedFinalDose;
+        : baseInputs.standardTaperDriver === "finalDose"
+        ? baseInputs.requestedFinalDose
+        : InputFactory.finalDoseForSteps(
+            baseInputs.startingDose,
+            baseInputs.doseChangePerStep,
+            baseInputs.totalSteps
+          );
 
     const customSegments = InputFactory.readCustomSegments(errors);
     const strengths = Strengths.create(baseInputs);
@@ -1331,6 +1388,14 @@ const DOMRenderer = {
 };
 
 const UISetup = {
+  getStandardTaperDriver() {
+    return DOMRefs.form.dataset.standardTaperDriver || APP_CONFIG.defaults.taper.standardTaperDriver;
+  },
+
+  setStandardTaperDriver(driver) {
+    DOMRefs.form.dataset.standardTaperDriver = driver === "finalDose" ? "finalDose" : "steps";
+  },
+
   writeNumericInputValue(input, value) {
     input.value =
       value == null || Number.isNaN(value)
@@ -1361,6 +1426,8 @@ const UISetup = {
       (DOMRefs.totalStepsModeInput.value || APP_CONFIG.defaults.taper.totalStepsMode) ===
       "discontinuation";
 
+    const effectiveSource = source === "auto" ? UISetup.getStandardTaperDriver() : source;
+
     if (isDiscontinuationMode) {
       const discontinuationSteps = InputFactory.stepsTilDiscontinuation(startingDose, signedDoseChange);
       const discontinuationFinalDose = InputFactory.finalDoseForSteps(
@@ -1372,12 +1439,14 @@ const UISetup = {
       return;
     }
 
-    if (source === "finalDose") {
+    if (effectiveSource === "finalDose") {
       const finalDose = NumberUtils.parseOptionalNumber(DOMRefs.finalDoseInput.value);
-      const totalSteps = InputFactory.stepsForFinalDose(startingDose, signedDoseChange, finalDose);
+      const totalSteps = InputFactory.stepsForRequestedFinalDose(
+        startingDose,
+        signedDoseChange,
+        finalDose
+      );
       UISetup.writeNumericInputValue(DOMRefs.form.totalSteps, totalSteps);
-      const syncedFinalDose = InputFactory.finalDoseForSteps(startingDose, signedDoseChange, totalSteps);
-      UISetup.writeNumericInputValue(DOMRefs.finalDoseInput, syncedFinalDose);
       return;
     }
 
@@ -1403,7 +1472,7 @@ const UISetup = {
       }
       DOMRefs.form.totalSteps.value = "";
       DOMRefs.form.totalSteps.disabled = true;
-      UISetup.syncStandardTaperDerivedFields("steps");
+      UISetup.syncStandardTaperDerivedFields("auto");
       return;
     }
 
@@ -1411,7 +1480,7 @@ const UISetup = {
     if (DOMRefs.form.totalSteps.value === "" && DOMRefs.form.totalSteps.dataset.manualValue) {
       DOMRefs.form.totalSteps.value = DOMRefs.form.totalSteps.dataset.manualValue;
     }
-    UISetup.syncStandardTaperDerivedFields("steps");
+    UISetup.syncStandardTaperDerivedFields("auto");
   },
 
   syncMedicationLabels() {
@@ -1620,6 +1689,7 @@ const UISetup = {
     const now = new Date();
     DOMRefs.form.taperStartDate.value = DateUtils.toDateInputValue(now);
     DOMRefs.form.totalSteps.dataset.manualValue = "";
+    UISetup.setStandardTaperDriver(taperDefaults.standardTaperDriver);
 
     Object.entries(taperDefaults).forEach(([key, value]) => {
       if (DOMRefs.form[key]) {
@@ -1658,15 +1728,15 @@ const AppController = {
       "click",
       AppController.handleTotalStepsModeToggle
     );
-    DOMRefs.loadExampleButton.addEventListener("click", AppController.handleLoadExample);
+      DOMRefs.loadExampleButton.addEventListener("click", AppController.handleLoadExample);
       DOMRefs.printLayoutSelect.addEventListener("change", DOMRenderer.syncPrintLayout);
       DOMRefs.form.startingDose.addEventListener("input", UISetup.syncCustomSegmentDoseHelpers);
-      DOMRefs.form.startingDose.addEventListener("input", () => UISetup.syncStandardTaperDerivedFields("steps"));
+      DOMRefs.form.startingDose.addEventListener("input", () => UISetup.syncStandardTaperDerivedFields("auto"));
       DOMRefs.form.tabletStrengthA.addEventListener("input", UISetup.syncCustomSegmentStrengthSelectors);
       DOMRefs.form.tabletStrengthB.addEventListener("input", UISetup.syncCustomSegmentStrengthSelectors);
       DOMRefs.form.tabletStrengthC.addEventListener("input", UISetup.syncCustomSegmentStrengthSelectors);
-      DOMRefs.form.doseChangePerStep.addEventListener("input", () => UISetup.syncStandardTaperDerivedFields("steps"));
-      DOMRefs.form.totalSteps.addEventListener("input", () => UISetup.syncStandardTaperDerivedFields("steps"));
+      DOMRefs.form.doseChangePerStep.addEventListener("input", () => UISetup.syncStandardTaperDerivedFields("auto"));
+      DOMRefs.form.totalSteps.addEventListener("input", AppController.handleTotalStepsInput);
       DOMRefs.finalDoseInput.addEventListener("input", AppController.handleFinalDoseInput);
       DOMRefs.customSegmentBody.addEventListener("input", UISetup.syncCustomSegmentDoseHelpers);
       DOMRefs.customSegmentBody.addEventListener("click", AppController.handleCustomSegmentRowClick);
@@ -1707,26 +1777,32 @@ const AppController = {
     UISetup.syncCustomSegmentControls();
   },
 
-  handleDoseDirectionClick(event) {
-    const direction = event.currentTarget.dataset.doseDirection;
-    if (!direction) return;
+    handleDoseDirectionClick(event) {
+      const direction = event.currentTarget.dataset.doseDirection;
+      if (!direction) return;
 
-    DOMRefs.doseChangeDirectionInput.value = direction;
-    UISetup.syncDoseChangeDirectionButtons();
-    UISetup.syncStandardTaperDerivedFields("steps");
-  },
+      DOMRefs.doseChangeDirectionInput.value = direction;
+      UISetup.syncDoseChangeDirectionButtons();
+      UISetup.syncStandardTaperDerivedFields("auto");
+    },
 
-  handleTotalStepsModeToggle() {
-    DOMRefs.totalStepsModeInput.value =
-      DOMRefs.totalStepsModeInput.value === "discontinuation" ? "manual" : "discontinuation";
-    UISetup.syncTotalStepsMode();
-  },
+    handleTotalStepsInput() {
+      UISetup.setStandardTaperDriver("steps");
+      UISetup.syncStandardTaperDerivedFields("steps");
+    },
 
-  handleFinalDoseInput() {
-    if (DOMRefs.totalStepsModeInput.value === "discontinuation") {
-      DOMRefs.totalStepsModeInput.value = "manual";
+    handleTotalStepsModeToggle() {
+      DOMRefs.totalStepsModeInput.value =
+        DOMRefs.totalStepsModeInput.value === "discontinuation" ? "manual" : "discontinuation";
       UISetup.syncTotalStepsMode();
-    }
+    },
+
+    handleFinalDoseInput() {
+      UISetup.setStandardTaperDriver("finalDose");
+      if (DOMRefs.totalStepsModeInput.value === "discontinuation") {
+        DOMRefs.totalStepsModeInput.value = "manual";
+        UISetup.syncTotalStepsMode();
+      }
 
     UISetup.syncStandardTaperDerivedFields("finalDose");
   },
