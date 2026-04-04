@@ -206,7 +206,10 @@ main {
 }
 
 .taper-mode-strip {
-  margin: 0 0 1.3rem;
+  display: flex;
+  justify-content: flex-start;
+  margin: 0 0 1.65rem;
+  padding: 0.1rem 0 0.15rem;
 }
 
 .taper-mode-strip .taper-mode-control {
