@@ -210,6 +210,11 @@ main {
   align-items: start;
 }
 
+.form-grid.is-advanced-mode {
+  grid-template-areas:
+    "med-start strengths";
+}
+
 .taper-mode-strip {
   display: flex;
   justify-content: flex-start;

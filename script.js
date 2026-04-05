@@ -861,6 +861,7 @@ const ViewModelFactory = {
 
 const DOMRefs = {
   form: document.getElementById("taper-form"),
+  formGrid: document.querySelector(".form-grid"),
   addSegmentRowButton: document.getElementById("add-segment-row"),
   customOverridePanel: document.getElementById("custom-override-panel"),
   customSegmentBody: document.getElementById("custom-segment-body"),
@@ -1525,6 +1526,7 @@ const UISetup = {
     DOMRefs.customOverridePanel.classList.toggle("is-hidden", !isVisible);
     DOMRefs.customOverridePanel.setAttribute("aria-hidden", String(!isVisible));
     DOMRefs.primaryTaperGroup.classList.toggle("is-hidden", isVisible);
+    DOMRefs.formGrid.classList.toggle("is-advanced-mode", isVisible);
     UISetup.syncTaperModeButtons();
     if (!isVisible) {
       UISetup.closeCustomSegmentSettings();

@@ -78,6 +78,10 @@
                 <input id="drug-name" name="drugName" type="text" maxlength="80" required>
               </label>
               <label>
+                <span>Starting Daily Dose (mg)</span>
+                <input id="starting-dose" name="startingDose" type="number" step="0.1" min="0" required>
+              </label>
+              <label>
                 <span>Taper Start Date</span>
                 <input id="taper-start-date" name="taperStartDate" type="date" required>
               </label>
@@ -85,10 +89,6 @@
 
             <fieldset class="group group-primary-taper">
               <legend>Primary Taper</legend>
-              <label>
-                <span>Starting Daily Dose (mg)</span>
-                <input id="starting-dose" name="startingDose" type="number" step="0.1" min="0" required>
-              </label>
               <label>
                 <span>Dose Change Per Step (mg)</span>
                 <div class="step-change-control">
