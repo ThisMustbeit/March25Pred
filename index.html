@@ -32,14 +32,24 @@
         </p>
       </div>
       <div class="hero-actions no-print">
-        <label class="print-layout-picker">
-          <span>Print Layout</span>
-          <select id="print-layout" name="printLayout">
-            <option value="portrait">Portrait</option>
-            <option value="landscape" selected>Landscape</option>
-          </select>
-        </label>
-        <button id="print-button" type="button" class="button button-secondary">Print</button>
+        <div class="hero-print-row">
+          <label class="print-layout-picker">
+            <span>Print Layout</span>
+            <select id="print-layout" name="printLayout">
+              <option value="portrait">Portrait</option>
+              <option value="landscape" selected>Landscape</option>
+            </select>
+          </label>
+          <button id="print-button" type="button" class="button button-secondary">Print</button>
+        </div>
+        <div class="code-import-bar">
+          <label class="code-import-field">
+            <span>Load Configuration Code</span>
+            <input id="config-code-input" type="text" autocomplete="off" spellcheck="false" placeholder="Paste a saved configuration code">
+          </label>
+          <button id="apply-config-code-button" type="button" class="button button-secondary">Apply Code</button>
+        </div>
+        <div id="config-code-status" class="code-status" aria-live="polite"></div>
       </div>
     </header>
 
@@ -208,6 +218,23 @@
                 </div>
               </fieldset>
             </div>
+
+            <fieldset class="group group-wide group-config-code no-print">
+              <legend>Configuration Code</legend>
+              <p class="help-text">
+                Generate a reusable code from the current inputs and paste it into the top bar later to restore the same setup.
+              </p>
+              <div class="config-code-row">
+                <label class="config-code-output-field">
+                  <span>Saved Configuration Code</span>
+                  <textarea id="generated-config-code" rows="3" readonly placeholder="Generate a code to save this setup"></textarea>
+                </label>
+                <div class="config-code-actions">
+                  <button id="generate-config-code-button" type="button" class="button button-secondary">Generate Code</button>
+                  <button id="copy-config-code-button" type="button" class="button button-secondary">Copy Code</button>
+                </div>
+              </div>
+            </fieldset>
           </div>
         </form>
 
@@ -343,7 +370,7 @@
       <td><input class="segment-days-per-step" type="number" step="1" min="1" max="365"></td>
         <td class="segment-repeats-cell">
           <input class="segment-repeats" type="number" step="1" min="0" max="100">
-          <span class="segment-repeats-static">1</span>
+          <span class="segment-repeats-static" aria-hidden="true"></span>
         </td>
         <td class="dose-helper"><span class="helper-dose helper-dose-end"></span></td>
         <td class="row-action-cell">

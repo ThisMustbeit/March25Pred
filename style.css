@@ -30,10 +30,6 @@ body {
   color: var(--text);
 }
 
-body.sticky-actions-visible {
-  padding-top: 88px;
-}
-
 button,
 input,
 select,
@@ -81,14 +77,15 @@ main {
   background: rgba(243, 246, 248, 0.96);
   backdrop-filter: blur(12px);
   border-bottom: 1px solid rgba(170, 192, 203, 0.55);
-  transform: translateY(-110%);
+  transform: translate3d(0, -110%, 0);
   opacity: 0;
   pointer-events: none;
-  transition: transform 180ms ease, opacity 180ms ease;
+  will-change: transform, opacity;
+  transition: transform 220ms ease, opacity 220ms ease;
 }
 
 body.sticky-actions-visible .sticky-action-bar {
-  transform: translateY(0);
+  transform: translate3d(0, 0, 0);
   opacity: 1;
   pointer-events: auto;
 }
@@ -174,7 +171,84 @@ body.sticky-actions-visible .sticky-action-bar {
 }
 
 .hero-actions {
+  display: grid;
+  justify-items: end;
+  gap: 0.7rem;
+}
+
+.hero-print-row {
+  display: flex;
   align-items: flex-end;
+  gap: 0.75rem;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+}
+
+.code-import-bar {
+  display: flex;
+  align-items: flex-end;
+  gap: 0.65rem;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+}
+
+.code-import-field,
+.config-code-output-field {
+  display: grid;
+  gap: 0.28rem;
+}
+
+.code-import-field {
+  min-width: min(360px, 100%);
+}
+
+.code-import-field span,
+.config-code-output-field span,
+.code-status {
+  font-size: 0.78rem;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  color: var(--muted);
+}
+
+.code-import-field input,
+.config-code-output-field textarea {
+  width: 100%;
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 0.68rem 0.8rem;
+  background: #fbfdfe;
+  color: var(--text);
+}
+
+.code-import-field input {
+  min-height: 54px;
+}
+
+.config-code-output-field textarea {
+  min-height: 104px;
+  resize: vertical;
+}
+
+.code-status {
+  min-height: 1rem;
+  text-align: right;
+}
+
+.code-status.is-error {
+  color: var(--danger);
+}
+
+.config-code-row {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: 1rem;
+  align-items: end;
+}
+
+.config-code-actions {
+  display: grid;
+  gap: 0.65rem;
 }
 
 .calendar-toolbar {
@@ -813,7 +887,7 @@ body.sticky-actions-visible .sticky-action-bar {
   border-bottom: 1px solid var(--border);
   padding: 0.9rem 0.8rem;
   text-align: left;
-  vertical-align: top;
+  vertical-align: middle;
 }
 
 .input-table th,
@@ -834,12 +908,13 @@ body.sticky-actions-visible .sticky-action-bar {
 
 .input-table .action-col,
 .input-table .row-action-cell {
-  width: 96px;
+  width: 84px;
   text-align: center;
 }
 
 .row-action-cell {
   position: relative;
+  vertical-align: middle;
 }
 
 .row-action-stack {
@@ -848,6 +923,7 @@ body.sticky-actions-visible .sticky-action-bar {
   justify-content: center;
   gap: 0.45rem;
   position: relative;
+  min-height: 44px;
 }
 
 .dose-helper {
@@ -855,6 +931,7 @@ body.sticky-actions-visible .sticky-action-bar {
   color: var(--muted);
   font-weight: 600;
   white-space: nowrap;
+  vertical-align: middle;
 }
 
 .segment-dose-static {
@@ -876,6 +953,7 @@ body.sticky-actions-visible .sticky-action-bar {
 .custom-segment-row.is-first-segment .segment-dose-static {
   display: inline-flex;
   align-items: center;
+  justify-content: flex-start;
   min-height: 44px;
 }
 
@@ -886,6 +964,7 @@ body.sticky-actions-visible .sticky-action-bar {
 .custom-segment-row.is-first-segment .segment-repeats-static {
   display: inline-flex;
   align-items: center;
+  justify-content: flex-start;
   min-height: 44px;
 }
 
@@ -1083,6 +1162,7 @@ body.sticky-actions-visible .sticky-action-bar {
 .segment-label {
   font-weight: 600;
   color: var(--muted);
+  white-space: nowrap;
 }
 
 @media (max-width: 900px) {
@@ -1090,6 +1170,17 @@ body.sticky-actions-visible .sticky-action-bar {
   .section-heading,
   .month-header {
     flex-direction: column;
+  }
+
+  .hero-actions,
+  .hero-print-row,
+  .code-import-bar {
+    width: 100%;
+    justify-content: stretch;
+  }
+
+  .code-import-field {
+    min-width: 100%;
   }
 
   .form-grid {
@@ -1128,6 +1219,17 @@ body.sticky-actions-visible .sticky-action-bar {
 
   .sticky-action-bar .button,
   .sticky-action-bar .print-layout-picker {
+    width: 100%;
+  }
+
+  .hero-print-row,
+  .code-import-bar,
+  .config-code-row {
+    display: grid;
+    grid-template-columns: 1fr;
+  }
+
+  .config-code-actions {
     width: 100%;
   }
 

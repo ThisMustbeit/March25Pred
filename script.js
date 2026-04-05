@@ -223,6 +223,75 @@ const Html = {
   },
 };
 
+const ConfigCode = {
+  prefix: "MTP1-",
+
+  encode(state) {
+    const json = JSON.stringify(state);
+    const bytes = new TextEncoder().encode(json);
+    let binary = "";
+
+    bytes.forEach((byte) => {
+      binary += String.fromCharCode(byte);
+    });
+
+    return `${ConfigCode.prefix}${btoa(binary).replace(/\+/g, "-").replace(/\//g, "_").replace(/=+$/g, "")}`;
+  },
+
+  decode(code) {
+    if (typeof code !== "string" || !code.startsWith(ConfigCode.prefix)) {
+      throw new Error("Invalid configuration code format.");
+    }
+
+    const payload = code.slice(ConfigCode.prefix.length);
+    const normalized = payload.replace(/-/g, "+").replace(/_/g, "/");
+    const padded = normalized.padEnd(Math.ceil(normalized.length / 4) * 4, "=");
+    const binary = atob(padded);
+    const bytes = Uint8Array.from(binary, (char) => char.charCodeAt(0));
+    const json = new TextDecoder().decode(bytes);
+    return JSON.parse(json);
+  },
+
+  captureCurrentState() {
+    const customSegments = [...DOMRefs.customSegmentBody.querySelectorAll("tr")].map((row, index) => {
+      const fields = UISetup.getCustomRowFields(row);
+      return {
+        doseChange: index === 0 ? "0" : fields.doseChangeInput.value,
+        daysPerStep: fields.daysPerStepInput.value,
+        repeats: index === 0 ? "1" : fields.repeatsInput.value,
+        allowedStrengthKeys: fields.strengthOptions
+          .map((option) => option.querySelector(".segment-strength-toggle"))
+          .filter((toggle) => toggle && !toggle.disabled && toggle.checked)
+          .map((toggle) => toggle.dataset.strengthKey),
+      };
+    });
+
+    return {
+      version: 1,
+      printLayout: DOMRefs.printLayoutSelect.value,
+      form: {
+        drugName: DOMRefs.form.drugName.value,
+        taperStartDate: DOMRefs.form.taperStartDate.value,
+        startingDose: DOMRefs.form.startingDose.value,
+        dosageForm: DOMRefs.form.dosageForm.value,
+        doseChangePerStep: DOMRefs.form.doseChangePerStep.value,
+        doseChangeDirection: DOMRefs.doseChangeDirectionInput.value,
+        daysPerStep: DOMRefs.form.daysPerStep.value,
+        totalSteps: DOMRefs.form.totalSteps.value,
+        finalDose: DOMRefs.finalDoseInput.value,
+        totalStepsMode: DOMRefs.totalStepsModeInput.value,
+        standardTaperDriver: UISetup.getStandardTaperDriver(),
+        useCustomOverride: DOMRefs.useCustomOverrideInput.value,
+        allowPartialTablets: DOMRefs.form.allowPartialTablets.checked,
+        tabletStrengthA: DOMRefs.form.tabletStrengthA.value,
+        tabletStrengthB: DOMRefs.form.tabletStrengthB.value,
+        tabletStrengthC: DOMRefs.form.tabletStrengthC.value,
+      },
+      customSegments,
+    };
+  },
+};
+
 const Strengths = {
   create(inputValues) {
     return [
@@ -883,11 +952,18 @@ const DOMRefs = {
   stickyPrintButton: document.getElementById("sticky-print-button"),
   stickyPrintLayoutSelect: document.getElementById("sticky-print-layout"),
   loadExampleButton: document.getElementById("load-example-button"),
+  configCodeInput: document.getElementById("config-code-input"),
+  applyConfigCodeButton: document.getElementById("apply-config-code-button"),
+  configCodeStatus: document.getElementById("config-code-status"),
+  generatedConfigCode: document.getElementById("generated-config-code"),
+  generateConfigCodeButton: document.getElementById("generate-config-code-button"),
+  copyConfigCodeButton: document.getElementById("copy-config-code-button"),
   calendarViewInputs: [...document.querySelectorAll('input[name="calendarView"]')],
   strengthLabelA: document.getElementById("strength-label-a"),
   strengthLabelB: document.getElementById("strength-label-b"),
   strengthLabelC: document.getElementById("strength-label-c"),
   partialUnitsLabel: document.getElementById("partial-units-label"),
+  partialUnitsRow: document.getElementById("partial-units-label")?.closest(".checkbox-row"),
   scheduleStrengthColA: document.getElementById("schedule-strength-col-a"),
   scheduleStrengthColB: document.getElementById("schedule-strength-col-b"),
   scheduleStrengthColC: document.getElementById("schedule-strength-col-c"),
@@ -1345,6 +1421,8 @@ const DOMBuilders = {
 };
 
 const DOMRenderer = {
+  stickyActionObserver: null,
+
   renderValidationErrors(errors) {
     if (errors.length === 0) {
       DOMRefs.validationSummary.classList.remove("active");
@@ -1427,6 +1505,36 @@ const DOMRenderer = {
 
     document.body.classList.toggle("sticky-actions-visible", isPastGenerateButton);
     DOMRefs.stickyActionBar.setAttribute("aria-hidden", String(!isPastGenerateButton));
+  },
+
+  initializeStickyActionBar() {
+    if (!DOMRefs.generateButton || !DOMRefs.stickyActionBar) return;
+
+    if (DOMRenderer.stickyActionObserver) {
+      DOMRenderer.stickyActionObserver.disconnect();
+      DOMRenderer.stickyActionObserver = null;
+    }
+
+    if (!("IntersectionObserver" in window)) {
+      window.addEventListener("scroll", DOMRenderer.syncStickyActionBarVisibility, { passive: true });
+      window.addEventListener("resize", DOMRenderer.syncStickyActionBarVisibility);
+      DOMRenderer.syncStickyActionBarVisibility();
+      return;
+    }
+
+    DOMRenderer.stickyActionObserver = new IntersectionObserver(
+      ([entry]) => {
+        const isPastGenerateButton = !entry.isIntersecting;
+        document.body.classList.toggle("sticky-actions-visible", isPastGenerateButton);
+        DOMRefs.stickyActionBar.setAttribute("aria-hidden", String(!isPastGenerateButton));
+      },
+      {
+        threshold: 0,
+        rootMargin: "-12px 0px 0px 0px",
+      }
+    );
+
+    DOMRenderer.stickyActionObserver.observe(DOMRefs.generateButton);
   },
 };
 
@@ -1538,6 +1646,7 @@ const UISetup = {
 
   syncMedicationLabels() {
     const dosageForm = MedicationTerms.normalizeDosageForm(DOMRefs.form.dosageForm.value);
+    const allowPartialVisible = dosageForm === "tablet";
 
     DOMRefs.strengthLabelA.textContent = MedicationTerms.strengthLabel("A", dosageForm);
     DOMRefs.strengthLabelB.textContent = MedicationTerms.strengthLabel("B", dosageForm);
@@ -1546,6 +1655,15 @@ const UISetup = {
     DOMRefs.scheduleStrengthColA.textContent = MedicationTerms.scheduleColumnLabel("A", dosageForm);
     DOMRefs.scheduleStrengthColB.textContent = MedicationTerms.scheduleColumnLabel("B", dosageForm);
     DOMRefs.scheduleStrengthColC.textContent = MedicationTerms.scheduleColumnLabel("C", dosageForm);
+
+    if (DOMRefs.partialUnitsRow) {
+      DOMRefs.partialUnitsRow.hidden = !allowPartialVisible;
+    }
+
+    if (!allowPartialVisible) {
+      DOMRefs.form.allowPartialTablets.checked = false;
+    }
+
     UISetup.syncCustomSegmentStrengthSelectors();
   },
 
@@ -1812,12 +1930,10 @@ const AppController = {
           input.addEventListener("change", DOMRenderer.syncLayoutControls)
         );
         document.addEventListener("click", AppController.handleDocumentClick);
-        window.addEventListener("scroll", DOMRenderer.syncStickyActionBarVisibility, { passive: true });
-        window.addEventListener("resize", DOMRenderer.syncStickyActionBarVisibility);
         window.addEventListener("beforeprint", () => document.body.classList.add("printing"));
         window.addEventListener("afterprint", () => document.body.classList.remove("printing"));
         DOMRenderer.syncPrintLayoutControls("main");
-        DOMRenderer.syncStickyActionBarVisibility();
+        DOMRenderer.initializeStickyActionBar();
         AppController.render();
     },
 
