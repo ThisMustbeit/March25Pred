@@ -7,6 +7,20 @@
   <link rel="stylesheet" href="style.css">
 </head>
 <body>
+  <div id="sticky-action-bar" class="sticky-action-bar no-print" aria-hidden="true">
+    <div class="sticky-action-bar-inner">
+      <button id="sticky-generate-button" type="submit" form="taper-form" class="button">Generate Schedule</button>
+      <label class="print-layout-picker sticky-print-layout-picker">
+        <span>Print Layout</span>
+        <select id="sticky-print-layout" name="stickyPrintLayout">
+          <option value="portrait">Portrait</option>
+          <option value="landscape" selected>Landscape</option>
+        </select>
+      </label>
+      <button id="sticky-print-button" type="button" class="button button-secondary">Print</button>
+    </div>
+  </div>
+
   <div class="app-shell">
     <header class="hero">
       <div>
@@ -327,7 +341,10 @@
         <span class="segment-dose-static">Starting dose</span>
       </td>
       <td><input class="segment-days-per-step" type="number" step="1" min="1" max="365"></td>
-      <td><input class="segment-repeats" type="number" step="1" min="0" max="100"></td>
+        <td class="segment-repeats-cell">
+          <input class="segment-repeats" type="number" step="1" min="0" max="100">
+          <span class="segment-repeats-static">1</span>
+        </td>
         <td class="dose-helper"><span class="helper-dose helper-dose-end"></span></td>
         <td class="row-action-cell">
           <div class="row-action-stack">

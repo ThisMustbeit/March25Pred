@@ -30,6 +30,10 @@ body {
   color: var(--text);
 }
 
+body.sticky-actions-visible {
+  padding-top: 88px;
+}
+
 button,
 input,
 select,
@@ -65,6 +69,38 @@ main {
   border: 1px solid rgba(170, 192, 203, 0.55);
   border-radius: var(--radius);
   box-shadow: var(--shadow);
+}
+
+.sticky-action-bar {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 60;
+  padding: 0.8rem 1rem;
+  background: rgba(243, 246, 248, 0.96);
+  backdrop-filter: blur(12px);
+  border-bottom: 1px solid rgba(170, 192, 203, 0.55);
+  transform: translateY(-110%);
+  opacity: 0;
+  pointer-events: none;
+  transition: transform 180ms ease, opacity 180ms ease;
+}
+
+body.sticky-actions-visible .sticky-action-bar {
+  transform: translateY(0);
+  opacity: 1;
+  pointer-events: auto;
+}
+
+.sticky-action-bar-inner {
+  width: min(1200px, calc(100% - 2rem));
+  margin: 0 auto;
+  display: flex;
+  align-items: flex-end;
+  justify-content: flex-end;
+  gap: 0.75rem;
+  flex-wrap: wrap;
 }
 
 .hero {
@@ -152,6 +188,10 @@ main {
   min-width: 150px;
 }
 
+.sticky-print-layout-picker {
+  min-width: 170px;
+}
+
 .print-layout-picker span {
   font-size: 0.78rem;
   font-weight: 700;
@@ -196,6 +236,11 @@ main {
 }
 
 .hero-actions .button {
+  min-height: 50px;
+  padding: 0.58rem 1.18rem;
+}
+
+.sticky-action-bar .button {
   min-height: 50px;
   padding: 0.58rem 1.18rem;
 }
@@ -818,11 +863,27 @@ main {
   font-weight: 600;
 }
 
+.segment-repeats-static {
+  display: none;
+  color: var(--muted);
+  font-weight: 600;
+}
+
 .custom-segment-row.is-first-segment .segment-dose-change {
   display: none;
 }
 
 .custom-segment-row.is-first-segment .segment-dose-static {
+  display: inline-flex;
+  align-items: center;
+  min-height: 44px;
+}
+
+.custom-segment-row.is-first-segment .segment-repeats {
+  display: none;
+}
+
+.custom-segment-row.is-first-segment .segment-repeats-static {
   display: inline-flex;
   align-items: center;
   min-height: 44px;
@@ -1054,6 +1115,20 @@ main {
   .card {
     padding: 1.15rem;
     border-radius: 14px;
+  }
+
+  .sticky-action-bar {
+    padding: 0.7rem 0.5rem;
+  }
+
+  .sticky-action-bar-inner {
+    width: min(100% - 0.5rem, 100%);
+    justify-content: stretch;
+  }
+
+  .sticky-action-bar .button,
+  .sticky-action-bar .print-layout-picker {
+    width: 100%;
   }
 
   .summary-card {

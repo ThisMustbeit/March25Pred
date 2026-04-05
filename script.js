@@ -862,6 +862,9 @@ const ViewModelFactory = {
 const DOMRefs = {
   form: document.getElementById("taper-form"),
   formGrid: document.querySelector(".form-grid"),
+  generateButton: document.getElementById("generate-button"),
+  stickyActionBar: document.getElementById("sticky-action-bar"),
+  stickyGenerateButton: document.getElementById("sticky-generate-button"),
   addSegmentRowButton: document.getElementById("add-segment-row"),
   customOverridePanel: document.getElementById("custom-override-panel"),
   customSegmentBody: document.getElementById("custom-segment-body"),
@@ -877,6 +880,8 @@ const DOMRefs = {
   scheduleBody: document.getElementById("schedule-body"),
   printButton: document.getElementById("print-button"),
   printLayoutSelect: document.getElementById("print-layout"),
+  stickyPrintButton: document.getElementById("sticky-print-button"),
+  stickyPrintLayoutSelect: document.getElementById("sticky-print-layout"),
   loadExampleButton: document.getElementById("load-example-button"),
   calendarViewInputs: [...document.querySelectorAll('input[name="calendarView"]')],
   strengthLabelA: document.getElementById("strength-label-a"),
@@ -988,9 +993,9 @@ const InputFactory = {
       const fields = UISetup.getCustomRowFields(row);
       const doseChangeValue = index === 0 ? "0" : fields.doseChangeInput.value.trim();
       const daysValue = fields.daysPerStepInput.value.trim();
-      const repeatsValue = fields.repeatsInput.value.trim();
+      const repeatsValue = index === 0 ? "1" : fields.repeatsInput.value.trim();
       const allBlank = index === 0
-        ? daysValue === "" && repeatsValue === ""
+        ? daysValue === ""
         : doseChangeValue === "" && daysValue === "" && repeatsValue === "";
 
       if (allBlank) return null;
@@ -998,7 +1003,7 @@ const InputFactory = {
       const segment = {
         doseChange: index === 0 ? 0 : NumberUtils.parseOptionalNumber(doseChangeValue),
         daysPerStep: daysValue === "" ? 0 : NumberUtils.parseOptionalInteger(daysValue),
-        repeats: repeatsValue === "" ? 0 : NumberUtils.parseOptionalInteger(repeatsValue),
+        repeats: index === 0 ? 1 : repeatsValue === "" ? 0 : NumberUtils.parseOptionalInteger(repeatsValue),
         allowedStrengthKeys: fields.strengthOptions
           .map((option) => option.querySelector(".segment-strength-toggle"))
           .filter((toggle) => toggle && !toggle.disabled && toggle.checked)
@@ -1400,6 +1405,29 @@ const DOMRenderer = {
     document.body.classList.toggle("print-layout-landscape", layout === "landscape");
     document.body.classList.toggle("print-layout-portrait", layout !== "landscape");
   },
+
+  syncPrintLayoutControls(source = "main") {
+    const sourceSelect =
+      source === "sticky" ? DOMRefs.stickyPrintLayoutSelect : DOMRefs.printLayoutSelect;
+    const targetSelect =
+      source === "sticky" ? DOMRefs.printLayoutSelect : DOMRefs.stickyPrintLayoutSelect;
+
+    if (sourceSelect && targetSelect) {
+      targetSelect.value = sourceSelect.value;
+    }
+
+    DOMRenderer.syncPrintLayout();
+  },
+
+  syncStickyActionBarVisibility() {
+    if (!DOMRefs.generateButton || !DOMRefs.stickyActionBar) return;
+
+    const buttonRect = DOMRefs.generateButton.getBoundingClientRect();
+    const isPastGenerateButton = buttonRect.bottom < 12;
+
+    document.body.classList.toggle("sticky-actions-visible", isPastGenerateButton);
+    DOMRefs.stickyActionBar.setAttribute("aria-hidden", String(!isPastGenerateButton));
+  },
 };
 
 const UISetup = {
@@ -1583,9 +1611,11 @@ const UISetup = {
       fields.daysPerStepInput.name = `customDaysPerStep${index}`;
       fields.repeatsInput.name = `customRepeats${index}`;
       fields.doseChangeInput.disabled = isFirstSegment;
+      fields.repeatsInput.disabled = isFirstSegment;
 
       if (isFirstSegment) {
         fields.doseChangeInput.value = "0";
+        fields.repeatsInput.value = "1";
       }
     });
   },
@@ -1666,8 +1696,8 @@ const UISetup = {
       const doseChange = isFirstSegment
         ? 0
         : NumberUtils.parseOptionalNumber(fields.doseChangeInput.value.trim());
-      const repeatsValue = fields.repeatsInput.value.trim();
-      const repeats = repeatsValue === "" ? 0 : NumberUtils.parseOptionalInteger(repeatsValue);
+      const repeatsValue = isFirstSegment ? "1" : fields.repeatsInput.value.trim();
+      const repeats = isFirstSegment ? 1 : repeatsValue === "" ? 0 : NumberUtils.parseOptionalInteger(repeatsValue);
 
       if (doseChange == null || repeats == null) {
         fields.startDoseEl.textContent = "";
@@ -1760,7 +1790,10 @@ const AppController = {
       AppController.handleTotalStepsModeToggle
     );
       DOMRefs.loadExampleButton.addEventListener("click", AppController.handleLoadExample);
-      DOMRefs.printLayoutSelect.addEventListener("change", DOMRenderer.syncPrintLayout);
+        DOMRefs.printLayoutSelect.addEventListener("change", () => DOMRenderer.syncPrintLayoutControls("main"));
+        DOMRefs.stickyPrintLayoutSelect.addEventListener("change", () =>
+          DOMRenderer.syncPrintLayoutControls("sticky")
+        );
       DOMRefs.form.startingDose.addEventListener("input", UISetup.syncCustomSegmentDoseHelpers);
       DOMRefs.form.startingDose.addEventListener("input", () => UISetup.syncStandardTaperDerivedFields("auto"));
       DOMRefs.form.tabletStrengthA.addEventListener("input", UISetup.syncCustomSegmentStrengthSelectors);
@@ -1773,15 +1806,20 @@ const AppController = {
       DOMRefs.customSegmentBody.addEventListener("click", AppController.handleCustomSegmentRowClick);
       DOMRefs.customSegmentBody.addEventListener("change", AppController.handleCustomSegmentSettingsChange);
       DOMRefs.addSegmentRowButton.addEventListener("click", AppController.handleAddCustomRow);
-      DOMRefs.printButton.addEventListener("click", AppController.handlePrint);
-      DOMRefs.calendarViewInputs.forEach((input) =>
-        input.addEventListener("change", DOMRenderer.syncLayoutControls)
-      );
-      document.addEventListener("click", AppController.handleDocumentClick);
-      window.addEventListener("beforeprint", () => document.body.classList.add("printing"));
-      window.addEventListener("afterprint", () => document.body.classList.remove("printing"));
-      AppController.render();
-  },
+        DOMRefs.printButton.addEventListener("click", AppController.handlePrint);
+        DOMRefs.stickyPrintButton.addEventListener("click", AppController.handlePrint);
+        DOMRefs.calendarViewInputs.forEach((input) =>
+          input.addEventListener("change", DOMRenderer.syncLayoutControls)
+        );
+        document.addEventListener("click", AppController.handleDocumentClick);
+        window.addEventListener("scroll", DOMRenderer.syncStickyActionBarVisibility, { passive: true });
+        window.addEventListener("resize", DOMRenderer.syncStickyActionBarVisibility);
+        window.addEventListener("beforeprint", () => document.body.classList.add("printing"));
+        window.addEventListener("afterprint", () => document.body.classList.remove("printing"));
+        DOMRenderer.syncPrintLayoutControls("main");
+        DOMRenderer.syncStickyActionBarVisibility();
+        AppController.render();
+    },
 
   handleGenerate(event) {
     event.preventDefault();
@@ -1900,9 +1938,10 @@ const AppController = {
     const calendars = CalendarLogic.generateCalendarRange(inputs, scheduleRows);
     const viewModel = ViewModelFactory.create(inputs, scheduleRows, summary, calendars);
 
-    DOMRenderer.render(viewModel);
-    DOMRenderer.syncLayoutControls();
-  },
-};
+      DOMRenderer.render(viewModel);
+      DOMRenderer.syncLayoutControls();
+      DOMRenderer.syncStickyActionBarVisibility();
+    },
+  };
 
 AppController.initialize();
