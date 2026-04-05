@@ -290,6 +290,21 @@ const ConfigCode = {
       customSegments,
     };
   },
+
+  normalizeImportedState(state) {
+    if (!state || typeof state !== "object") {
+      throw new Error("Configuration code is missing data.");
+    }
+
+    return {
+      printLayout: state.printLayout === "portrait" ? "portrait" : "landscape",
+      form: {
+        ...APP_CONFIG.defaults.taper,
+        ...(state.form || {}),
+      },
+      customSegments: Array.isArray(state.customSegments) ? state.customSegments : [],
+    };
+  },
 };
 
 const Strengths = {
@@ -1079,7 +1094,7 @@ const InputFactory = {
       const segment = {
         doseChange: index === 0 ? 0 : NumberUtils.parseOptionalNumber(doseChangeValue),
         daysPerStep: daysValue === "" ? 0 : NumberUtils.parseOptionalInteger(daysValue),
-        repeats: index === 0 ? 1 : repeatsValue === "" ? 0 : NumberUtils.parseOptionalInteger(repeatsValue),
+        repeats: index === 0 ? 1 : repeatsValue === "" ? 1 : NumberUtils.parseOptionalInteger(repeatsValue),
         allowedStrengthKeys: fields.strengthOptions
           .map((option) => option.querySelector(".segment-strength-toggle"))
           .filter((toggle) => toggle && !toggle.disabled && toggle.checked)
@@ -1444,6 +1459,12 @@ const DOMRenderer = {
     DOMRefs.calendarMonths.innerHTML = "";
     DOMRefs.calendarList.innerHTML = "";
     DOMRefs.scheduleBody.innerHTML = "";
+  },
+
+  setConfigCodeStatus(message = "", tone = "") {
+    if (!DOMRefs.configCodeStatus) return;
+    DOMRefs.configCodeStatus.textContent = message;
+    DOMRefs.configCodeStatus.classList.toggle("is-error", tone === "error");
   },
 
   render(viewModel) {
@@ -1815,7 +1836,7 @@ const UISetup = {
         ? 0
         : NumberUtils.parseOptionalNumber(fields.doseChangeInput.value.trim());
       const repeatsValue = isFirstSegment ? "1" : fields.repeatsInput.value.trim();
-      const repeats = isFirstSegment ? 1 : repeatsValue === "" ? 0 : NumberUtils.parseOptionalInteger(repeatsValue);
+      const repeats = isFirstSegment ? 1 : repeatsValue === "" ? 1 : NumberUtils.parseOptionalInteger(repeatsValue);
 
       if (doseChange == null || repeats == null) {
         fields.startDoseEl.textContent = "";
@@ -1882,6 +1903,51 @@ const UISetup = {
       UISetup.syncCustomOverrideVisibility();
     },
 
+  applyImportedConfiguration(state) {
+    const normalized = ConfigCode.normalizeImportedState(state);
+
+    DOMRefs.printLayoutSelect.value = normalized.printLayout;
+    DOMRefs.stickyPrintLayoutSelect.value = normalized.printLayout;
+    DOMRenderer.syncPrintLayoutControls("main");
+
+    UISetup.applyFormDefaults(normalized.form, []);
+
+    DOMRefs.useCustomOverrideInput.value = normalized.form.useCustomOverride === "true" ? "true" : "false";
+    UISetup.setStandardTaperDriver(normalized.form.standardTaperDriver);
+
+    const importedSegments = normalized.customSegments.map((segment, index) => [
+      index === 0 ? "0" : segment?.doseChange ?? "",
+      segment?.daysPerStep ?? "",
+      index === 0 ? "1" : segment?.repeats ?? "",
+    ]);
+
+    UISetup.rebuildCustomSegmentRows(importedSegments);
+
+    [...DOMRefs.customSegmentBody.querySelectorAll("tr")].forEach((row, index) => {
+      const importedSegment = normalized.customSegments[index];
+      if (!importedSegment) return;
+
+      const fields = UISetup.getCustomRowFields(row);
+      fields.strengthOptions.forEach((option) => {
+        const toggle = option.querySelector(".segment-strength-toggle");
+        if (!toggle || toggle.disabled) return;
+
+        if (Array.isArray(importedSegment.allowedStrengthKeys)) {
+          toggle.checked = importedSegment.allowedStrengthKeys.includes(toggle.dataset.strengthKey);
+          toggle.dataset.userSet = "true";
+        }
+      });
+    });
+
+    UISetup.syncDoseChangeDirectionButtons();
+    UISetup.syncMedicationLabels();
+    UISetup.syncTotalStepsMode();
+    UISetup.syncCustomOverrideVisibility();
+    UISetup.syncCustomSegmentDoseHelpers();
+    UISetup.syncCustomSegmentControls();
+    UISetup.syncStandardTaperDerivedFields("auto");
+  },
+
   applyDefaults() {
     UISetup.applyFormDefaults(APP_CONFIG.defaults.taper, []);
   },
@@ -1908,6 +1974,10 @@ const AppController = {
       AppController.handleTotalStepsModeToggle
     );
       DOMRefs.loadExampleButton.addEventListener("click", AppController.handleLoadExample);
+      DOMRefs.generateConfigCodeButton.addEventListener("click", AppController.handleGenerateConfigCode);
+      DOMRefs.copyConfigCodeButton.addEventListener("click", AppController.handleCopyConfigCode);
+      DOMRefs.applyConfigCodeButton.addEventListener("click", AppController.handleApplyConfigCode);
+      DOMRefs.configCodeInput.addEventListener("keydown", AppController.handleConfigCodeKeydown);
         DOMRefs.printLayoutSelect.addEventListener("change", () => DOMRenderer.syncPrintLayoutControls("main"));
         DOMRefs.stickyPrintLayoutSelect.addEventListener("change", () =>
           DOMRenderer.syncPrintLayoutControls("sticky")
@@ -1952,6 +2022,54 @@ const AppController = {
   handleLoadExample() {
     UISetup.loadExample();
     AppController.render();
+  },
+
+  handleGenerateConfigCode() {
+    try {
+      const code = ConfigCode.encode(ConfigCode.captureCurrentState());
+      DOMRefs.generatedConfigCode.value = code;
+      DOMRenderer.setConfigCodeStatus("Configuration code generated.");
+    } catch (error) {
+      DOMRenderer.setConfigCodeStatus("Unable to generate configuration code.", "error");
+    }
+  },
+
+  async handleCopyConfigCode() {
+    const code = DOMRefs.generatedConfigCode.value.trim();
+    if (!code) {
+      DOMRenderer.setConfigCodeStatus("Generate a configuration code first.", "error");
+      return;
+    }
+
+    try {
+      await navigator.clipboard.writeText(code);
+      DOMRenderer.setConfigCodeStatus("Configuration code copied.");
+    } catch (error) {
+      DOMRenderer.setConfigCodeStatus("Unable to copy configuration code.", "error");
+    }
+  },
+
+  handleApplyConfigCode() {
+    const code = DOMRefs.configCodeInput.value.trim();
+    if (!code) {
+      DOMRenderer.setConfigCodeStatus("Paste a configuration code first.", "error");
+      return;
+    }
+
+    try {
+      const state = ConfigCode.decode(code);
+      UISetup.applyImportedConfiguration(state);
+      DOMRenderer.setConfigCodeStatus("Configuration code applied.");
+      AppController.render();
+    } catch (error) {
+      DOMRenderer.setConfigCodeStatus("That configuration code could not be loaded.", "error");
+    }
+  },
+
+  handleConfigCodeKeydown(event) {
+    if (event.key !== "Enter") return;
+    event.preventDefault();
+    AppController.handleApplyConfigCode();
   },
 
   handleAddCustomRow() {
