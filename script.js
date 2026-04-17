@@ -994,10 +994,17 @@ const DOMRefs = {
   doseDirectionButtons: [...document.querySelectorAll("[data-dose-direction]")],
   taperModeButtons: [...document.querySelectorAll("[data-taper-mode]")],
   useCustomOverrideInput: document.getElementById("use-custom-override"),
+  taperModeStrip: document.querySelector(".taper-mode-strip"),
   primaryTaperGroup: document.querySelector(".group-primary-taper"),
+  medStartGroup: document.querySelector(".group-med-start"),
+  customOverrideFieldset: document.querySelector("#custom-override-panel fieldset"),
   finalDoseInput: document.getElementById("final-dose"),
   totalStepsModeInput: document.getElementById("total-steps-mode"),
   totalStepsDiscontinuationButton: document.getElementById("total-steps-discontinuation"),
+  mobileTaperModeHome: document.getElementById("mobile-taper-mode-home"),
+  mobileStartingDoseHome: document.getElementById("mobile-starting-dose-home"),
+  mobileStartingDoseTarget: document.getElementById("mobile-starting-dose-target"),
+  mobileAdvancedTaperTarget: document.getElementById("mobile-advanced-taper-target"),
 };
 
 const MobileFlow = {
@@ -1005,7 +1012,7 @@ const MobileFlow = {
   steps: [
     {
       title: "Medication & Start",
-      description: "Enter the medication name, starting dose, and taper start date.",
+      description: "Enter the medication name and taper start date.",
       nextLabel: "Next: Strengths",
     },
     {
@@ -1054,6 +1061,7 @@ const MobileFlow = {
       document.body.dataset.mobileStep = String(MobileFlow.currentStep);
     }
 
+    UISetup.syncMobileFieldPlacement();
     DOMRenderer.syncMobileFlow();
   },
 };
@@ -1595,6 +1603,8 @@ const DOMRenderer = {
     const isActive = MobileFlow.isActive();
     const currentStep = MobileFlow.steps[MobileFlow.currentStep - 1] || MobileFlow.steps[0];
 
+    UISetup.syncMobileFieldPlacement();
+
     document.body.classList.toggle("mobile-step-1", isActive && MobileFlow.currentStep === 1);
     document.body.classList.toggle("mobile-step-2", isActive && MobileFlow.currentStep === 2);
     document.body.classList.toggle("mobile-step-3", isActive && MobileFlow.currentStep === 3);
@@ -1792,8 +1802,42 @@ const UISetup = {
     DOMRefs.primaryTaperGroup.classList.toggle("is-hidden", isVisible);
     DOMRefs.formGrid.classList.toggle("is-advanced-mode", isVisible);
     UISetup.syncTaperModeButtons();
+    UISetup.syncMobileFieldPlacement();
     if (!isVisible) {
       UISetup.closeCustomSegmentSettings();
+    }
+  },
+
+  syncMobileFieldPlacement() {
+    const startingDoseLabel = DOMRefs.form.startingDose?.closest("label");
+    const taperStartDateLabel = DOMRefs.form.taperStartDate?.closest("label");
+
+    if (!startingDoseLabel || !DOMRefs.taperModeStrip || !DOMRefs.mobileTaperModeHome) return;
+
+    if (MobileFlow.isActive()) {
+      const isAdvancedMode = DOMRefs.useCustomOverrideInput.value === "true";
+      const mobileTaperContainer = isAdvancedMode ? DOMRefs.customOverrideFieldset : DOMRefs.primaryTaperGroup;
+      const mobileStartingDoseAnchor = isAdvancedMode
+        ? DOMRefs.mobileAdvancedTaperTarget
+        : DOMRefs.mobileStartingDoseTarget;
+
+      if (mobileTaperContainer && mobileStartingDoseAnchor && startingDoseLabel.parentElement !== mobileTaperContainer) {
+        mobileTaperContainer.insertBefore(startingDoseLabel, mobileStartingDoseAnchor.nextSibling);
+      }
+
+      if (mobileTaperContainer && DOMRefs.taperModeStrip.parentElement !== mobileTaperContainer) {
+        mobileTaperContainer.insertBefore(DOMRefs.taperModeStrip, mobileStartingDoseAnchor || mobileTaperContainer.firstChild);
+      }
+
+      return;
+    }
+
+    if (DOMRefs.mobileStartingDoseHome && taperStartDateLabel && startingDoseLabel.parentElement !== DOMRefs.medStartGroup) {
+      DOMRefs.medStartGroup.insertBefore(startingDoseLabel, taperStartDateLabel);
+    }
+
+    if (DOMRefs.taperModeStrip.parentElement !== DOMRefs.mobileTaperModeHome.parentElement) {
+      DOMRefs.mobileTaperModeHome.parentElement.insertBefore(DOMRefs.taperModeStrip, DOMRefs.mobileTaperModeHome.nextSibling);
     }
   },
 

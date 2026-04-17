@@ -151,6 +151,13 @@ body.sticky-actions-visible .sticky-action-bar {
   display: none;
 }
 
+#mobile-starting-dose-home,
+#mobile-starting-dose-target,
+#mobile-taper-mode-home,
+#mobile-advanced-taper-target {
+  display: none;
+}
+
 .card {
   padding: 1.9rem;
 }
@@ -1375,7 +1382,7 @@ body.sticky-actions-visible .sticky-action-bar {
   body.mobile-flow-active.mobile-step-3 .taper-mode-strip {
     display: flex;
     width: 100%;
-    margin-bottom: 0.4rem;
+    margin-bottom: 0.75rem;
   }
 
   body.mobile-flow-active.mobile-step-3 .group-config-code {
@@ -1388,6 +1395,30 @@ body.sticky-actions-visible .sticky-action-bar {
 
   body.mobile-flow-active .group {
     margin-bottom: 0;
+  }
+
+  body.mobile-flow-active .group-primary-taper .taper-mode-strip {
+    padding-top: 0;
+  }
+
+  body.mobile-flow-active .group-primary-taper .taper-mode-control {
+    width: 100%;
+    gap: 0.4rem;
+  }
+
+  body.mobile-flow-active .group-primary-taper .taper-mode-label {
+    font-size: 0.88rem;
+  }
+
+  body.mobile-flow-active .group-primary-taper .direction-toggle {
+    width: 100%;
+    padding: 0.2rem;
+  }
+
+  body.mobile-flow-active .group-primary-taper .direction-toggle-button {
+    min-width: 0;
+    padding: 0.6rem 0.5rem;
+    font-size: 0.92rem;
   }
 }
 
