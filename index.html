@@ -93,6 +93,14 @@
           </div>
         </div>
 
+        <div class="mobile-stepper no-print" aria-live="polite">
+          <p id="mobile-step-count" class="mobile-step-count">Step 1 of 4</p>
+          <h3 id="mobile-step-title" class="mobile-step-title">Medication &amp; Start</h3>
+          <p id="mobile-step-description" class="mobile-step-description">
+            Enter the medication name, starting dose, and taper start date.
+          </p>
+        </div>
+
         <form id="taper-form" novalidate>
           <div class="form-grid">
             <fieldset class="group group-med-start">
@@ -239,9 +247,32 @@
         </form>
 
         <div id="validation-summary" class="validation-summary" aria-live="polite"></div>
+
+        <div class="mobile-flow-footer no-print">
+          <button id="mobile-step-back" type="button" class="button button-secondary">Back</button>
+          <button id="mobile-step-next" type="button" class="button">Next</button>
+        </div>
       </section>
 
       <section id="results" class="results-stack">
+        <div class="card mobile-results-actions no-print">
+          <div class="mobile-results-header">
+            <p class="section-kicker">Step 4 of 4</p>
+            <h2>Calendar &amp; Print</h2>
+          </div>
+          <div class="mobile-results-action-row">
+            <button id="mobile-edit-inputs-button" type="button" class="button button-secondary">Edit Inputs</button>
+            <label class="print-layout-picker mobile-print-layout-picker">
+              <span>Print Layout</span>
+              <select id="mobile-print-layout" name="mobilePrintLayout">
+                <option value="portrait">Portrait</option>
+                <option value="landscape" selected>Landscape</option>
+              </select>
+            </label>
+            <button id="mobile-print-button" type="button" class="button button-secondary">Print</button>
+          </div>
+        </div>
+
         <section class="card summary-card">
           <div class="section-heading">
             <div>

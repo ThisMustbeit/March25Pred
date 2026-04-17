@@ -145,6 +145,12 @@ body.sticky-actions-visible .sticky-action-bar {
   display: none;
 }
 
+.mobile-stepper,
+.mobile-flow-footer,
+.mobile-results-actions {
+  display: none;
+}
+
 .card {
   padding: 1.9rem;
 }
@@ -249,6 +255,57 @@ body.sticky-actions-visible .sticky-action-bar {
 .config-code-actions {
   display: grid;
   gap: 0.65rem;
+}
+
+.mobile-stepper {
+  gap: 0.35rem;
+  margin: -0.15rem 0 0.2rem;
+  padding: 0.95rem 1rem;
+  border: 1px solid rgba(170, 192, 203, 0.45);
+  border-radius: 14px;
+  background: linear-gradient(180deg, #fbfdfe 0%, #f5f9fb 100%);
+}
+
+.mobile-step-count {
+  margin: 0;
+  font-size: 0.76rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--accent);
+}
+
+.mobile-step-title {
+  margin: 0;
+  font-size: 1.08rem;
+  color: var(--accent-dark);
+}
+
+.mobile-step-description {
+  margin: 0;
+  color: var(--muted);
+  line-height: 1.45;
+  font-size: 0.92rem;
+}
+
+.mobile-flow-footer {
+  gap: 0.75rem;
+  margin-top: 0.4rem;
+}
+
+.mobile-results-actions {
+  gap: 1rem;
+  padding: 1rem 1.05rem;
+}
+
+.mobile-results-header h2 {
+  margin: 0;
+  font-size: 1.15rem;
+}
+
+.mobile-results-action-row {
+  display: grid;
+  gap: 0.75rem;
 }
 
 .calendar-toolbar {
@@ -1265,6 +1322,75 @@ body.sticky-actions-visible .sticky-action-bar {
   }
 }
 
+@media (max-width: 768px) {
+  body.mobile-flow-active .hero-actions,
+  body.mobile-flow-active .sticky-action-bar,
+  body.mobile-flow-active .form-actions {
+    display: none !important;
+  }
+
+  body.mobile-flow-active .mobile-stepper,
+  body.mobile-flow-active .mobile-flow-footer {
+    display: grid;
+  }
+
+  body.mobile-flow-active .mobile-flow-footer {
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1.35fr);
+  }
+
+  body.mobile-flow-active .mobile-results-actions {
+    display: none;
+  }
+
+  body.mobile-flow-active.mobile-step-1 #results,
+  body.mobile-flow-active.mobile-step-2 #results,
+  body.mobile-flow-active.mobile-step-3 #results {
+    display: none;
+  }
+
+  body.mobile-flow-active.mobile-step-4 .form-card {
+    display: none;
+  }
+
+  body.mobile-flow-active.mobile-step-4 .mobile-results-actions {
+    display: grid;
+  }
+
+  body.mobile-flow-active.mobile-step-1 .taper-mode-strip,
+  body.mobile-flow-active.mobile-step-2 .taper-mode-strip,
+  body.mobile-flow-active.mobile-step-1 .group-primary-taper,
+  body.mobile-flow-active.mobile-step-1 .group-strengths,
+  body.mobile-flow-active.mobile-step-1 .custom-override-panel,
+  body.mobile-flow-active.mobile-step-1 .group-config-code,
+  body.mobile-flow-active.mobile-step-2 .taper-mode-strip,
+  body.mobile-flow-active.mobile-step-2 .group-med-start,
+  body.mobile-flow-active.mobile-step-2 .group-primary-taper,
+  body.mobile-flow-active.mobile-step-2 .custom-override-panel,
+  body.mobile-flow-active.mobile-step-2 .group-config-code,
+  body.mobile-flow-active.mobile-step-3 .group-med-start,
+  body.mobile-flow-active.mobile-step-3 .group-strengths {
+    display: none !important;
+  }
+
+  body.mobile-flow-active.mobile-step-3 .taper-mode-strip {
+    display: flex;
+    width: 100%;
+    margin-bottom: 0.4rem;
+  }
+
+  body.mobile-flow-active.mobile-step-3 .group-config-code {
+    display: block;
+  }
+
+  body.mobile-flow-active .form-grid {
+    display: block;
+  }
+
+  body.mobile-flow-active .group {
+    margin-bottom: 0;
+  }
+}
+
 @media (max-width: 640px) {
   .app-shell {
     width: min(100% - 1rem, 100%);
@@ -1280,6 +1406,11 @@ body.sticky-actions-visible .sticky-action-bar {
   .hero h1,
   .section-heading h2 {
     font-size: 1.6rem;
+  }
+
+  .mobile-results-action-row,
+  .mobile-flow-footer {
+    grid-template-columns: 1fr;
   }
 
   .hero-copy {

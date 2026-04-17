@@ -966,6 +966,8 @@ const DOMRefs = {
   printLayoutSelect: document.getElementById("print-layout"),
   stickyPrintButton: document.getElementById("sticky-print-button"),
   stickyPrintLayoutSelect: document.getElementById("sticky-print-layout"),
+  mobilePrintButton: document.getElementById("mobile-print-button"),
+  mobilePrintLayoutSelect: document.getElementById("mobile-print-layout"),
   loadExampleButton: document.getElementById("load-example-button"),
   configCodeInput: document.getElementById("config-code-input"),
   applyConfigCodeButton: document.getElementById("apply-config-code-button"),
@@ -973,6 +975,12 @@ const DOMRefs = {
   generatedConfigCode: document.getElementById("generated-config-code"),
   generateConfigCodeButton: document.getElementById("generate-config-code-button"),
   copyConfigCodeButton: document.getElementById("copy-config-code-button"),
+  mobileStepCount: document.getElementById("mobile-step-count"),
+  mobileStepTitle: document.getElementById("mobile-step-title"),
+  mobileStepDescription: document.getElementById("mobile-step-description"),
+  mobileStepBackButton: document.getElementById("mobile-step-back"),
+  mobileStepNextButton: document.getElementById("mobile-step-next"),
+  mobileEditInputsButton: document.getElementById("mobile-edit-inputs-button"),
   calendarViewInputs: [...document.querySelectorAll('input[name="calendarView"]')],
   strengthLabelA: document.getElementById("strength-label-a"),
   strengthLabelB: document.getElementById("strength-label-b"),
@@ -990,6 +998,64 @@ const DOMRefs = {
   finalDoseInput: document.getElementById("final-dose"),
   totalStepsModeInput: document.getElementById("total-steps-mode"),
   totalStepsDiscontinuationButton: document.getElementById("total-steps-discontinuation"),
+};
+
+const MobileFlow = {
+  currentStep: 1,
+  steps: [
+    {
+      title: "Medication & Start",
+      description: "Enter the medication name, starting dose, and taper start date.",
+      nextLabel: "Next: Strengths",
+    },
+    {
+      title: "Medication Strengths",
+      description: "Choose the medication form and the strengths available for planning.",
+      nextLabel: "Next: Taper Setup",
+    },
+    {
+      title: "Taper Setup",
+      description: "Choose the taper mode and complete the taper settings before generating the calendar.",
+      nextLabel: "Generate Calendar",
+    },
+    {
+      title: "Calendar & Print",
+      description: "Review the generated schedule, switch views, and print the taper calendar.",
+      nextLabel: "Generate Calendar",
+    },
+  ],
+
+  isActive() {
+    return window.matchMedia("(max-width: 768px)").matches;
+  },
+
+  setStep(step) {
+    const normalizedStep = Math.min(Math.max(step, 1), MobileFlow.steps.length);
+    MobileFlow.currentStep = normalizedStep;
+    document.body.dataset.mobileStep = String(normalizedStep);
+    document.body.classList.toggle("mobile-flow-active", MobileFlow.isActive());
+    DOMRenderer.syncMobileFlow();
+  },
+
+  goToNextStep() {
+    if (MobileFlow.currentStep >= MobileFlow.steps.length) return;
+    MobileFlow.setStep(MobileFlow.currentStep + 1);
+  },
+
+  goToPreviousStep() {
+    if (MobileFlow.currentStep <= 1) return;
+    MobileFlow.setStep(MobileFlow.currentStep - 1);
+  },
+
+  syncForViewport() {
+    document.body.classList.toggle("mobile-flow-active", MobileFlow.isActive());
+
+    if (!document.body.dataset.mobileStep) {
+      document.body.dataset.mobileStep = String(MobileFlow.currentStep);
+    }
+
+    DOMRenderer.syncMobileFlow();
+  },
 };
 
 const InputFactory = {
@@ -1506,16 +1572,47 @@ const DOMRenderer = {
   },
 
   syncPrintLayoutControls(source = "main") {
-    const sourceSelect =
-      source === "sticky" ? DOMRefs.stickyPrintLayoutSelect : DOMRefs.printLayoutSelect;
-    const targetSelect =
-      source === "sticky" ? DOMRefs.printLayoutSelect : DOMRefs.stickyPrintLayoutSelect;
+    const selectMap = {
+      main: DOMRefs.printLayoutSelect,
+      sticky: DOMRefs.stickyPrintLayoutSelect,
+      mobile: DOMRefs.mobilePrintLayoutSelect,
+    };
 
-    if (sourceSelect && targetSelect) {
-      targetSelect.value = sourceSelect.value;
-    }
+    const sourceSelect = selectMap[source] || DOMRefs.printLayoutSelect;
+    const sourceValue = sourceSelect?.value || DOMRefs.printLayoutSelect?.value || "landscape";
+
+    Object.values(selectMap).forEach((select) => {
+      if (!select) return;
+      select.value = sourceValue;
+    });
 
     DOMRenderer.syncPrintLayout();
+  },
+
+  syncMobileFlow() {
+    if (!DOMRefs.mobileStepCount || !DOMRefs.mobileStepTitle || !DOMRefs.mobileStepDescription) return;
+
+    const isActive = MobileFlow.isActive();
+    const currentStep = MobileFlow.steps[MobileFlow.currentStep - 1] || MobileFlow.steps[0];
+
+    document.body.classList.toggle("mobile-step-1", isActive && MobileFlow.currentStep === 1);
+    document.body.classList.toggle("mobile-step-2", isActive && MobileFlow.currentStep === 2);
+    document.body.classList.toggle("mobile-step-3", isActive && MobileFlow.currentStep === 3);
+    document.body.classList.toggle("mobile-step-4", isActive && MobileFlow.currentStep === 4);
+
+    DOMRefs.mobileStepCount.textContent = `Step ${MobileFlow.currentStep} of ${MobileFlow.steps.length}`;
+    DOMRefs.mobileStepTitle.textContent = currentStep.title;
+    DOMRefs.mobileStepDescription.textContent = currentStep.description;
+
+    if (DOMRefs.mobileStepBackButton) {
+      DOMRefs.mobileStepBackButton.disabled = MobileFlow.currentStep === 1;
+    }
+
+    if (DOMRefs.mobileStepNextButton) {
+      DOMRefs.mobileStepNextButton.textContent =
+        MobileFlow.currentStep === 3 ? "Generate & View Calendar" : currentStep.nextLabel;
+      DOMRefs.mobileStepNextButton.hidden = MobileFlow.currentStep === 4;
+    }
   },
 
   syncStickyActionBarVisibility() {
@@ -1960,6 +2057,7 @@ const UISetup = {
 const AppController = {
   initialize() {
       UISetup.applyDefaults();
+      MobileFlow.syncForViewport();
       DOMRefs.form.addEventListener("submit", AppController.handleGenerate);
       DOMRefs.form.addEventListener("reset", AppController.handleReset);
       DOMRefs.taperModeButtons.forEach((button) =>
@@ -1978,10 +2076,13 @@ const AppController = {
       DOMRefs.copyConfigCodeButton.addEventListener("click", AppController.handleCopyConfigCode);
       DOMRefs.applyConfigCodeButton.addEventListener("click", AppController.handleApplyConfigCode);
       DOMRefs.configCodeInput.addEventListener("keydown", AppController.handleConfigCodeKeydown);
-        DOMRefs.printLayoutSelect.addEventListener("change", () => DOMRenderer.syncPrintLayoutControls("main"));
-        DOMRefs.stickyPrintLayoutSelect.addEventListener("change", () =>
+      DOMRefs.printLayoutSelect.addEventListener("change", () => DOMRenderer.syncPrintLayoutControls("main"));
+      DOMRefs.stickyPrintLayoutSelect.addEventListener("change", () =>
           DOMRenderer.syncPrintLayoutControls("sticky")
-        );
+      );
+      DOMRefs.mobilePrintLayoutSelect?.addEventListener("change", () =>
+        DOMRenderer.syncPrintLayoutControls("mobile")
+      );
       DOMRefs.form.startingDose.addEventListener("input", UISetup.syncCustomSegmentDoseHelpers);
       DOMRefs.form.startingDose.addEventListener("input", () => UISetup.syncStandardTaperDerivedFields("auto"));
       DOMRefs.form.tabletStrengthA.addEventListener("input", UISetup.syncCustomSegmentStrengthSelectors);
@@ -1994,34 +2095,46 @@ const AppController = {
       DOMRefs.customSegmentBody.addEventListener("click", AppController.handleCustomSegmentRowClick);
       DOMRefs.customSegmentBody.addEventListener("change", AppController.handleCustomSegmentSettingsChange);
       DOMRefs.addSegmentRowButton.addEventListener("click", AppController.handleAddCustomRow);
-        DOMRefs.printButton.addEventListener("click", AppController.handlePrint);
-        DOMRefs.stickyPrintButton.addEventListener("click", AppController.handlePrint);
-        DOMRefs.calendarViewInputs.forEach((input) =>
+      DOMRefs.printButton.addEventListener("click", AppController.handlePrint);
+      DOMRefs.stickyPrintButton.addEventListener("click", AppController.handlePrint);
+      DOMRefs.mobilePrintButton?.addEventListener("click", AppController.handlePrint);
+      DOMRefs.mobileStepBackButton?.addEventListener("click", AppController.handleMobileStepBack);
+      DOMRefs.mobileStepNextButton?.addEventListener("click", AppController.handleMobileStepNext);
+      DOMRefs.mobileEditInputsButton?.addEventListener("click", AppController.handleMobileEditInputs);
+      DOMRefs.calendarViewInputs.forEach((input) =>
           input.addEventListener("change", DOMRenderer.syncLayoutControls)
-        );
-        document.addEventListener("click", AppController.handleDocumentClick);
-        window.addEventListener("beforeprint", () => document.body.classList.add("printing"));
-        window.addEventListener("afterprint", () => document.body.classList.remove("printing"));
-        DOMRenderer.syncPrintLayoutControls("main");
-        DOMRenderer.initializeStickyActionBar();
-        AppController.render();
+      );
+      document.addEventListener("click", AppController.handleDocumentClick);
+      window.addEventListener("beforeprint", () => document.body.classList.add("printing"));
+      window.addEventListener("afterprint", () => document.body.classList.remove("printing"));
+      window.addEventListener("resize", MobileFlow.syncForViewport);
+      DOMRenderer.syncPrintLayoutControls("main");
+      DOMRenderer.initializeStickyActionBar();
+      AppController.render();
     },
 
   handleGenerate(event) {
     event.preventDefault();
-    AppController.render();
+    const success = AppController.render();
+    if (success && MobileFlow.isActive()) {
+      MobileFlow.setStep(4);
+    }
   },
 
   handleReset() {
     window.setTimeout(() => {
       UISetup.applyDefaults();
       AppController.render();
+      MobileFlow.setStep(1);
     }, 0);
   },
 
   handleLoadExample() {
     UISetup.loadExample();
     AppController.render();
+    if (MobileFlow.isActive()) {
+      MobileFlow.setStep(1);
+    }
   },
 
   handleGenerateConfigCode() {
@@ -2061,9 +2174,29 @@ const AppController = {
       UISetup.applyImportedConfiguration(state);
       DOMRenderer.setConfigCodeStatus("Configuration code applied.");
       AppController.render();
+      if (MobileFlow.isActive()) {
+        MobileFlow.setStep(1);
+      }
     } catch (error) {
       DOMRenderer.setConfigCodeStatus("That configuration code could not be loaded.", "error");
     }
+  },
+
+  handleMobileStepBack() {
+    MobileFlow.goToPreviousStep();
+  },
+
+  handleMobileStepNext() {
+    if (MobileFlow.currentStep < 3) {
+      MobileFlow.goToNextStep();
+      return;
+    }
+
+    DOMRefs.form.requestSubmit();
+  },
+
+  handleMobileEditInputs() {
+    MobileFlow.setStep(3);
   },
 
   handleConfigCodeKeydown(event) {
@@ -2163,7 +2296,8 @@ const AppController = {
     if (errors.length > 0) {
       DOMRenderer.renderValidationErrors(errors);
       DOMRenderer.clearResults();
-      return;
+      DOMRenderer.syncMobileFlow();
+      return false;
     }
 
     DOMRenderer.renderValidationErrors([]);
@@ -2175,6 +2309,8 @@ const AppController = {
       DOMRenderer.render(viewModel);
       DOMRenderer.syncLayoutControls();
       DOMRenderer.syncStickyActionBarVisibility();
+      DOMRenderer.syncMobileFlow();
+      return true;
     },
   };
 
