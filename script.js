@@ -1064,6 +1064,49 @@ const MobileFlow = {
     UISetup.syncMobileFieldPlacement();
     DOMRenderer.syncMobileFlow();
   },
+
+  validateCurrentStep() {
+    if (MobileFlow.currentStep === 1) {
+      const errors = [];
+      if (!DOMRefs.form.drugName.value.trim()) {
+        errors.push("Medication name is required.");
+      }
+      if (!InputFactory.parseDate(DOMRefs.form.taperStartDate.value)) {
+        errors.push("Taper start date is required.");
+      }
+      return errors;
+    }
+
+    if (MobileFlow.currentStep === 2) {
+      const inputs = InputFactory.readNumericInputs();
+      const dosageForm = MedicationTerms.normalizeDosageForm(DOMRefs.form.dosageForm.value);
+      const strengths = Strengths.create({
+        ...inputs,
+        dosageForm,
+        allowPartialTablets: false,
+      });
+      const errors = [];
+
+      if (inputs.tabletStrengthA == null || inputs.tabletStrengthA <= 0) {
+        errors.push("Strength A is required and must be greater than 0.");
+      }
+      if (inputs.tabletStrengthB != null && inputs.tabletStrengthB <= 0) {
+        errors.push("Strength B must be greater than 0 if provided.");
+      }
+      if (inputs.tabletStrengthC != null && inputs.tabletStrengthC <= 0) {
+        errors.push("Strength C must be greater than 0 if provided.");
+      }
+
+      errors.push(...Strengths.validateOrder(strengths));
+      return errors;
+    }
+
+    if (MobileFlow.currentStep === 3) {
+      return InputFactory.create().errors;
+    }
+
+    return [];
+  },
 };
 
 const InputFactory = {
@@ -2227,10 +2270,19 @@ const AppController = {
   },
 
   handleMobileStepBack() {
+    DOMRenderer.renderValidationErrors([]);
     MobileFlow.goToPreviousStep();
   },
 
   handleMobileStepNext() {
+    const stepErrors = MobileFlow.validateCurrentStep();
+    if (stepErrors.length > 0) {
+      DOMRenderer.renderValidationErrors(stepErrors);
+      return;
+    }
+
+    DOMRenderer.renderValidationErrors([]);
+
     if (MobileFlow.currentStep < 3) {
       MobileFlow.goToNextStep();
       return;
@@ -2240,6 +2292,7 @@ const AppController = {
   },
 
   handleMobileEditInputs() {
+    DOMRenderer.renderValidationErrors([]);
     MobileFlow.setStep(3);
   },
 

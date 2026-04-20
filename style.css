@@ -1385,8 +1385,8 @@ body.sticky-actions-visible .sticky-action-bar {
     margin-bottom: 0.75rem;
   }
 
-  body.mobile-flow-active.mobile-step-3 .group-config-code {
-    display: block;
+  body.mobile-flow-active .group-config-code {
+    display: none !important;
   }
 
   body.mobile-flow-active .form-grid {
@@ -1419,6 +1419,38 @@ body.sticky-actions-visible .sticky-action-bar {
     min-width: 0;
     padding: 0.6rem 0.5rem;
     font-size: 0.92rem;
+  }
+
+  body.mobile-flow-active.mobile-step-3 .group-primary-taper,
+  body.mobile-flow-active.mobile-step-3 #custom-override-panel .group {
+    padding: 1rem;
+  }
+
+  body.mobile-flow-active.mobile-step-3 .step-change-control {
+    gap: 0.5rem;
+  }
+
+  body.mobile-flow-active.mobile-step-3 .step-change-control .direction-toggle,
+  body.mobile-flow-active.mobile-step-3 .paired-field-grid,
+  body.mobile-flow-active.mobile-step-3 .paired-field-action,
+  body.mobile-flow-active.mobile-step-3 .paired-field-action .inline-action-button {
+    width: 100%;
+  }
+
+  body.mobile-flow-active.mobile-step-3 .step-change-control .direction-toggle-button {
+    padding: 0.55rem 0.4rem;
+    font-size: 0.88rem;
+  }
+
+  body.mobile-flow-active.mobile-step-3 .inline-action-button {
+    padding: 0.7rem 0.85rem;
+    font-size: 0.94rem;
+  }
+
+  body.mobile-flow-active.mobile-step-3 .custom-override-panel .table-scroll {
+    margin: 0 -0.1rem;
+    padding: 0 0.1rem 0.25rem;
+    -webkit-overflow-scrolling: touch;
   }
 }
 
