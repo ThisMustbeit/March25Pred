@@ -1330,6 +1330,10 @@ body.sticky-actions-visible .sticky-action-bar {
 }
 
 @media (max-width: 768px) {
+  body.mobile-flow-active.mobile-step-3 {
+    overflow-x: hidden;
+  }
+
   body.mobile-flow-active .hero-actions,
   body.mobile-flow-active .sticky-action-bar,
   body.mobile-flow-active .form-actions {
@@ -1395,30 +1399,52 @@ body.sticky-actions-visible .sticky-action-bar {
 
   body.mobile-flow-active .group {
     margin-bottom: 0;
+    min-width: 0;
+  }
+
+  body.mobile-flow-active.mobile-step-3 .form-card {
+    gap: 1rem;
+    padding: 1rem;
+  }
+
+  body.mobile-flow-active.mobile-step-3 .section-heading {
+    margin-bottom: 0.75rem;
+  }
+
+  body.mobile-flow-active.mobile-step-3 .section-heading h2 {
+    font-size: 1.35rem;
+  }
+
+  body.mobile-flow-active.mobile-step-3 .mobile-stepper {
+    padding: 0.85rem 0.9rem;
   }
 
   body.mobile-flow-active .group-primary-taper .taper-mode-strip {
     padding-top: 0;
   }
 
-  body.mobile-flow-active .group-primary-taper .taper-mode-control {
+  body.mobile-flow-active.mobile-step-3 .taper-mode-control {
     width: 100%;
     gap: 0.4rem;
+    min-width: 0;
   }
 
-  body.mobile-flow-active .group-primary-taper .taper-mode-label {
+  body.mobile-flow-active.mobile-step-3 .taper-mode-label {
     font-size: 0.88rem;
   }
 
-  body.mobile-flow-active .group-primary-taper .direction-toggle {
+  body.mobile-flow-active.mobile-step-3 .direction-toggle {
     width: 100%;
     padding: 0.2rem;
+    min-width: 0;
   }
 
-  body.mobile-flow-active .group-primary-taper .direction-toggle-button {
+  body.mobile-flow-active.mobile-step-3 .direction-toggle-button {
     min-width: 0;
     padding: 0.6rem 0.5rem;
     font-size: 0.92rem;
+    white-space: normal;
+    text-align: center;
   }
 
   body.mobile-flow-active.mobile-step-3 .group-primary-taper,
@@ -1448,7 +1474,7 @@ body.sticky-actions-visible .sticky-action-bar {
   body.mobile-flow-active.mobile-step-3 .step-change-control .direction-toggle,
   body.mobile-flow-active.mobile-step-3 .taper-mode-strip .direction-toggle {
     display: grid;
-    grid-template-columns: repeat(2, minmax(0, 1fr));
+    grid-template-columns: 1fr;
     gap: 0.25rem;
   }
 
@@ -1461,6 +1487,13 @@ body.sticky-actions-visible .sticky-action-bar {
     grid-template-columns: 1fr;
     gap: 0.6rem;
     margin-bottom: 0;
+  }
+
+  body.mobile-flow-active.mobile-step-3 .group-primary-taper input,
+  body.mobile-flow-active.mobile-step-3 .group-primary-taper select,
+  body.mobile-flow-active.mobile-step-3 #custom-override-panel input {
+    min-width: 0;
+    max-width: 100%;
   }
 
   body.mobile-flow-active.mobile-step-3 .paired-field-action {
