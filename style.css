@@ -1426,20 +1426,45 @@ body.sticky-actions-visible .sticky-action-bar {
     padding: 1rem;
   }
 
+  body.mobile-flow-active.mobile-step-3 .group-primary-taper label,
+  body.mobile-flow-active.mobile-step-3 #custom-override-panel .help-text {
+    margin-bottom: 0.8rem;
+  }
+
   body.mobile-flow-active.mobile-step-3 .step-change-control {
+    grid-template-columns: 1fr;
     gap: 0.5rem;
+    align-items: stretch;
   }
 
   body.mobile-flow-active.mobile-step-3 .step-change-control .direction-toggle,
+  body.mobile-flow-active.mobile-step-3 .taper-mode-strip .direction-toggle,
   body.mobile-flow-active.mobile-step-3 .paired-field-grid,
   body.mobile-flow-active.mobile-step-3 .paired-field-action,
   body.mobile-flow-active.mobile-step-3 .paired-field-action .inline-action-button {
     width: 100%;
   }
 
+  body.mobile-flow-active.mobile-step-3 .step-change-control .direction-toggle,
+  body.mobile-flow-active.mobile-step-3 .taper-mode-strip .direction-toggle {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 0.25rem;
+  }
+
   body.mobile-flow-active.mobile-step-3 .step-change-control .direction-toggle-button {
     padding: 0.55rem 0.4rem;
     font-size: 0.88rem;
+  }
+
+  body.mobile-flow-active.mobile-step-3 .paired-field-grid {
+    grid-template-columns: 1fr;
+    gap: 0.6rem;
+    margin-bottom: 0;
+  }
+
+  body.mobile-flow-active.mobile-step-3 .paired-field-action {
+    justify-content: stretch;
   }
 
   body.mobile-flow-active.mobile-step-3 .inline-action-button {
@@ -1448,9 +1473,103 @@ body.sticky-actions-visible .sticky-action-bar {
   }
 
   body.mobile-flow-active.mobile-step-3 .custom-override-panel .table-scroll {
-    margin: 0 -0.1rem;
-    padding: 0 0.1rem 0.25rem;
-    -webkit-overflow-scrolling: touch;
+    margin: 0;
+    padding: 0;
+    overflow: visible;
+  }
+
+  body.mobile-flow-active.mobile-step-3 .custom-override-panel .input-table,
+  body.mobile-flow-active.mobile-step-3 .custom-override-panel .input-table tbody,
+  body.mobile-flow-active.mobile-step-3 .custom-override-panel .input-table tr,
+  body.mobile-flow-active.mobile-step-3 .custom-override-panel .input-table td {
+    display: block;
+    width: 100%;
+  }
+
+  body.mobile-flow-active.mobile-step-3 .custom-override-panel .input-table {
+    min-width: 0;
+    border-collapse: separate;
+  }
+
+  body.mobile-flow-active.mobile-step-3 .custom-override-panel .input-table thead {
+    display: none;
+  }
+
+  body.mobile-flow-active.mobile-step-3 .custom-override-panel .input-table tfoot {
+    display: table-footer-group;
+  }
+
+  body.mobile-flow-active.mobile-step-3 .custom-override-panel .input-table tr.custom-segment-row {
+    padding: 0.85rem;
+    margin-bottom: 0.8rem;
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    background: #fbfdfe;
+  }
+
+  body.mobile-flow-active.mobile-step-3 .custom-override-panel .input-table td {
+    border-bottom: 0;
+    padding: 0;
+    margin-bottom: 0.75rem;
+  }
+
+  body.mobile-flow-active.mobile-step-3 .custom-override-panel .input-table td:last-child {
+    margin-bottom: 0;
+  }
+
+  body.mobile-flow-active.mobile-step-3 .custom-override-panel .input-table td::before {
+    display: block;
+    margin-bottom: 0.32rem;
+    font-size: 0.75rem;
+    font-weight: 700;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    color: var(--muted);
+  }
+
+  body.mobile-flow-active.mobile-step-3 .custom-override-panel .input-table td:nth-child(1)::before {
+    content: "Segment";
+  }
+
+  body.mobile-flow-active.mobile-step-3 .custom-override-panel .input-table td:nth-child(2)::before {
+    content: "Start Dose";
+  }
+
+  body.mobile-flow-active.mobile-step-3 .custom-override-panel .input-table td:nth-child(3)::before {
+    content: "Dose Change";
+  }
+
+  body.mobile-flow-active.mobile-step-3 .custom-override-panel .input-table td:nth-child(4)::before {
+    content: "Days Per Step";
+  }
+
+  body.mobile-flow-active.mobile-step-3 .custom-override-panel .input-table td:nth-child(5)::before {
+    content: "Repeats";
+  }
+
+  body.mobile-flow-active.mobile-step-3 .custom-override-panel .input-table td:nth-child(6)::before {
+    content: "End Dose";
+  }
+
+  body.mobile-flow-active.mobile-step-3 .custom-override-panel .input-table td:nth-child(7)::before {
+    content: "Row Actions";
+  }
+
+  body.mobile-flow-active.mobile-step-3 .custom-override-panel .input-table .row-action-cell {
+    width: 100%;
+    text-align: left;
+  }
+
+  body.mobile-flow-active.mobile-step-3 .custom-override-panel .row-action-stack {
+    justify-content: flex-start;
+    min-height: 0;
+  }
+
+  body.mobile-flow-active.mobile-step-3 .custom-override-panel .dose-helper,
+  body.mobile-flow-active.mobile-step-3 .custom-override-panel .segment-dose-static,
+  body.mobile-flow-active.mobile-step-3 .custom-override-panel .segment-repeats-static {
+    min-width: 0;
+    white-space: normal;
   }
 }
 
