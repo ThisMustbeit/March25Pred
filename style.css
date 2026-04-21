@@ -1405,18 +1405,17 @@ body.sticky-actions-visible .sticky-action-bar {
   body.mobile-flow-active.mobile-step-3 .form-card {
     gap: 1rem;
     padding: 1rem;
+    max-width: 100%;
+    overflow-x: hidden;
   }
 
   body.mobile-flow-active.mobile-step-3 .section-heading {
-    margin-bottom: 0.75rem;
-  }
-
-  body.mobile-flow-active.mobile-step-3 .section-heading h2 {
-    font-size: 1.35rem;
+    display: none;
   }
 
   body.mobile-flow-active.mobile-step-3 .mobile-stepper {
     padding: 0.85rem 0.9rem;
+    margin-top: 0;
   }
 
   body.mobile-flow-active .group-primary-taper .taper-mode-strip {
@@ -1450,11 +1449,19 @@ body.sticky-actions-visible .sticky-action-bar {
   body.mobile-flow-active.mobile-step-3 .group-primary-taper,
   body.mobile-flow-active.mobile-step-3 #custom-override-panel .group {
     padding: 1rem;
+    width: 100%;
+    max-width: 100%;
+    overflow-x: hidden;
   }
 
   body.mobile-flow-active.mobile-step-3 .group-primary-taper label,
   body.mobile-flow-active.mobile-step-3 #custom-override-panel .help-text {
     margin-bottom: 0.8rem;
+  }
+
+  body.mobile-flow-active.mobile-step-3 .group-primary-taper legend,
+  body.mobile-flow-active.mobile-step-3 #custom-override-panel .group legend {
+    font-size: 1rem;
   }
 
   body.mobile-flow-active.mobile-step-3 .step-change-control {
@@ -1481,6 +1488,7 @@ body.sticky-actions-visible .sticky-action-bar {
   body.mobile-flow-active.mobile-step-3 .step-change-control .direction-toggle-button {
     padding: 0.55rem 0.4rem;
     font-size: 0.88rem;
+    line-height: 1.2;
   }
 
   body.mobile-flow-active.mobile-step-3 .paired-field-grid {
@@ -1494,6 +1502,7 @@ body.sticky-actions-visible .sticky-action-bar {
   body.mobile-flow-active.mobile-step-3 #custom-override-panel input {
     min-width: 0;
     max-width: 100%;
+    width: 100%;
   }
 
   body.mobile-flow-active.mobile-step-3 .paired-field-action {
@@ -1538,6 +1547,7 @@ body.sticky-actions-visible .sticky-action-bar {
     border: 1px solid var(--border);
     border-radius: 14px;
     background: #fbfdfe;
+    overflow: hidden;
   }
 
   body.mobile-flow-active.mobile-step-3 .custom-override-panel .input-table td {
@@ -1595,6 +1605,7 @@ body.sticky-actions-visible .sticky-action-bar {
 
   body.mobile-flow-active.mobile-step-3 .custom-override-panel .row-action-stack {
     justify-content: flex-start;
+    flex-wrap: wrap;
     min-height: 0;
   }
 
