@@ -1109,6 +1109,10 @@ const MobileFlow = {
   },
 };
 
+const UIState = {
+  mobileValidationRequested: false,
+};
+
 const InputFactory = {
   signedDoseChange(value, direction) {
     if (value == null) return null;
@@ -1555,8 +1559,14 @@ const DOMBuilders = {
 const DOMRenderer = {
   stickyActionObserver: null,
 
-  renderValidationErrors(errors) {
+  renderValidationErrors(errors, forceVisible = false) {
     if (errors.length === 0) {
+      DOMRefs.validationSummary.classList.remove("active");
+      DOMRefs.validationSummary.innerHTML = "";
+      return;
+    }
+
+    if (MobileFlow.isActive() && !forceVisible && !UIState.mobileValidationRequested) {
       DOMRefs.validationSummary.classList.remove("active");
       DOMRefs.validationSummary.innerHTML = "";
       return;
@@ -2202,14 +2212,17 @@ const AppController = {
 
   handleGenerate(event) {
     event.preventDefault();
+    UIState.mobileValidationRequested = MobileFlow.isActive();
     const success = AppController.render();
     if (success && MobileFlow.isActive()) {
+      UIState.mobileValidationRequested = false;
       MobileFlow.setStep(4);
     }
   },
 
   handleReset() {
     window.setTimeout(() => {
+      UIState.mobileValidationRequested = false;
       UISetup.applyDefaults();
       AppController.render();
       MobileFlow.setStep(1);
@@ -2217,6 +2230,7 @@ const AppController = {
   },
 
   handleLoadExample() {
+    UIState.mobileValidationRequested = false;
     UISetup.loadExample();
     AppController.render();
     if (MobileFlow.isActive()) {
@@ -2258,6 +2272,7 @@ const AppController = {
 
     try {
       const state = ConfigCode.decode(code);
+      UIState.mobileValidationRequested = false;
       UISetup.applyImportedConfiguration(state);
       DOMRenderer.setConfigCodeStatus("Configuration code applied.");
       AppController.render();
@@ -2270,6 +2285,7 @@ const AppController = {
   },
 
   handleMobileStepBack() {
+    UIState.mobileValidationRequested = false;
     DOMRenderer.renderValidationErrors([]);
     MobileFlow.goToPreviousStep();
   },
@@ -2277,10 +2293,12 @@ const AppController = {
   handleMobileStepNext() {
     const stepErrors = MobileFlow.validateCurrentStep();
     if (stepErrors.length > 0) {
-      DOMRenderer.renderValidationErrors(stepErrors);
+      UIState.mobileValidationRequested = true;
+      DOMRenderer.renderValidationErrors(stepErrors, true);
       return;
     }
 
+    UIState.mobileValidationRequested = false;
     DOMRenderer.renderValidationErrors([]);
 
     if (MobileFlow.currentStep < 3) {
@@ -2288,10 +2306,12 @@ const AppController = {
       return;
     }
 
+    UIState.mobileValidationRequested = true;
     DOMRefs.form.requestSubmit();
   },
 
   handleMobileEditInputs() {
+    UIState.mobileValidationRequested = false;
     DOMRenderer.renderValidationErrors([]);
     MobileFlow.setStep(3);
   },
@@ -2397,6 +2417,7 @@ const AppController = {
       return false;
     }
 
+    UIState.mobileValidationRequested = false;
     DOMRenderer.renderValidationErrors([]);
     const scheduleRows = ScheduleLogic.generateScheduleRows(inputs);
     const summary = ScheduleLogic.generateSummary(inputs, scheduleRows);
