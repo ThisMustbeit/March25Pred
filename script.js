@@ -1728,6 +1728,18 @@ const UISetup = {
     DOMRefs.form.dataset.standardTaperDriver = driver === "finalDose" ? "finalDose" : "steps";
   },
 
+  syncInputUnitAffixes() {
+    if (!DOMRefs.form) return;
+
+    DOMRefs.form.querySelectorAll(".input-with-unit").forEach((wrapper) => {
+      const input = wrapper.querySelector("input");
+      if (!input) return;
+
+      const hasValue = input.value != null && input.value.trim() !== "";
+      wrapper.classList.toggle("has-value", hasValue);
+    });
+  },
+
   writeNumericInputValue(input, value) {
     input.value =
       value == null || Number.isNaN(value)
@@ -1735,6 +1747,8 @@ const UISetup = {
         : Number.isInteger(value)
         ? String(value)
         : value.toFixed(1).replace(/\.0$/, "");
+
+    UISetup.syncInputUnitAffixes();
   },
 
   syncDoseChangeDirectionButtons() {
@@ -1845,6 +1859,7 @@ const UISetup = {
       DOMRefs.form.allowPartialTablets.checked = false;
     }
 
+    UISetup.syncInputUnitAffixes();
     UISetup.syncCustomSegmentStrengthSelectors();
   },
 
@@ -2095,6 +2110,7 @@ const UISetup = {
       UISetup.syncTaperModeButtons();
       UISetup.syncMedicationLabels();
       UISetup.syncCustomOverrideVisibility();
+      UISetup.syncInputUnitAffixes();
     },
 
   applyImportedConfiguration(state) {
@@ -2185,6 +2201,8 @@ const AppController = {
       DOMRefs.form.tabletStrengthA.addEventListener("input", UISetup.syncCustomSegmentStrengthSelectors);
       DOMRefs.form.tabletStrengthB.addEventListener("input", UISetup.syncCustomSegmentStrengthSelectors);
       DOMRefs.form.tabletStrengthC.addEventListener("input", UISetup.syncCustomSegmentStrengthSelectors);
+      DOMRefs.form.addEventListener("input", UISetup.syncInputUnitAffixes);
+      DOMRefs.form.addEventListener("change", UISetup.syncInputUnitAffixes);
       DOMRefs.form.doseChangePerStep.addEventListener("input", () => UISetup.syncStandardTaperDerivedFields("auto"));
       DOMRefs.form.totalSteps.addEventListener("input", AppController.handleTotalStepsInput);
       DOMRefs.finalDoseInput.addEventListener("input", AppController.handleFinalDoseInput);

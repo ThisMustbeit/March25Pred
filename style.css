@@ -483,6 +483,32 @@ body.sticky-actions-visible .sticky-action-bar {
   cursor: not-allowed;
 }
 
+.input-with-unit {
+  position: relative;
+  width: 100%;
+}
+
+.group .input-with-unit input {
+  padding-right: 3.5rem;
+}
+
+.input-unit {
+  position: absolute;
+  top: 50%;
+  right: 0.85rem;
+  transform: translateY(-50%);
+  font-size: 0.84rem;
+  font-weight: 600;
+  color: #8ea0aa;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 140ms ease;
+}
+
+.input-with-unit.has-value .input-unit {
+  opacity: 1;
+}
+
 .step-change-control {
   display: grid;
   grid-template-columns: auto minmax(0, 1fr);
@@ -516,6 +542,8 @@ body.sticky-actions-visible .sticky-action-bar {
   border-radius: 999px;
   background: #f5f9fb;
   width: fit-content;
+  align-items: stretch;
+  overflow: hidden;
 }
 
 .direction-toggle-button {
@@ -527,6 +555,10 @@ body.sticky-actions-visible .sticky-action-bar {
   font: inherit;
   font-weight: 600;
   cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 2.9rem;
   transition: background 140ms ease, color 140ms ease, box-shadow 140ms ease;
 }
 
@@ -1444,6 +1476,7 @@ body.sticky-actions-visible .sticky-action-bar {
     font-size: 0.92rem;
     white-space: normal;
     text-align: center;
+    width: 100%;
   }
 
   body.mobile-flow-active.mobile-step-3 .group-primary-taper,
@@ -1502,6 +1535,10 @@ body.sticky-actions-visible .sticky-action-bar {
   body.mobile-flow-active.mobile-step-3 #custom-override-panel input {
     min-width: 0;
     max-width: 100%;
+    width: 100%;
+  }
+
+  body.mobile-flow-active.mobile-step-3 .input-with-unit {
     width: 100%;
   }
 
