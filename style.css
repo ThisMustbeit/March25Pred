@@ -1558,7 +1558,6 @@ body.sticky-actions-visible .sticky-action-bar {
   }
 
   body.mobile-flow-active.mobile-step-3 .custom-override-panel .input-table,
-  body.mobile-flow-active.mobile-step-3 .custom-override-panel .input-table tbody,
   body.mobile-flow-active.mobile-step-3 .custom-override-panel .input-table tr,
   body.mobile-flow-active.mobile-step-3 .custom-override-panel .input-table td {
     display: block;
@@ -1570,6 +1569,11 @@ body.sticky-actions-visible .sticky-action-bar {
     border-collapse: separate;
   }
 
+  body.mobile-flow-active.mobile-step-3 .custom-override-panel .input-table tbody {
+    display: grid;
+    gap: 0.9rem;
+  }
+
   body.mobile-flow-active.mobile-step-3 .custom-override-panel .input-table thead {
     display: none;
   }
@@ -1579,28 +1583,27 @@ body.sticky-actions-visible .sticky-action-bar {
   }
 
   body.mobile-flow-active.mobile-step-3 .custom-override-panel .input-table tr.custom-segment-row {
-    padding: 0.85rem;
-    margin-bottom: 0.8rem;
+    display: grid;
+    gap: 0.7rem;
+    padding: 0.95rem;
     border: 1px solid var(--border);
-    border-radius: 14px;
-    background: #fbfdfe;
+    border-radius: 16px;
+    background: linear-gradient(180deg, #fcfeff 0%, #f6fafc 100%);
+    box-shadow: 0 8px 22px rgba(18, 59, 86, 0.06);
     overflow: hidden;
   }
 
   body.mobile-flow-active.mobile-step-3 .custom-override-panel .input-table td {
     border-bottom: 0;
     padding: 0;
-    margin-bottom: 0.75rem;
-  }
-
-  body.mobile-flow-active.mobile-step-3 .custom-override-panel .input-table td:last-child {
-    margin-bottom: 0;
+    margin: 0;
+    min-width: 0;
   }
 
   body.mobile-flow-active.mobile-step-3 .custom-override-panel .input-table td::before {
     display: block;
-    margin-bottom: 0.32rem;
-    font-size: 0.75rem;
+    margin-bottom: 0.3rem;
+    font-size: 0.72rem;
     font-weight: 700;
     letter-spacing: 0.04em;
     text-transform: uppercase;
@@ -1608,7 +1611,7 @@ body.sticky-actions-visible .sticky-action-bar {
   }
 
   body.mobile-flow-active.mobile-step-3 .custom-override-panel .input-table td:nth-child(1)::before {
-    content: "Segment";
+    display: none;
   }
 
   body.mobile-flow-active.mobile-step-3 .custom-override-panel .input-table td:nth-child(2)::before {
@@ -1635,14 +1638,40 @@ body.sticky-actions-visible .sticky-action-bar {
     content: "Row Actions";
   }
 
+  body.mobile-flow-active.mobile-step-3 .custom-override-panel .input-table td:nth-child(1) {
+    font-size: 1rem;
+    font-weight: 700;
+    color: var(--accent-dark);
+    padding-bottom: 0.1rem;
+  }
+
+  body.mobile-flow-active.mobile-step-3 .custom-override-panel .input-table td:nth-child(2),
+  body.mobile-flow-active.mobile-step-3 .custom-override-panel .input-table td:nth-child(6) {
+    color: var(--accent-dark);
+    font-weight: 600;
+  }
+
+  body.mobile-flow-active.mobile-step-3 .custom-override-panel .input-table td:nth-child(2) .helper-dose,
+  body.mobile-flow-active.mobile-step-3 .custom-override-panel .input-table td:nth-child(6) .helper-dose {
+    display: inline-flex;
+    align-items: center;
+    min-height: 2.8rem;
+    padding: 0 0.85rem;
+    border: 1px solid rgba(170, 192, 203, 0.5);
+    border-radius: 12px;
+    background: #ffffff;
+  }
+
   body.mobile-flow-active.mobile-step-3 .custom-override-panel .input-table .row-action-cell {
     width: 100%;
     text-align: left;
   }
 
   body.mobile-flow-active.mobile-step-3 .custom-override-panel .row-action-stack {
+    display: grid;
+    grid-template-columns: repeat(2, 2.5rem);
     justify-content: flex-start;
-    flex-wrap: wrap;
+    gap: 0.55rem;
     min-height: 0;
   }
 
@@ -1651,6 +1680,34 @@ body.sticky-actions-visible .sticky-action-bar {
   body.mobile-flow-active.mobile-step-3 .custom-override-panel .segment-repeats-static {
     min-width: 0;
     white-space: normal;
+  }
+
+  body.mobile-flow-active.mobile-step-3 .custom-override-panel .segment-dose-static,
+  body.mobile-flow-active.mobile-step-3 .custom-override-panel .segment-repeats-static {
+    min-height: 2.8rem;
+    padding: 0 0.85rem;
+    border: 1px solid rgba(170, 192, 203, 0.5);
+    border-radius: 12px;
+    background: #ffffff;
+  }
+
+  body.mobile-flow-active.mobile-step-3 .custom-override-panel .segment-settings-button,
+  body.mobile-flow-active.mobile-step-3 .custom-override-panel .row-delete-button {
+    width: 2.5rem;
+    height: 2.5rem;
+  }
+
+  body.mobile-flow-active.mobile-step-3 .custom-override-panel .segment-settings-popover {
+    position: static;
+    top: auto;
+    right: auto;
+    width: 100%;
+    margin-top: 0.1rem;
+    padding: 0.8rem 0.85rem;
+    grid-column: 1 / -1;
+    border-radius: 12px;
+    background: #f5fafc;
+    box-shadow: none;
   }
 }
 
