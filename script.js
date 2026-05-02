@@ -224,32 +224,182 @@ const Html = {
 };
 
 const ConfigCode = {
-  prefix: "MTP1-",
+  prefix: "MTP2-",
+  legacyPrefix: "MTP1-",
+  fieldOrder: [
+    "drugName",
+    "taperStartDate",
+    "startingDose",
+    "doseChangePerStep",
+    "daysPerStep",
+    "totalSteps",
+    "finalDose",
+    "tabletStrengthA",
+    "tabletStrengthB",
+    "tabletStrengthC",
+  ],
 
-  encode(state) {
-    const json = JSON.stringify(state);
-    const bytes = new TextEncoder().encode(json);
-    let binary = "";
-
-    bytes.forEach((byte) => {
-      binary += String.fromCharCode(byte);
-    });
-
-    return `${ConfigCode.prefix}${btoa(binary).replace(/\+/g, "-").replace(/\//g, "_").replace(/=+$/g, "")}`;
+  encodePart(value) {
+    return encodeURIComponent(String(value ?? ""));
   },
 
-  decode(code) {
-    if (typeof code !== "string" || !code.startsWith(ConfigCode.prefix)) {
-      throw new Error("Invalid configuration code format.");
-    }
+  decodePart(value) {
+    return decodeURIComponent(value || "");
+  },
 
-    const payload = code.slice(ConfigCode.prefix.length);
+  trimTrailingEmpty(values) {
+    const trimmed = [...values];
+    while (trimmed.length > 0 && trimmed[trimmed.length - 1] === "") {
+      trimmed.pop();
+    }
+    return trimmed;
+  },
+
+  buildFlags(state) {
+    const form = state.form || {};
+    return [
+      state.printLayout === "portrait" ? "p" : "l",
+      form.useCustomOverride === "true" ? "a" : "s",
+      form.dosageForm === "capsule" ? "c" : "t",
+      form.doseChangeDirection === "increase" ? "i" : "r",
+      form.totalStepsMode === "discontinuation" ? "d" : "m",
+      form.standardTaperDriver === "finalDose" ? "f" : "s",
+      form.allowPartialTablets ? "1" : "0",
+    ].join("");
+  },
+
+  parseFlags(flags = "") {
+    return {
+      printLayout: flags[0] === "p" ? "portrait" : "landscape",
+      useCustomOverride: flags[1] === "a" ? "true" : "false",
+      dosageForm: flags[2] === "c" ? "capsule" : "tablet",
+      doseChangeDirection: flags[3] === "i" ? "increase" : "reduce",
+      totalStepsMode: flags[4] === "d" ? "discontinuation" : "manual",
+      standardTaperDriver: flags[5] === "f" ? "finalDose" : "steps",
+      allowPartialTablets: flags[6] === "1",
+    };
+  },
+
+  allowedKeysToMask(keys = []) {
+    const normalized = new Set(Array.isArray(keys) ? keys : []);
+    return ["A", "B", "C"].reduce((mask, key, index) => {
+      if (!normalized.has(key)) return mask;
+      return mask + 2 ** index;
+    }, 0);
+  },
+
+  maskToAllowedKeys(maskValue) {
+    const mask = Number(maskValue || 0);
+    return ["A", "B", "C"].filter((_, index) => (mask & 2 ** index) !== 0);
+  },
+
+  isMeaningfulSegment(segment) {
+    if (!segment) return false;
+
+    const hasValue =
+      String(segment.doseChange ?? "") !== "" ||
+      String(segment.daysPerStep ?? "") !== "" ||
+      String(segment.repeats ?? "") !== "";
+
+    const mask = ConfigCode.allowedKeysToMask(segment.allowedStrengthKeys);
+    return hasValue || mask !== 7;
+  },
+
+  serializeSegments(segments = []) {
+    const meaningfulCount = segments.reduce((count, segment, index) => {
+      return ConfigCode.isMeaningfulSegment(segment) ? index + 1 : count;
+    }, 0);
+
+    return segments
+      .slice(0, meaningfulCount)
+      .map((segment) =>
+        [
+          segment?.doseChange ?? "",
+          segment?.daysPerStep ?? "",
+          segment?.repeats ?? "",
+          String(ConfigCode.allowedKeysToMask(segment?.allowedStrengthKeys)),
+        ]
+          .map((value) => ConfigCode.encodePart(value))
+          .join(",")
+      )
+      .join("~");
+  },
+
+  deserializeSegments(segmentText = "") {
+    if (!segmentText) return [];
+
+    return segmentText.split("~").map((rowText) => {
+      const [doseChange = "", daysPerStep = "", repeats = "", mask = "7"] = rowText.split(",");
+      return {
+        doseChange: ConfigCode.decodePart(doseChange),
+        daysPerStep: ConfigCode.decodePart(daysPerStep),
+        repeats: ConfigCode.decodePart(repeats),
+        allowedStrengthKeys: ConfigCode.maskToAllowedKeys(ConfigCode.decodePart(mask)),
+      };
+    });
+  },
+
+  encode(state) {
+    const flags = ConfigCode.buildFlags(state);
+    const fieldValues = ConfigCode.trimTrailingEmpty(
+      ConfigCode.fieldOrder.map((key) => ConfigCode.encodePart(state.form?.[key] ?? ""))
+    );
+    const segmentText = ConfigCode.serializeSegments(state.customSegments);
+    return [ConfigCode.prefix + flags, ...fieldValues, segmentText].join("|");
+  },
+
+  decodeLegacy(code) {
+    const payload = code.slice(ConfigCode.legacyPrefix.length);
     const normalized = payload.replace(/-/g, "+").replace(/_/g, "/");
     const padded = normalized.padEnd(Math.ceil(normalized.length / 4) * 4, "=");
     const binary = atob(padded);
     const bytes = Uint8Array.from(binary, (char) => char.charCodeAt(0));
     const json = new TextDecoder().decode(bytes);
     return JSON.parse(json);
+  },
+
+  decodeCompact(code) {
+    const parts = code.split("|");
+    const [prefixAndFlags, ...rest] = parts;
+    const flags = prefixAndFlags.slice(ConfigCode.prefix.length);
+    const parsedFlags = ConfigCode.parseFlags(flags);
+    const segmentText = rest.length > ConfigCode.fieldOrder.length ? rest.pop() : "";
+    const formValues = {};
+
+    ConfigCode.fieldOrder.forEach((key, index) => {
+      formValues[key] = ConfigCode.decodePart(rest[index] ?? "");
+    });
+
+    return {
+      version: 2,
+      printLayout: parsedFlags.printLayout,
+      form: {
+        ...formValues,
+        dosageForm: parsedFlags.dosageForm,
+        doseChangeDirection: parsedFlags.doseChangeDirection,
+        totalStepsMode: parsedFlags.totalStepsMode,
+        standardTaperDriver: parsedFlags.standardTaperDriver,
+        useCustomOverride: parsedFlags.useCustomOverride,
+        allowPartialTablets: parsedFlags.allowPartialTablets,
+      },
+      customSegments: ConfigCode.deserializeSegments(segmentText),
+    };
+  },
+
+  decode(code) {
+    if (typeof code !== "string") {
+      throw new Error("Invalid configuration code format.");
+    }
+
+    if (code.startsWith(ConfigCode.prefix)) {
+      return ConfigCode.decodeCompact(code);
+    }
+
+    if (code.startsWith(ConfigCode.legacyPrefix)) {
+      return ConfigCode.decodeLegacy(code);
+    }
+
+    throw new Error("Invalid configuration code format.");
   },
 
   captureCurrentState() {
@@ -2099,6 +2249,10 @@ const UISetup = {
 
     Object.entries(taperDefaults).forEach(([key, value]) => {
       if (DOMRefs.form[key]) {
+        if (DOMRefs.form[key].type === "checkbox") {
+          DOMRefs.form[key].checked = Boolean(value);
+          return;
+        }
         DOMRefs.form[key].value = value;
       }
     });
