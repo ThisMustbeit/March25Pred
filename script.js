@@ -1142,6 +1142,8 @@ const DOMRefs = {
   scheduleStrengthColC: document.getElementById("schedule-strength-col-c"),
   doseChangeDirectionInput: document.getElementById("dose-change-direction"),
   doseDirectionButtons: [...document.querySelectorAll("[data-dose-direction]")],
+  previewModeButtons: [...document.querySelectorAll("[data-preview-mode]")],
+  previewModeInput: document.getElementById("preview-mode"),
   taperModeButtons: [...document.querySelectorAll("[data-taper-mode]")],
   useCustomOverrideInput: document.getElementById("use-custom-override"),
   taperModeStrip: document.querySelector(".taper-mode-strip"),
@@ -1183,6 +1185,9 @@ const MobileFlow = {
   ],
 
   isActive() {
+    const previewMode = DOMRefs.previewModeInput?.value || "";
+    if (previewMode === "guided") return true;
+    if (previewMode === "full") return false;
     return window.matchMedia("(max-width: 768px)").matches;
   },
 
@@ -1190,7 +1195,9 @@ const MobileFlow = {
     const normalizedStep = Math.min(Math.max(step, 1), MobileFlow.steps.length);
     MobileFlow.currentStep = normalizedStep;
     document.body.dataset.mobileStep = String(normalizedStep);
-    document.body.classList.toggle("mobile-flow-active", MobileFlow.isActive());
+    const isActive = MobileFlow.isActive();
+    document.body.classList.toggle("mobile-flow-active", isActive);
+    document.body.classList.toggle("guided-preview-active", isActive);
     DOMRenderer.syncMobileFlow();
   },
 
@@ -1205,7 +1212,9 @@ const MobileFlow = {
   },
 
   syncForViewport() {
-    document.body.classList.toggle("mobile-flow-active", MobileFlow.isActive());
+    const isActive = MobileFlow.isActive();
+    document.body.classList.toggle("mobile-flow-active", isActive);
+    document.body.classList.toggle("guided-preview-active", isActive);
 
     if (!document.body.dataset.mobileStep) {
       document.body.dataset.mobileStep = String(MobileFlow.currentStep);
@@ -1901,6 +1910,27 @@ const UISetup = {
     UISetup.syncInputUnitAffixes();
   },
 
+  syncPreviewModeButtons() {
+    const activeMode = DOMRefs.previewModeInput?.value || "full";
+
+    DOMRefs.previewModeButtons.forEach((button) => {
+      const isActive = button.dataset.previewMode === activeMode;
+      button.classList.toggle("is-active", isActive);
+      button.setAttribute("aria-pressed", String(isActive));
+    });
+  },
+
+  setPreviewMode(mode) {
+    const normalized = mode === "guided" ? "guided" : "full";
+
+    if (DOMRefs.previewModeInput) {
+      DOMRefs.previewModeInput.value = normalized;
+    }
+
+    UISetup.syncPreviewModeButtons();
+    MobileFlow.syncForViewport();
+  },
+
   syncDoseChangeDirectionButtons() {
     const activeDirection =
       DOMRefs.doseChangeDirectionInput.value || APP_CONFIG.defaults.taper.doseChangeDirection;
@@ -2259,6 +2289,7 @@ const UISetup = {
 
       UISetup.rebuildCustomSegmentRows(customSegments);
       UISetup.syncDoseChangeDirectionButtons();
+      UISetup.syncPreviewModeButtons();
       UISetup.syncTotalStepsMode();
       UISetup.syncStandardTaperDerivedFields("steps");
       UISetup.syncTaperModeButtons();
@@ -2324,9 +2355,13 @@ const UISetup = {
 const AppController = {
   initialize() {
       UISetup.applyDefaults();
+      UISetup.setPreviewMode(window.matchMedia("(max-width: 768px)").matches ? "guided" : "full");
       MobileFlow.syncForViewport();
       DOMRefs.form.addEventListener("submit", AppController.handleGenerate);
       DOMRefs.form.addEventListener("reset", AppController.handleReset);
+      DOMRefs.previewModeButtons.forEach((button) =>
+        button.addEventListener("click", AppController.handlePreviewModeClick)
+      );
       DOMRefs.taperModeButtons.forEach((button) =>
         button.addEventListener("click", AppController.handleTaperModeClick)
       );
@@ -2515,6 +2550,11 @@ const AppController = {
       const mode = event.currentTarget.dataset.taperMode === "advanced" ? "true" : "false";
       DOMRefs.useCustomOverrideInput.value = mode;
       UISetup.syncCustomOverrideVisibility();
+    },
+
+    handlePreviewModeClick(event) {
+      const mode = event.currentTarget.dataset.previewMode === "guided" ? "guided" : "full";
+      UISetup.setPreviewMode(mode);
     },
 
     handleTotalStepsInput() {

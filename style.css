@@ -315,6 +315,43 @@ body.sticky-actions-visible .sticky-action-bar {
   gap: 0.75rem;
 }
 
+body.guided-preview-active {
+  overflow-x: hidden;
+}
+
+body.guided-preview-active .hero-actions,
+body.guided-preview-active .sticky-action-bar,
+body.guided-preview-active .form-actions {
+  display: none !important;
+}
+
+body.guided-preview-active .mobile-stepper,
+body.guided-preview-active .mobile-flow-footer {
+  display: grid;
+}
+
+body.guided-preview-active .mobile-flow-footer {
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1.35fr);
+}
+
+body.guided-preview-active .mobile-results-actions {
+  display: none;
+}
+
+body.guided-preview-active.mobile-step-1 #results,
+body.guided-preview-active.mobile-step-2 #results,
+body.guided-preview-active.mobile-step-3 #results {
+  display: none;
+}
+
+body.guided-preview-active.mobile-step-4 .form-card {
+  display: none;
+}
+
+body.guided-preview-active.mobile-step-4 .mobile-results-actions {
+  display: grid;
+}
+
 .calendar-toolbar {
   align-items: center;
   justify-content: flex-end;
@@ -407,6 +444,23 @@ body.sticky-actions-visible .sticky-action-bar {
 
 .taper-mode-strip .taper-mode-control {
   width: fit-content;
+}
+
+.preview-mode-strip {
+  display: flex;
+  justify-content: flex-start;
+  margin: 0;
+}
+
+.preview-mode-control {
+  display: grid;
+  gap: 0.45rem;
+  width: fit-content;
+}
+
+.preview-mode-label {
+  font-size: 0.92rem;
+  color: var(--muted);
 }
 
 .group {
@@ -604,6 +658,176 @@ body.sticky-actions-visible .sticky-action-bar {
 .taper-mode-label {
   font-size: 0.92rem;
   color: var(--muted);
+}
+
+body.guided-preview-active.mobile-step-1 .taper-mode-strip,
+body.guided-preview-active.mobile-step-2 .taper-mode-strip,
+body.guided-preview-active.mobile-step-1 .group-primary-taper,
+body.guided-preview-active.mobile-step-1 .group-strengths,
+body.guided-preview-active.mobile-step-1 .custom-override-panel,
+body.guided-preview-active.mobile-step-1 .group-config-code,
+body.guided-preview-active.mobile-step-2 .group-med-start,
+body.guided-preview-active.mobile-step-2 .group-primary-taper,
+body.guided-preview-active.mobile-step-2 .custom-override-panel,
+body.guided-preview-active.mobile-step-2 .group-config-code,
+body.guided-preview-active.mobile-step-3 .group-med-start,
+body.guided-preview-active.mobile-step-3 .group-strengths {
+  display: none !important;
+}
+
+body.guided-preview-active .group-config-code {
+  display: none !important;
+}
+
+body.guided-preview-active .form-grid {
+  display: block;
+  max-width: 760px;
+  margin: 0 auto;
+}
+
+body.guided-preview-active .group {
+  min-width: 0;
+}
+
+body.guided-preview-active.mobile-step-3 .section-heading {
+  display: none;
+}
+
+body.guided-preview-active.mobile-step-3 .taper-mode-strip {
+  display: flex;
+  width: 100%;
+  margin-bottom: 0.75rem;
+  padding-top: 0;
+}
+
+body.guided-preview-active.mobile-step-3 .taper-mode-control,
+body.guided-preview-active.mobile-step-3 .preview-mode-control {
+  width: 100%;
+  min-width: 0;
+}
+
+body.guided-preview-active.mobile-step-3 .direction-toggle,
+body.guided-preview-active.mobile-step-3 .step-change-control .direction-toggle {
+  width: 100%;
+}
+
+body.guided-preview-active.mobile-step-3 .step-change-control,
+body.guided-preview-active.mobile-step-3 .paired-field-grid {
+  grid-template-columns: 1fr;
+}
+
+body.guided-preview-active.mobile-step-3 .paired-field-action,
+body.guided-preview-active.mobile-step-3 .paired-field-action .inline-action-button,
+body.guided-preview-active.mobile-step-3 .group-primary-taper input,
+body.guided-preview-active.mobile-step-3 .group-primary-taper select,
+body.guided-preview-active.mobile-step-3 #custom-override-panel input {
+  width: 100%;
+  max-width: 100%;
+}
+
+body.guided-preview-active.mobile-step-3 .paired-field-action {
+  justify-content: stretch;
+}
+
+body.guided-preview-active.mobile-step-3 .custom-override-panel .table-scroll {
+  overflow: visible;
+}
+
+body.guided-preview-active.mobile-step-3 .custom-override-panel .input-table,
+body.guided-preview-active.mobile-step-3 .custom-override-panel .input-table tr,
+body.guided-preview-active.mobile-step-3 .custom-override-panel .input-table td {
+  display: block;
+  width: 100%;
+}
+
+body.guided-preview-active.mobile-step-3 .custom-override-panel .input-table {
+  min-width: 0;
+  border-collapse: separate;
+}
+
+body.guided-preview-active.mobile-step-3 .custom-override-panel .input-table thead {
+  display: none;
+}
+
+body.guided-preview-active.mobile-step-3 .custom-override-panel .input-table tbody {
+  display: grid;
+  gap: 0.9rem;
+}
+
+body.guided-preview-active.mobile-step-3 .custom-override-panel .input-table tr.custom-segment-row {
+  display: grid;
+  gap: 0.7rem;
+  padding: 0.95rem;
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  background: linear-gradient(180deg, #fcfeff 0%, #f6fafc 100%);
+  box-shadow: 0 8px 22px rgba(18, 59, 86, 0.06);
+}
+
+body.guided-preview-active.mobile-step-3 .custom-override-panel .input-table td {
+  border-bottom: 0;
+  padding: 0;
+  margin: 0;
+  min-width: 0;
+}
+
+body.guided-preview-active.mobile-step-3 .custom-override-panel .input-table td::before {
+  display: block;
+  margin-bottom: 0.3rem;
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+
+body.guided-preview-active.mobile-step-3 .custom-override-panel .input-table td:nth-child(1)::before {
+  display: none;
+}
+
+body.guided-preview-active.mobile-step-3 .custom-override-panel .input-table td:nth-child(2)::before {
+  content: "Start Dose";
+}
+
+body.guided-preview-active.mobile-step-3 .custom-override-panel .input-table td:nth-child(3)::before {
+  content: "Dose Change";
+}
+
+body.guided-preview-active.mobile-step-3 .custom-override-panel .input-table td:nth-child(4)::before {
+  content: "Days Per Step";
+}
+
+body.guided-preview-active.mobile-step-3 .custom-override-panel .input-table td:nth-child(5)::before {
+  content: "Repeats";
+}
+
+body.guided-preview-active.mobile-step-3 .custom-override-panel .input-table td:nth-child(6)::before {
+  content: "End Dose";
+}
+
+body.guided-preview-active.mobile-step-3 .custom-override-panel .input-table td:nth-child(7)::before {
+  content: "Row Actions";
+}
+
+body.guided-preview-active.mobile-step-3 .custom-override-panel .row-action-stack {
+  display: grid;
+  grid-template-columns: repeat(2, 2.5rem);
+  justify-content: flex-start;
+  gap: 0.55rem;
+  min-height: 0;
+}
+
+body.guided-preview-active.mobile-step-3 .custom-override-panel .segment-settings-popover {
+  position: static;
+  top: auto;
+  right: auto;
+  width: 100%;
+  margin-top: 0.1rem;
+  padding: 0.8rem 0.85rem;
+  grid-column: 1 / -1;
+  border-radius: 12px;
+  background: #f5fafc;
+  box-shadow: none;
 }
 
 .checkbox-row {

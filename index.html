@@ -63,6 +63,30 @@
           <div class="section-heading-main">
             <p class="section-kicker">Inputs</p>
             <h2>Taper Settings</h2>
+            <div class="preview-mode-strip" aria-label="Preview mode">
+              <div class="preview-mode-control">
+                <span class="preview-mode-label">Preview Mode</span>
+                <div class="direction-toggle" role="group" aria-label="Preview mode">
+                  <button
+                    id="preview-mode-guided"
+                    type="button"
+                    class="direction-toggle-button"
+                    data-preview-mode="guided"
+                  >
+                    Guided Setup
+                  </button>
+                  <button
+                    id="preview-mode-full"
+                    type="button"
+                    class="direction-toggle-button"
+                    data-preview-mode="full"
+                  >
+                    Full Workspace
+                  </button>
+                </div>
+                <input id="preview-mode" name="previewMode" type="hidden" value="full">
+              </div>
+            </div>
             <div class="taper-mode-strip" aria-label="Taper mode">
               <div class="taper-mode-control">
                 <span class="taper-mode-label">Taper Mode</span>
