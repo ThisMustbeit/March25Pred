@@ -99,7 +99,7 @@ const MedicationTerms = {
 
   strengthLabel(key, dosageForm, solutionUnit = "ml") {
     if (MedicationTerms.normalizeDosageForm(dosageForm) === "solution") {
-      return `Solution Strength ${key} (${MedicationTerms.solutionStrengthSuffix(solutionUnit)})`;
+      return `Solution Concentration ${key} (${MedicationTerms.solutionStrengthSuffix(solutionUnit)})`;
     }
 
     return `${MedicationTerms.titleSingular(dosageForm, solutionUnit)} Strength ${key} (mg)`;
@@ -107,7 +107,7 @@ const MedicationTerms = {
 
   scheduleColumnLabel(key, dosageForm, solutionUnit = "ml") {
     if (MedicationTerms.normalizeDosageForm(dosageForm) === "solution") {
-      return `Solution ${key}`;
+      return `${MedicationTerms.solutionUnitLabel(solutionUnit, 2)} ${key}`;
     }
 
     return `${MedicationTerms.titleSingular(dosageForm, solutionUnit)} ${key}`;
@@ -121,7 +121,7 @@ const MedicationTerms = {
     if (MedicationTerms.normalizeDosageForm(dosageForm) === "solution") {
       return `${Formatters.dose(strengthValue).replace(" mg", "")} ${MedicationTerms.solutionStrengthSuffix(
         solutionUnit
-      )} used`;
+      )} solution used`;
     }
 
     return `${Formatters.dose(strengthValue)} ${MedicationTerms.plural(dosageForm, solutionUnit)} used`;
@@ -158,7 +158,7 @@ const MedicationTerms = {
 
   settingsTitle(dosageForm, solutionUnit = "ml") {
     if (MedicationTerms.normalizeDosageForm(dosageForm) === "solution") {
-      return `Solution units used (${MedicationTerms.solutionUnitLabel(solutionUnit, 2)})`;
+      return `Solution concentrations used (${MedicationTerms.solutionUnitLabel(solutionUnit, 2)})`;
     }
 
     return `${MedicationTerms.titleSingular(dosageForm, solutionUnit)} strengths used`;

@@ -542,6 +542,11 @@ body.guided-preview-active.mobile-step-4 .mobile-results-actions {
   color: var(--muted);
 }
 
+.group label[hidden],
+.checkbox-row[hidden] {
+  display: none !important;
+}
+
 .group input,
 .group select {
   width: 100%;
