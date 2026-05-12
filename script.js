@@ -12,6 +12,7 @@ const APP_CONFIG = {
     taper: {
       drugName: "Prednisone",
       dosageForm: "tablet",
+      solutionUnit: "ml",
       startingDose: "",
       doseChangePerStep: "",
       doseChangeDirection: "reduce",
@@ -29,6 +30,7 @@ const APP_CONFIG = {
     exampleTaper: {
       drugName: "Prednisone",
       dosageForm: "tablet",
+      solutionUnit: "ml",
       startingDose: "50",
       doseChangePerStep: "4",
       doseChangeDirection: "reduce",
@@ -53,36 +55,113 @@ const APP_CONFIG = {
 
 const MedicationTerms = {
   normalizeDosageForm(value) {
-    return value === "capsule" ? "capsule" : "tablet";
+    if (value === "capsule" || value === "solution") return value;
+    return "tablet";
   },
 
-  singular(dosageForm) {
-    return MedicationTerms.normalizeDosageForm(dosageForm);
+  normalizeSolutionUnit(value) {
+    return value === "drop" ? "drop" : "ml";
   },
 
-  plural(dosageForm) {
+  solutionUnitLabel(solutionUnit, count = 2) {
+    const normalized = MedicationTerms.normalizeSolutionUnit(solutionUnit);
+    if (normalized === "ml") {
+      return "mL";
+    }
+    return count === 1 ? "drop" : "drops";
+  },
+
+  solutionStrengthSuffix(solutionUnit) {
+    const normalized = MedicationTerms.normalizeSolutionUnit(solutionUnit);
+    return normalized === "ml" ? "mg/mL" : "mg/drop";
+  },
+
+  singular(dosageForm, solutionUnit = "ml") {
+    const normalized = MedicationTerms.normalizeDosageForm(dosageForm);
+    if (normalized === "solution") {
+      return MedicationTerms.solutionUnitLabel(solutionUnit, 1);
+    }
+    return normalized;
+  },
+
+  plural(dosageForm, solutionUnit = "ml") {
+    const normalized = MedicationTerms.normalizeDosageForm(dosageForm);
+    if (normalized === "solution") {
+      return MedicationTerms.solutionUnitLabel(solutionUnit, 2);
+    }
     return `${MedicationTerms.singular(dosageForm)}s`;
   },
 
-  titleSingular(dosageForm) {
-    const singular = MedicationTerms.singular(dosageForm);
+  titleSingular(dosageForm, solutionUnit = "ml") {
+    const singular = MedicationTerms.singular(dosageForm, solutionUnit);
     return singular.charAt(0).toUpperCase() + singular.slice(1);
   },
 
-  strengthLabel(key, dosageForm) {
-    return `${MedicationTerms.titleSingular(dosageForm)} Strength ${key} (mg)`;
+  strengthLabel(key, dosageForm, solutionUnit = "ml") {
+    if (MedicationTerms.normalizeDosageForm(dosageForm) === "solution") {
+      return `Solution Strength ${key} (${MedicationTerms.solutionStrengthSuffix(solutionUnit)})`;
+    }
+
+    return `${MedicationTerms.titleSingular(dosageForm, solutionUnit)} Strength ${key} (mg)`;
   },
 
-  scheduleColumnLabel(key, dosageForm) {
-    return `${MedicationTerms.titleSingular(dosageForm)} ${key}`;
+  scheduleColumnLabel(key, dosageForm, solutionUnit = "ml") {
+    if (MedicationTerms.normalizeDosageForm(dosageForm) === "solution") {
+      return `Solution ${key}`;
+    }
+
+    return `${MedicationTerms.titleSingular(dosageForm, solutionUnit)} ${key}`;
   },
 
-  partialLabel(dosageForm) {
-    return `Allow partial ${MedicationTerms.plural(dosageForm)}`;
+  partialLabel(dosageForm, solutionUnit = "ml") {
+    return `Allow partial ${MedicationTerms.plural(dosageForm, solutionUnit)}`;
   },
 
-  usageLabel(strengthValue, dosageForm) {
-    return `${Formatters.dose(strengthValue)} ${MedicationTerms.plural(dosageForm)} used`;
+  usageLabel(strengthValue, dosageForm, solutionUnit = "ml") {
+    if (MedicationTerms.normalizeDosageForm(dosageForm) === "solution") {
+      return `${Formatters.dose(strengthValue).replace(" mg", "")} ${MedicationTerms.solutionStrengthSuffix(
+        solutionUnit
+      )} used`;
+    }
+
+    return `${Formatters.dose(strengthValue)} ${MedicationTerms.plural(dosageForm, solutionUnit)} used`;
+  },
+
+  lineItem(strengthValue, count, dosageForm, solutionUnit = "ml") {
+    if (MedicationTerms.normalizeDosageForm(dosageForm) === "solution") {
+      return `${Formatters.tabletCount(count)} ${MedicationTerms.solutionUnitLabel(
+        solutionUnit,
+        count
+      )} of ${Formatters.dose(strengthValue).replace(" mg", "")} ${MedicationTerms.solutionStrengthSuffix(
+        solutionUnit
+      )}`;
+    }
+
+    return `${Formatters.tabletCount(count)} ${Formatters.plural(
+      MedicationTerms.singular(dosageForm, solutionUnit),
+      count
+    )} of ${Formatters.dose(strengthValue)}`;
+  },
+
+  compactLineItem(strengthValue, count, dosageForm, solutionUnit = "ml") {
+    if (MedicationTerms.normalizeDosageForm(dosageForm) === "solution") {
+      return `${Formatters.tabletCount(count)} ${MedicationTerms.solutionUnitLabel(
+        solutionUnit,
+        count
+      )} x ${Formatters.dose(strengthValue).replace(" mg", "")} ${MedicationTerms.solutionStrengthSuffix(
+        solutionUnit
+      )}`;
+    }
+
+    return `${Formatters.tabletCount(count)} x ${Formatters.dose(strengthValue)}`;
+  },
+
+  settingsTitle(dosageForm, solutionUnit = "ml") {
+    if (MedicationTerms.normalizeDosageForm(dosageForm) === "solution") {
+      return `Solution units used (${MedicationTerms.solutionUnitLabel(solutionUnit, 2)})`;
+    }
+
+    return `${MedicationTerms.titleSingular(dosageForm, solutionUnit)} strengths used`;
   },
 
   printableTitle(drugName) {
@@ -229,6 +308,7 @@ const ConfigCode = {
   fieldOrder: [
     "drugName",
     "taperStartDate",
+    "solutionUnit",
     "startingDose",
     "doseChangePerStep",
     "daysPerStep",
@@ -260,7 +340,7 @@ const ConfigCode = {
     return [
       state.printLayout === "portrait" ? "p" : "l",
       form.useCustomOverride === "true" ? "a" : "s",
-      form.dosageForm === "capsule" ? "c" : "t",
+      form.dosageForm === "capsule" ? "c" : form.dosageForm === "solution" ? "s" : "t",
       form.doseChangeDirection === "increase" ? "i" : "r",
       form.totalStepsMode === "discontinuation" ? "d" : "m",
       form.standardTaperDriver === "finalDose" ? "f" : "s",
@@ -272,7 +352,7 @@ const ConfigCode = {
     return {
       printLayout: flags[0] === "p" ? "portrait" : "landscape",
       useCustomOverride: flags[1] === "a" ? "true" : "false",
-      dosageForm: flags[2] === "c" ? "capsule" : "tablet",
+      dosageForm: flags[2] === "c" ? "capsule" : flags[2] === "s" ? "solution" : "tablet",
       doseChangeDirection: flags[3] === "i" ? "increase" : "reduce",
       totalStepsMode: flags[4] === "d" ? "discontinuation" : "manual",
       standardTaperDriver: flags[5] === "f" ? "finalDose" : "steps",
@@ -422,6 +502,7 @@ const ConfigCode = {
       form: {
         drugName: DOMRefs.form.drugName.value,
         taperStartDate: DOMRefs.form.taperStartDate.value,
+        solutionUnit: DOMRefs.form.solutionUnit?.value || APP_CONFIG.defaults.taper.solutionUnit,
         startingDose: DOMRefs.form.startingDose.value,
         dosageForm: DOMRefs.form.dosageForm.value,
         doseChangePerStep: DOMRefs.form.doseChangePerStep.value,
@@ -616,22 +697,18 @@ const Strengths = {
     return exactPartialResult || wholeOnlyResult;
   },
 
-  buildTabletLines(allocations, dosageForm = "tablet") {
+  buildTabletLines(allocations, dosageForm = "tablet", solutionUnit = "ml") {
     return allocations
       .filter((item) => item.count > 0)
       .map(
-        (item) =>
-          `${Formatters.tabletCount(item.count)} ${Formatters.plural(
-            MedicationTerms.singular(dosageForm),
-            item.count
-          )} of ${Formatters.dose(item.strength)}`
+        (item) => MedicationTerms.lineItem(item.strength, item.count, dosageForm, solutionUnit)
       );
   },
 
-  buildCompactSummary(allocations, doseMg) {
+  buildCompactSummary(allocations, doseMg, dosageForm = "tablet", solutionUnit = "ml") {
     const parts = allocations
       .filter((item) => item.count > 0)
-      .map((item) => `${Formatters.tabletCount(item.count)} x ${Formatters.dose(item.strength)}`);
+      .map((item) => MedicationTerms.compactLineItem(item.strength, item.count, dosageForm, solutionUnit));
 
     if (parts.length === 0 && NumberUtils.isNearZero(doseMg)) {
       return "";
@@ -837,7 +914,7 @@ const ScheduleLogic = {
     return NumberUtils.isNearZero(allocation.finalRemainder) ? "" : Messages.exactDoseWarning();
   },
 
-  buildInstructionParts(doseMg, allocation, warning, dosageForm = "tablet") {
+  buildInstructionParts(doseMg, allocation, warning, dosageForm = "tablet", solutionUnit = "ml") {
     if (NumberUtils.isNearZero(doseMg)) {
       return {
         totalLine: "",
@@ -848,17 +925,18 @@ const ScheduleLogic = {
 
     return {
       totalLine: `Total = ${Formatters.dose(doseMg)}`,
-      tabletLines: Strengths.buildTabletLines(allocation.allocations, dosageForm),
+      tabletLines: Strengths.buildTabletLines(allocation.allocations, dosageForm, solutionUnit),
       warningLine: warning || "",
     };
   },
 
-  buildPrintableText(doseMg, allocation, warning, dosageForm = "tablet") {
+  buildPrintableText(doseMg, allocation, warning, dosageForm = "tablet", solutionUnit = "ml") {
     const instructionParts = ScheduleLogic.buildInstructionParts(
       doseMg,
       allocation,
       warning,
-      dosageForm
+      dosageForm,
+      solutionUnit
     );
     return [instructionParts.totalLine, ...instructionParts.tabletLines, instructionParts.warningLine]
       .filter(Boolean)
@@ -877,13 +955,15 @@ const ScheduleLogic = {
       doseMg,
       allocation,
       warning,
-      inputs.dosageForm
+      inputs.dosageForm,
+      inputs.solutionUnit
     );
     const printableText = ScheduleLogic.buildPrintableText(
       doseMg,
       allocation,
       warning,
-      inputs.dosageForm
+      inputs.dosageForm,
+      inputs.solutionUnit
     );
 
     return {
@@ -896,7 +976,12 @@ const ScheduleLogic = {
       warning,
       instructionParts,
       printableText,
-      compactTabletSummary: Strengths.buildCompactSummary(allocation.allocations, doseMg),
+      compactTabletSummary: Strengths.buildCompactSummary(
+        allocation.allocations,
+        doseMg,
+        inputs.dosageForm,
+        inputs.solutionUnit
+      ),
     };
   },
 
@@ -1014,7 +1099,7 @@ const ViewModelFactory = {
 
     if (inputs.tabletStrengthA != null) {
       tabletItems.push({
-        label: MedicationTerms.usageLabel(inputs.tabletStrengthA, inputs.dosageForm),
+        label: MedicationTerms.usageLabel(inputs.tabletStrengthA, inputs.dosageForm, inputs.solutionUnit),
         value: Formatters.tabletCount(summary.tabletTotals.A),
         level: "secondary",
       });
@@ -1022,7 +1107,7 @@ const ViewModelFactory = {
 
     if (inputs.tabletStrengthB != null) {
       tabletItems.push({
-        label: MedicationTerms.usageLabel(inputs.tabletStrengthB, inputs.dosageForm),
+        label: MedicationTerms.usageLabel(inputs.tabletStrengthB, inputs.dosageForm, inputs.solutionUnit),
         value: Formatters.tabletCount(summary.tabletTotals.B),
         level: "secondary",
       });
@@ -1030,7 +1115,7 @@ const ViewModelFactory = {
 
     if (inputs.tabletStrengthC != null) {
       tabletItems.push({
-        label: MedicationTerms.usageLabel(inputs.tabletStrengthC, inputs.dosageForm),
+        label: MedicationTerms.usageLabel(inputs.tabletStrengthC, inputs.dosageForm, inputs.solutionUnit),
         value: Formatters.tabletCount(summary.tabletTotals.C),
         level: "secondary",
       });
@@ -1104,6 +1189,7 @@ const DOMRefs = {
   customSegmentBody: document.getElementById("custom-segment-body"),
   segmentRowTemplate: document.getElementById("segment-row-template"),
   validationSummary: document.getElementById("validation-summary"),
+  results: document.getElementById("results"),
   summaryGrid: document.getElementById("summary-grid"),
   printCalendarRoot: document.getElementById("print-calendar-root"),
   calendarTitle: document.getElementById("calendar-title"),
@@ -1135,6 +1221,8 @@ const DOMRefs = {
   strengthLabelA: document.getElementById("strength-label-a"),
   strengthLabelB: document.getElementById("strength-label-b"),
   strengthLabelC: document.getElementById("strength-label-c"),
+  solutionUnitRow: document.getElementById("solution-unit-row"),
+  solutionUnitSelect: document.getElementById("solution-unit"),
   partialUnitsLabel: document.getElementById("partial-units-label"),
   partialUnitsRow: document.getElementById("partial-units-label")?.closest(".checkbox-row"),
   scheduleStrengthColA: document.getElementById("schedule-strength-col-a"),
@@ -1242,8 +1330,9 @@ const MobileFlow = {
       const strengths = Strengths.create({
         ...inputs,
         dosageForm,
-        allowPartialTablets: false,
-      });
+      allowPartialTablets: false,
+      solutionUnit: MedicationTerms.normalizeSolutionUnit(DOMRefs.form.solutionUnit?.value),
+    });
       const errors = [];
 
       if (inputs.tabletStrengthA == null || inputs.tabletStrengthA <= 0) {
@@ -1270,6 +1359,7 @@ const MobileFlow = {
 
 const UIState = {
   mobileValidationRequested: false,
+  validationRequested: false,
 };
 
 const InputFactory = {
@@ -1404,6 +1494,7 @@ const InputFactory = {
       allowPartialTablets: DOMRefs.form.allowPartialTablets.checked,
       drugName: (DOMRefs.form.drugName.value || APP_CONFIG.defaults.taper.drugName).trim(),
       dosageForm: MedicationTerms.normalizeDosageForm(DOMRefs.form.dosageForm.value),
+      solutionUnit: MedicationTerms.normalizeSolutionUnit(DOMRefs.form.solutionUnit?.value),
       doseChangeDirection: DOMRefs.form.doseChangeDirection.value || APP_CONFIG.defaults.taper.doseChangeDirection,
       totalStepsMode: DOMRefs.form.totalStepsMode.value || APP_CONFIG.defaults.taper.totalStepsMode,
       standardTaperDriver: UISetup.getStandardTaperDriver(),
@@ -1607,7 +1698,7 @@ const DOMBuilders = {
     const weekdayLabels = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
     const printableWeeks = DOMBuilders.getPrintableWeeks(calendar);
     const printDisclaimer =
-      "For use by qualified healthcare professionals only. Taper schedules generated by this tool must be independently reviewed and confirmed by the prescribing clinician before use. Users are responsible for verifying all doses, durations, and instructions in accordance with clinical judgment, product labeling, institutional policy, and patient-specific factors.";
+      "Professional reference only. Any taper schedule generated by this tool must be reviewed and approved by the responsible clinician before use. Users remain responsible for verifying all doses, durations, and instructions against clinical judgment, product information, local policy, and patient-specific factors.";
     const printableDrugName = MedicationTerms.printableTitle(
       DOMRefs.form?.drugName?.value || APP_CONFIG.defaults.taper.drugName
     );
@@ -1725,19 +1816,36 @@ const DOMRenderer = {
       return;
     }
 
+    if (!forceVisible && !UIState.validationRequested) {
+      DOMRefs.validationSummary.classList.remove("active");
+      DOMRefs.validationSummary.innerHTML = "";
+      return;
+    }
+
     if (MobileFlow.isActive() && !forceVisible && !UIState.mobileValidationRequested) {
       DOMRefs.validationSummary.classList.remove("active");
       DOMRefs.validationSummary.innerHTML = "";
       return;
     }
 
+    const hasMissingOrRequiredError = errors.some((error) => {
+      const normalized = String(error).toLowerCase();
+      return (
+        normalized.includes("required") ||
+        normalized.includes("must be at least") ||
+        normalized.includes("must be greater than 0") ||
+        normalized.includes("must be 0 or greater")
+      );
+    });
+
     DOMRefs.validationSummary.classList.add("active");
-    DOMRefs.validationSummary.innerHTML = `<strong>Please review the following:</strong><ul>${errors
+    DOMRefs.validationSummary.innerHTML = `${hasMissingOrRequiredError ? "<strong>Please review the following:</strong>" : ""}<ul>${errors
       .map((error) => `<li>${Html.escape(error)}</li>`)
       .join("")}</ul>`;
   },
 
   clearResults() {
+    DOMRefs.results?.classList.add("is-hidden");
     DOMRefs.summaryGrid.innerHTML = "";
     DOMRefs.printCalendarRoot.innerHTML = "";
     DOMRefs.calendarTitle.textContent = "Month Calendar";
@@ -1754,6 +1862,7 @@ const DOMRenderer = {
   },
 
   render(viewModel) {
+    DOMRefs.results?.classList.toggle("is-hidden", viewModel.scheduleRows.length === 0);
     const summaryMarkup = DOMBuilders.summaryMarkup(viewModel.summaryItems);
     DOMRefs.summaryGrid.innerHTML = summaryMarkup;
     DOMRefs.calendarTitle.textContent = viewModel.calendarTitle;
@@ -2021,18 +2130,23 @@ const UISetup = {
 
   syncMedicationLabels() {
     const dosageForm = MedicationTerms.normalizeDosageForm(DOMRefs.form.dosageForm.value);
+    const solutionUnit = MedicationTerms.normalizeSolutionUnit(DOMRefs.solutionUnitSelect?.value);
     const allowPartialVisible = dosageForm === "tablet";
 
-    DOMRefs.strengthLabelA.textContent = MedicationTerms.strengthLabel("A", dosageForm);
-    DOMRefs.strengthLabelB.textContent = MedicationTerms.strengthLabel("B", dosageForm);
-    DOMRefs.strengthLabelC.textContent = MedicationTerms.strengthLabel("C", dosageForm);
-    DOMRefs.partialUnitsLabel.textContent = MedicationTerms.partialLabel(dosageForm);
-    DOMRefs.scheduleStrengthColA.textContent = MedicationTerms.scheduleColumnLabel("A", dosageForm);
-    DOMRefs.scheduleStrengthColB.textContent = MedicationTerms.scheduleColumnLabel("B", dosageForm);
-    DOMRefs.scheduleStrengthColC.textContent = MedicationTerms.scheduleColumnLabel("C", dosageForm);
+    DOMRefs.strengthLabelA.textContent = MedicationTerms.strengthLabel("A", dosageForm, solutionUnit);
+    DOMRefs.strengthLabelB.textContent = MedicationTerms.strengthLabel("B", dosageForm, solutionUnit);
+    DOMRefs.strengthLabelC.textContent = MedicationTerms.strengthLabel("C", dosageForm, solutionUnit);
+    DOMRefs.partialUnitsLabel.textContent = MedicationTerms.partialLabel(dosageForm, solutionUnit);
+    DOMRefs.scheduleStrengthColA.textContent = MedicationTerms.scheduleColumnLabel("A", dosageForm, solutionUnit);
+    DOMRefs.scheduleStrengthColB.textContent = MedicationTerms.scheduleColumnLabel("B", dosageForm, solutionUnit);
+    DOMRefs.scheduleStrengthColC.textContent = MedicationTerms.scheduleColumnLabel("C", dosageForm, solutionUnit);
 
     if (DOMRefs.partialUnitsRow) {
       DOMRefs.partialUnitsRow.hidden = !allowPartialVisible;
+    }
+
+    if (DOMRefs.solutionUnitRow) {
+      DOMRefs.solutionUnitRow.hidden = dosageForm !== "solution";
     }
 
     if (!allowPartialVisible) {
@@ -2150,7 +2264,8 @@ const UISetup = {
 
   syncCustomSegmentStrengthSelectors() {
     const dosageForm = MedicationTerms.normalizeDosageForm(DOMRefs.form.dosageForm.value);
-    const settingsTitle = `${MedicationTerms.titleSingular(dosageForm)} strengths used`;
+    const solutionUnit = MedicationTerms.normalizeSolutionUnit(DOMRefs.solutionUnitSelect?.value);
+    const settingsTitle = MedicationTerms.settingsTitle(dosageForm, solutionUnit);
     const strengthValues = {
       A: NumberUtils.parseOptionalNumber(DOMRefs.form.tabletStrengthA.value),
       B: NumberUtils.parseOptionalNumber(DOMRefs.form.tabletStrengthB.value),
@@ -2366,6 +2481,7 @@ const AppController = {
         button.addEventListener("click", AppController.handleTaperModeClick)
       );
       DOMRefs.form.dosageForm.addEventListener("change", UISetup.syncMedicationLabels);
+      DOMRefs.solutionUnitSelect?.addEventListener("change", UISetup.syncMedicationLabels);
     DOMRefs.doseDirectionButtons.forEach((button) =>
       button.addEventListener("click", AppController.handleDoseDirectionClick)
     );
@@ -2419,9 +2535,11 @@ const AppController = {
 
   handleGenerate(event) {
     event.preventDefault();
+    UIState.validationRequested = true;
     UIState.mobileValidationRequested = MobileFlow.isActive();
     const success = AppController.render();
     if (success && MobileFlow.isActive()) {
+      UIState.validationRequested = false;
       UIState.mobileValidationRequested = false;
       MobileFlow.setStep(4);
     }
@@ -2429,6 +2547,7 @@ const AppController = {
 
   handleReset() {
     window.setTimeout(() => {
+      UIState.validationRequested = false;
       UIState.mobileValidationRequested = false;
       UISetup.applyDefaults();
       AppController.render();
@@ -2437,6 +2556,7 @@ const AppController = {
   },
 
   handleLoadExample() {
+    UIState.validationRequested = false;
     UIState.mobileValidationRequested = false;
     UISetup.loadExample();
     AppController.render();
@@ -2479,6 +2599,7 @@ const AppController = {
 
     try {
       const state = ConfigCode.decode(code);
+      UIState.validationRequested = false;
       UIState.mobileValidationRequested = false;
       UISetup.applyImportedConfiguration(state);
       DOMRenderer.setConfigCodeStatus("Configuration code applied.");
@@ -2492,6 +2613,7 @@ const AppController = {
   },
 
   handleMobileStepBack() {
+    UIState.validationRequested = false;
     UIState.mobileValidationRequested = false;
     DOMRenderer.renderValidationErrors([]);
     MobileFlow.goToPreviousStep();
@@ -2500,11 +2622,13 @@ const AppController = {
   handleMobileStepNext() {
     const stepErrors = MobileFlow.validateCurrentStep();
     if (stepErrors.length > 0) {
+      UIState.validationRequested = true;
       UIState.mobileValidationRequested = true;
       DOMRenderer.renderValidationErrors(stepErrors, true);
       return;
     }
 
+    UIState.validationRequested = false;
     UIState.mobileValidationRequested = false;
     DOMRenderer.renderValidationErrors([]);
 
@@ -2518,6 +2642,7 @@ const AppController = {
   },
 
   handleMobileEditInputs() {
+    UIState.validationRequested = false;
     UIState.mobileValidationRequested = false;
     DOMRenderer.renderValidationErrors([]);
     MobileFlow.setStep(3);
@@ -2629,6 +2754,7 @@ const AppController = {
       return false;
     }
 
+    UIState.validationRequested = false;
     UIState.mobileValidationRequested = false;
     DOMRenderer.renderValidationErrors([]);
     const scheduleRows = ScheduleLogic.generateScheduleRows(inputs);

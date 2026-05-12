@@ -29,8 +29,7 @@
       <div class="hero-brand">
         <img src="website-icon.png" alt="Medication taper calendar logo" class="hero-logo">
         <div class="hero-brand-copy">
-        <p class="eyebrow">Medication Taper Planner</p>
-        <h1>Medication Taper Calendar Generator</h1>
+        <h1>Medication Taper Calendar Generator | CalendRx</h1>
         <p class="hero-copy">
           Build a day-by-day medication taper schedule, see strength breakdowns, review exact-dose warnings,
           and print a clean monthly calendar.
@@ -223,6 +222,14 @@
                 <select id="dosage-form" name="dosageForm">
                   <option value="tablet">Tablets</option>
                   <option value="capsule">Capsules</option>
+                  <option value="solution">Solution</option>
+                </select>
+              </label>
+              <label id="solution-unit-row" hidden>
+                <span>Solution Unit</span>
+                <select id="solution-unit" name="solutionUnit">
+                  <option value="ml">mL</option>
+                  <option value="drop">Eye drops</option>
                 </select>
               </label>
               <label>
@@ -398,44 +405,47 @@
 
         <div class="disclaimer-copy">
           <p>
-            This tool generates medication taper calendars from user-entered information and is intended to
-            support clinical workflow only. All schedules, doses, durations, and patient instructions must be
-            reviewed and confirmed by the prescribing clinician before use.
+            This website provides medication-planning tools for professional reference only. It is intended to
+            assist qualified healthcare professionals in organizing taper instructions, but it does not replace
+            clinical assessment, prescribing authority, or independent decision-making.
           </p>
 
           <p>
-            The content on this website is provided for informational and educational purposes only and is not a
-            substitute for independent professional judgment.
+            Any calendar, dose schedule, or instruction generated through this website should be treated as a
+            draft output. Final dosing, duration, taper sequence, and patient directions must be reviewed and
+            approved by the responsible clinician before implementation.
           </p>
 
           <p>
-            No warranty or representation is made regarding the accuracy, completeness, reliability, or clinical
-            suitability of any calculation, schedule, or related information.
+            Users are responsible for confirming that all results are appropriate for the individual patient and
+            consistent with applicable product information, professional standards, local policies, and relevant
+            clinical guidance.
           </p>
 
           <p>
-            Users are solely responsible for independently verifying all outputs and for ensuring that clinical
-            decisions are consistent with applicable guidelines, product labeling, institutional policies, and
-            patient-specific considerations.
+            The information and calculations made available here are offered without any representation or
+            warranty as to accuracy, completeness, reliability, or fitness for a particular clinical purpose.
           </p>
 
           <p>
-            This website is intended for use by qualified healthcare professionals and is not intended for patient
-            self-management or as a substitute for consultation with a licensed healthcare provider.
+            This website is not intended for use by patients and should not be relied upon as a substitute for
+            consultation with a licensed healthcare professional.
           </p>
 
           <p>
-            The creators of this website disclaim responsibility for errors, omissions, or outcomes arising from
-            use of the site and, to the fullest extent permitted by law, shall not be liable for any direct,
-            indirect, incidental, consequential, special, or exemplary damages related to its use.
+            The creators and maintainers of this website disclaim responsibility for errors, omissions, or
+            consequences arising from its use. To the fullest extent permitted by law, they shall not be liable
+            for any direct, indirect, incidental, consequential, special, or exemplary loss or damage connected
+            with use of, or inability to use, this website or its tools.
           </p>
 
           <p>
-            This website is not intended to diagnose, treat, cure, or prevent any disease or medical condition.
+            Nothing on this website is intended to diagnose, treat, cure, or prevent any disease or medical
+            condition.
           </p>
 
           <p>
-            By using this website, you acknowledge and accept this disclaimer.
+            By continuing to use this website, you acknowledge and accept these terms.
           </p>
         </div>
       </section>

@@ -148,10 +148,19 @@ body.sticky-actions-visible .sticky-action-bar {
   margin: 0.95rem 0 0;
 }
 
+.hero h1 {
+  font-size: clamp(1.8rem, 3vw, 2.6rem);
+  line-height: 1.12;
+}
+
 .results-stack,
 .form-card {
   display: grid;
   gap: 2rem;
+}
+
+.results-stack.is-hidden {
+  display: none;
 }
 
 .print-only {
@@ -706,6 +715,10 @@ body.guided-preview-active .group {
   min-width: 0;
 }
 
+body.guided-preview-active.mobile-step-3 .form-card {
+  padding-bottom: 1.5rem;
+}
+
 body.guided-preview-active.mobile-step-3 .section-heading {
   display: none;
 }
@@ -867,9 +880,9 @@ body.guided-preview-active.mobile-step-3 .custom-override-panel .segment-setting
 
 .custom-override-panel {
   overflow: visible;
-  max-height: 1400px;
+  max-height: none;
   opacity: 1;
-  transition: max-height 0.22s ease, opacity 0.18s ease;
+  transition: opacity 0.18s ease;
 }
 
 .custom-override-panel.is-hidden {
@@ -1726,6 +1739,10 @@ body.guided-preview-active.mobile-step-3 .custom-override-panel .segment-setting
     width: 100%;
     max-width: 100%;
     overflow-x: hidden;
+  }
+
+  body.mobile-flow-active.mobile-step-3 .form-card {
+    padding-bottom: 1.5rem;
   }
 
   body.mobile-flow-active.mobile-step-3 .group-primary-taper label,
