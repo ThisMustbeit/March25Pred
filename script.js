@@ -99,7 +99,7 @@ const MedicationTerms = {
 
   strengthLabel(key, dosageForm, solutionUnit = "ml") {
     if (MedicationTerms.normalizeDosageForm(dosageForm) === "solution") {
-      return `Solution Concentration ${key} (${MedicationTerms.solutionStrengthSuffix(solutionUnit)})`;
+      return "";
     }
 
     return `${MedicationTerms.titleSingular(dosageForm, solutionUnit)} Strength ${key} (mg)`;
@@ -107,7 +107,7 @@ const MedicationTerms = {
 
   scheduleColumnLabel(key, dosageForm, solutionUnit = "ml") {
     if (MedicationTerms.normalizeDosageForm(dosageForm) === "solution") {
-      return `${MedicationTerms.solutionUnitLabel(solutionUnit, 2)} ${key}`;
+      return "";
     }
 
     return `${MedicationTerms.titleSingular(dosageForm, solutionUnit)} ${key}`;
@@ -119,9 +119,7 @@ const MedicationTerms = {
 
   usageLabel(strengthValue, dosageForm, solutionUnit = "ml") {
     if (MedicationTerms.normalizeDosageForm(dosageForm) === "solution") {
-      return `${Formatters.dose(strengthValue).replace(" mg", "")} ${MedicationTerms.solutionStrengthSuffix(
-        solutionUnit
-      )} solution used`;
+      return "";
     }
 
     return `${Formatters.dose(strengthValue)} ${MedicationTerms.plural(dosageForm, solutionUnit)} used`;
@@ -158,7 +156,7 @@ const MedicationTerms = {
 
   settingsTitle(dosageForm, solutionUnit = "ml") {
     if (MedicationTerms.normalizeDosageForm(dosageForm) === "solution") {
-      return `Solution concentrations used (${MedicationTerms.solutionUnitLabel(solutionUnit, 2)})`;
+      return "";
     }
 
     return `${MedicationTerms.titleSingular(dosageForm, solutionUnit)} strengths used`;
@@ -540,6 +538,10 @@ const ConfigCode = {
 
 const Strengths = {
   create(inputValues) {
+    if (MedicationTerms.normalizeDosageForm(inputValues.dosageForm) === "solution") {
+      return [];
+    }
+
     return [
       {
         key: "A",
@@ -721,6 +723,7 @@ const Strengths = {
 const Validation = {
   validateInputs(inputs) {
     const errors = [];
+    const isSolution = inputs.dosageForm === "solution";
 
     if (!inputs.taperStartDate) errors.push("Taper start date is required.");
     if (inputs.startingDose == null || inputs.startingDose < 0) {
@@ -760,17 +763,19 @@ const Validation = {
     } else if (inputs.minDoseClamp > inputs.maxDoseClamp) {
       errors.push("Minimum dose clamp cannot be greater than maximum dose clamp.");
     }
-    if (inputs.tabletStrengthA == null || inputs.tabletStrengthA <= 0) {
-      errors.push("Strength A is required and must be greater than 0.");
-    }
-    if (inputs.tabletStrengthB != null && inputs.tabletStrengthB <= 0) {
-      errors.push("Strength B must be greater than 0 if provided.");
-    }
-    if (inputs.tabletStrengthC != null && inputs.tabletStrengthC <= 0) {
-      errors.push("Strength C must be greater than 0 if provided.");
-    }
+    if (!isSolution) {
+      if (inputs.tabletStrengthA == null || inputs.tabletStrengthA <= 0) {
+        errors.push("Strength A is required and must be greater than 0.");
+      }
+      if (inputs.tabletStrengthB != null && inputs.tabletStrengthB <= 0) {
+        errors.push("Strength B must be greater than 0 if provided.");
+      }
+      if (inputs.tabletStrengthC != null && inputs.tabletStrengthC <= 0) {
+        errors.push("Strength C must be greater than 0 if provided.");
+      }
 
-    errors.push(...Strengths.validateOrder(inputs.strengths));
+      errors.push(...Strengths.validateOrder(inputs.strengths));
+    }
 
     if (inputs.useCustomOverride) {
       const usedSegments = inputs.customSegments.filter(Boolean);
@@ -950,7 +955,7 @@ const ScheduleLogic = {
     const allocation = Strengths.allocateDose(doseMg, strengthsForDay, {
       allowPartialTablets: inputs.allowPartialTablets,
     });
-    const warning = ScheduleLogic.getExactnessWarning(doseMg, allocation);
+    const warning = inputs.dosageForm === "solution" ? "" : ScheduleLogic.getExactnessWarning(doseMg, allocation);
     const instructionParts = ScheduleLogic.buildInstructionParts(
       doseMg,
       allocation,
@@ -971,6 +976,7 @@ const ScheduleLogic = {
       dayIndex,
       stepIndex,
       doseMg,
+      dosageForm: inputs.dosageForm,
       strengths: strengthsForDay,
       allocations: allocation.allocations,
       warning,
@@ -1097,6 +1103,10 @@ const ViewModelFactory = {
   buildTabletSummaryItems(inputs, summary) {
     const tabletItems = [];
 
+    if (inputs.dosageForm === "solution") {
+      return tabletItems;
+    }
+
     if (inputs.tabletStrengthA != null) {
       tabletItems.push({
         label: MedicationTerms.usageLabel(inputs.tabletStrengthA, inputs.dosageForm, inputs.solutionUnit),
@@ -1221,8 +1231,12 @@ const DOMRefs = {
   strengthLabelA: document.getElementById("strength-label-a"),
   strengthLabelB: document.getElementById("strength-label-b"),
   strengthLabelC: document.getElementById("strength-label-c"),
+  strengthRowA: document.getElementById("strength-label-a")?.closest("label"),
+  strengthRowB: document.getElementById("strength-label-b")?.closest("label"),
+  strengthRowC: document.getElementById("strength-label-c")?.closest("label"),
   solutionUnitRow: document.getElementById("solution-unit-row"),
-  solutionUnitSelect: document.getElementById("solution-unit"),
+  solutionUnitInput: document.getElementById("solution-unit"),
+  solutionUnitButtons: [...document.querySelectorAll("[data-solution-unit]")],
   partialUnitsLabel: document.getElementById("partial-units-label"),
   partialUnitsRow: document.getElementById("partial-units-label")?.closest(".checkbox-row"),
   scheduleStrengthColA: document.getElementById("schedule-strength-col-a"),
@@ -1335,17 +1349,19 @@ const MobileFlow = {
     });
       const errors = [];
 
-      if (inputs.tabletStrengthA == null || inputs.tabletStrengthA <= 0) {
-        errors.push("Strength A is required and must be greater than 0.");
-      }
-      if (inputs.tabletStrengthB != null && inputs.tabletStrengthB <= 0) {
-        errors.push("Strength B must be greater than 0 if provided.");
-      }
-      if (inputs.tabletStrengthC != null && inputs.tabletStrengthC <= 0) {
-        errors.push("Strength C must be greater than 0 if provided.");
-      }
+      if (dosageForm !== "solution") {
+        if (inputs.tabletStrengthA == null || inputs.tabletStrengthA <= 0) {
+          errors.push("Strength A is required and must be greater than 0.");
+        }
+        if (inputs.tabletStrengthB != null && inputs.tabletStrengthB <= 0) {
+          errors.push("Strength B must be greater than 0 if provided.");
+        }
+        if (inputs.tabletStrengthC != null && inputs.tabletStrengthC <= 0) {
+          errors.push("Strength C must be greater than 0 if provided.");
+        }
 
-      errors.push(...Strengths.validateOrder(strengths));
+        errors.push(...Strengths.validateOrder(strengths));
+      }
       return errors;
     }
 
@@ -1671,6 +1687,7 @@ const DOMBuilders = {
           : "";
 
         const counts = Object.fromEntries(row.allocations.map((item) => [item.key, item.count]));
+        const isSolution = row.dosageForm === "solution";
 
         return `
           <tr class="${row.warning ? "row-warning" : ""}">
@@ -1678,9 +1695,9 @@ const DOMBuilders = {
             <td>${row.dayIndex}</td>
             <td>${row.stepIndex}</td>
             <td>${Html.escape(Formatters.dose(row.doseMg))}</td>
-            <td>${Html.escape(Formatters.tabletCount(counts.A ?? 0))}</td>
-            <td>${Html.escape(Formatters.tabletCount(counts.B ?? 0))}</td>
-            <td>${Html.escape(Formatters.tabletCount(counts.C ?? 0))}</td>
+            <td>${isSolution ? "" : Html.escape(Formatters.tabletCount(counts.A ?? 0))}</td>
+            <td>${isSolution ? "" : Html.escape(Formatters.tabletCount(counts.B ?? 0))}</td>
+            <td>${isSolution ? "" : Html.escape(Formatters.tabletCount(counts.C ?? 0))}</td>
             <td>${warningBadge}</td>
             <td class="pre">${Html.escape(row.printableText)}</td>
           </tr>
@@ -2051,6 +2068,17 @@ const UISetup = {
     });
   },
 
+  syncSolutionUnitButtons() {
+    const activeUnit =
+      DOMRefs.solutionUnitInput?.value || APP_CONFIG.defaults.taper.solutionUnit;
+
+    DOMRefs.solutionUnitButtons.forEach((button) => {
+      const isActive = button.dataset.solutionUnit === activeUnit;
+      button.classList.toggle("is-active", isActive);
+      button.setAttribute("aria-pressed", String(isActive));
+    });
+  },
+
   syncTaperModeButtons() {
     const activeMode = DOMRefs.useCustomOverrideInput.value === "true" ? "advanced" : "standard";
 
@@ -2130,8 +2158,10 @@ const UISetup = {
 
   syncMedicationLabels() {
     const dosageForm = MedicationTerms.normalizeDosageForm(DOMRefs.form.dosageForm.value);
-    const solutionUnit = MedicationTerms.normalizeSolutionUnit(DOMRefs.solutionUnitSelect?.value);
+    const solutionUnit = MedicationTerms.normalizeSolutionUnit(DOMRefs.solutionUnitInput?.value);
     const allowPartialVisible = dosageForm === "tablet";
+    const showSolutionUnit = dosageForm === "solution";
+    const showStrengthRows = dosageForm !== "solution";
 
     DOMRefs.strengthLabelA.textContent = MedicationTerms.strengthLabel("A", dosageForm, solutionUnit);
     DOMRefs.strengthLabelB.textContent = MedicationTerms.strengthLabel("B", dosageForm, solutionUnit);
@@ -2141,18 +2171,23 @@ const UISetup = {
     DOMRefs.scheduleStrengthColB.textContent = MedicationTerms.scheduleColumnLabel("B", dosageForm, solutionUnit);
     DOMRefs.scheduleStrengthColC.textContent = MedicationTerms.scheduleColumnLabel("C", dosageForm, solutionUnit);
 
+    DOMRefs.strengthRowA.hidden = !showStrengthRows;
+    DOMRefs.strengthRowB.hidden = !showStrengthRows;
+    DOMRefs.strengthRowC.hidden = !showStrengthRows;
+
     if (DOMRefs.partialUnitsRow) {
       DOMRefs.partialUnitsRow.hidden = !allowPartialVisible;
     }
 
     if (DOMRefs.solutionUnitRow) {
-      DOMRefs.solutionUnitRow.hidden = dosageForm !== "solution";
+      DOMRefs.solutionUnitRow.hidden = !showSolutionUnit;
     }
 
     if (!allowPartialVisible) {
       DOMRefs.form.allowPartialTablets.checked = false;
     }
 
+    UISetup.syncSolutionUnitButtons();
     UISetup.syncInputUnitAffixes();
     UISetup.syncCustomSegmentStrengthSelectors();
   },
@@ -2264,7 +2299,7 @@ const UISetup = {
 
   syncCustomSegmentStrengthSelectors() {
     const dosageForm = MedicationTerms.normalizeDosageForm(DOMRefs.form.dosageForm.value);
-    const solutionUnit = MedicationTerms.normalizeSolutionUnit(DOMRefs.solutionUnitSelect?.value);
+    const solutionUnit = MedicationTerms.normalizeSolutionUnit(DOMRefs.solutionUnitInput?.value);
     const settingsTitle = MedicationTerms.settingsTitle(dosageForm, solutionUnit);
     const strengthValues = {
       A: NumberUtils.parseOptionalNumber(DOMRefs.form.tabletStrengthA.value),
@@ -2275,6 +2310,7 @@ const UISetup = {
     [...DOMRefs.customSegmentBody.querySelectorAll("tr")].forEach((row) => {
       const fields = UISetup.getCustomRowFields(row);
       fields.settingsTitle.textContent = settingsTitle;
+      fields.settingsButton.hidden = dosageForm === "solution";
       let visibleOptionCount = 0;
 
       fields.strengthOptions.forEach((option) => {
@@ -2481,7 +2517,9 @@ const AppController = {
         button.addEventListener("click", AppController.handleTaperModeClick)
       );
       DOMRefs.form.dosageForm.addEventListener("change", UISetup.syncMedicationLabels);
-      DOMRefs.solutionUnitSelect?.addEventListener("change", UISetup.syncMedicationLabels);
+      DOMRefs.solutionUnitButtons.forEach((button) =>
+        button.addEventListener("click", AppController.handleSolutionUnitClick)
+      );
     DOMRefs.doseDirectionButtons.forEach((button) =>
       button.addEventListener("click", AppController.handleDoseDirectionClick)
     );
@@ -2675,6 +2713,12 @@ const AppController = {
       const mode = event.currentTarget.dataset.taperMode === "advanced" ? "true" : "false";
       DOMRefs.useCustomOverrideInput.value = mode;
       UISetup.syncCustomOverrideVisibility();
+    },
+
+    handleSolutionUnitClick(event) {
+      const unit = event.currentTarget.dataset.solutionUnit === "drop" ? "drop" : "ml";
+      DOMRefs.solutionUnitInput.value = unit;
+      UISetup.syncMedicationLabels();
     },
 
     handlePreviewModeClick(event) {

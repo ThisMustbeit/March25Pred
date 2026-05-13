@@ -227,10 +227,25 @@
               </label>
               <label id="solution-unit-row" hidden>
                 <span>Solution Unit</span>
-                <select id="solution-unit" name="solutionUnit">
-                  <option value="ml">mL</option>
-                  <option value="drop">Eye drops</option>
-                </select>
+                <div class="direction-toggle" role="group" aria-label="Solution unit">
+                  <button
+                    id="solution-unit-ml"
+                    type="button"
+                    class="direction-toggle-button is-active"
+                    data-solution-unit="ml"
+                  >
+                    mL
+                  </button>
+                  <button
+                    id="solution-unit-drop"
+                    type="button"
+                    class="direction-toggle-button"
+                    data-solution-unit="drop"
+                  >
+                    Eye drops
+                  </button>
+                </div>
+                <input id="solution-unit" name="solutionUnit" type="hidden" value="ml">
               </label>
               <label>
                 <span id="strength-label-a">Tablet Strength A (mg)</span>
