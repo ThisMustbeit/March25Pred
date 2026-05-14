@@ -297,6 +297,13 @@ body.sticky-actions-visible .sticky-action-bar {
   resize: vertical;
 }
 
+.barcode-format-hint {
+  margin: -0.35rem 0 0;
+  color: var(--muted);
+  line-height: 1.5;
+  font-size: 0.92rem;
+}
+
 .barcode-field input,
 .barcode-field select,
 .barcode-field textarea {

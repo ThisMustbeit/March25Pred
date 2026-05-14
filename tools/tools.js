@@ -23,6 +23,7 @@ const TOOL_DEFAULTS = {
     upc: "12345678901\n123456789012",
     gtin13: "123456789012\n400638133393",
     gtin14: "1234567890123\n01234567890123",
+    gs1datamatrix: "(01)00012345678905(17)270101(10)BATCH123\n(01)00312345678904(21)SN123456",
   },
 };
 
@@ -34,6 +35,8 @@ const refs = {
   barcodeHeight: document.getElementById("barcode-height"),
   fontSize: document.getElementById("barcode-font-size"),
   showText: document.getElementById("barcode-show-text"),
+  formatHint: document.getElementById("barcode-format-hint"),
+  toolNote: document.getElementById("barcode-tool-note"),
   generateButton: document.getElementById("barcode-generate-button"),
   loadExampleButton: document.getElementById("barcode-load-example-button"),
   clearButton: document.getElementById("barcode-clear-button"),
@@ -49,6 +52,7 @@ function getFormatConfig(format) {
     upc: { label: "UPC-A", length: 12, baseLength: 11 },
     gtin13: { label: "GTIN-13", length: 13, baseLength: 12 },
     gtin14: { label: "GTIN-14", length: 14, baseLength: 13 },
+    gs1datamatrix: { label: "GS1 DataMatrix (Square)" },
   };
 
   return configs[format] || configs.upc;
@@ -118,6 +122,31 @@ function normalizeBarcodeEntry(rawValue, format) {
   };
 }
 
+function normalizeGs1DataMatrixEntry(rawValue) {
+  const text = String(rawValue || "").trim();
+
+  if (!text) {
+    return {
+      valid: false,
+      message: "Enter GS1 DataMatrix content using GS1 AI notation.",
+    };
+  }
+
+  if (!/\(\d{2,4}\)/.test(text)) {
+    return {
+      valid: false,
+      message: "Use bracketed GS1 AI notation such as (01)00012345678905(17)270101.",
+    };
+  }
+
+  return {
+    valid: true,
+    normalizedText: text.replace(/\s+/g, ""),
+    formatLabel: "GS1 DataMatrix",
+    note: "Square GS1 DataMatrix preview.",
+  };
+}
+
 function encodeCode128Numeric(value) {
   const codes = [];
   let index = 0;
@@ -147,6 +176,26 @@ function encodeCode128Numeric(value) {
 }
 
 function buildSvgMarkup(entry, options) {
+  if (entry.kind === "gs1datamatrix") {
+    if (!window.bwipjs || typeof window.bwipjs.toSVG !== "function") {
+      throw new Error("GS1 DataMatrix rendering is not available yet. Refresh and try again.");
+    }
+
+    const scale = Math.max(1, Math.round(Number(options.moduleWidth) || 2));
+    return window.bwipjs.toSVG({
+      bcid: "gs1datamatrix",
+      text: entry.normalizedText,
+      parsefnc: true,
+      format: "square",
+      scaleX: scale,
+      scaleY: scale,
+      includetext: Boolean(options.showText),
+      textsize: Number(options.fontSize) || 16,
+      paddingwidth: 8,
+      paddingheight: 8,
+    });
+  }
+
   const codes = encodeCode128Numeric(entry.normalizedDigits);
   const quietZoneModules = 10;
   const moduleWidth = Number(options.moduleWidth);
@@ -203,7 +252,7 @@ function createDownloadButton(entry, svgMarkup) {
     const url = URL.createObjectURL(blob);
     const link = document.createElement("a");
     link.href = url;
-    link.download = `${entry.normalizedDigits}.svg`;
+    link.download = `${entry.normalizedDigits || entry.normalizedText}.svg`;
     document.body.appendChild(link);
     link.click();
     document.body.removeChild(link);
@@ -225,7 +274,7 @@ function renderResults(entries, options) {
     meta.innerHTML = `
       <div>
         <h3>${entry.formatLabel}</h3>
-        <p>${entry.normalizedDigits}</p>
+        <p>${entry.normalizedDigits || entry.normalizedText}</p>
       </div>
       <span class="status-pill status-pill-soft">${entry.note}</span>
     `;
@@ -287,11 +336,17 @@ function generateBarcodes(event) {
   const format = refs.format.value;
   const errors = [];
   const entries = rawLines.map((line, index) => {
-    const normalized = normalizeBarcodeEntry(line, format);
+    const normalized =
+      format === "gs1datamatrix"
+        ? normalizeGs1DataMatrixEntry(line)
+        : normalizeBarcodeEntry(line, format);
     if (!normalized.valid) {
       errors.push(`Row ${index + 1}: ${normalized.message}`);
     }
-    return normalized;
+    return {
+      ...normalized,
+      kind: format === "gs1datamatrix" ? "gs1datamatrix" : "linear",
+    };
   });
 
   if (errors.length > 0) {
@@ -300,7 +355,13 @@ function generateBarcodes(event) {
     return;
   }
 
-  renderResults(entries, getRenderOptions());
+  try {
+    renderResults(entries, getRenderOptions());
+  } catch (error) {
+    clearResults();
+    setStatus(error instanceof Error ? error.message : "Unable to generate the selected barcode format.", "error");
+    return;
+  }
   setStatus(`Generated ${entries.length} barcode preview${entries.length === 1 ? "" : "s"}.`, "success");
 }
 
@@ -321,6 +382,7 @@ function clearTool() {
   refs.barcodeHeight.value = TOOL_DEFAULTS.barcodeHeight;
   refs.fontSize.value = TOOL_DEFAULTS.fontSize;
   refs.showText.checked = TOOL_DEFAULTS.showText;
+  syncExampleDataHint();
   clearResults();
   setStatus("", "");
 }
@@ -328,6 +390,18 @@ function clearTool() {
 function syncExampleDataHint() {
   const format = refs.format.value;
   refs.data.placeholder = TOOL_DEFAULTS.exampleData[format];
+
+  if (format === "gs1datamatrix") {
+    refs.formatHint.textContent =
+      "Enter one GS1 barcode string per line using bracketed AI notation, for example (01)00012345678905(17)270101(10)BATCH123.";
+    refs.toolNote.textContent =
+      "This option renders a square GS1 DataMatrix symbol in the browser. Use standard GS1 AI notation with parentheses for each row.";
+  } else {
+    refs.formatHint.textContent =
+      "Enter one UPC / GTIN value per line. You can paste either the base digits or the full code with check digit.";
+    refs.toolNote.textContent =
+      "Rendering uses a numeric Code 128 barcode preview so the tool can handle bulk UPC and GTIN values in one workflow. Check digits are still validated according to the selected UPC / GTIN format.";
+  }
 }
 
 function printSheet() {

@@ -8,6 +8,7 @@
   <link rel="shortcut icon" href="/website-icon.png" type="image/png">
   <link rel="apple-touch-icon" href="/website-icon.png">
   <link rel="stylesheet" href="/style.css">
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/bwip-js/4.7.0/bwip-js-min.js" defer></script>
   <script src="/tools/tools.js" defer></script>
 </head>
 <body>
@@ -64,6 +65,9 @@
                   required
                 ></textarea>
               </label>
+              <p id="barcode-format-hint" class="barcode-format-hint">
+                Enter one UPC / GTIN value per line. You can paste either the base digits or the full code with check digit.
+              </p>
 
               <div class="barcode-form-grid">
                 <label class="barcode-field">
@@ -72,6 +76,7 @@
                     <option value="upc">UPC-A</option>
                     <option value="gtin13">GTIN-13</option>
                     <option value="gtin14">GTIN-14</option>
+                    <option value="gs1datamatrix">GS1 DataMatrix (Square)</option>
                   </select>
                 </label>
 
@@ -97,7 +102,7 @@
               </label>
 
               <div class="tool-note">
-                <p>
+                <p id="barcode-tool-note">
                   Rendering uses a numeric Code 128 barcode preview so the tool can handle bulk UPC and GTIN values in
                   one workflow. Check digits are still validated according to the selected UPC / GTIN format.
                 </p>
