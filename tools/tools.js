@@ -27,6 +27,13 @@ const TOOL_DEFAULTS = {
   },
 };
 
+const GS1_LABEL_AI_MAP = {
+  "01": { key: "gtin", label: "GTIN", fixedLength: 14 },
+  "10": { key: "lot", label: "LOT", variableLength: true },
+  "17": { key: "exp", label: "EXP", fixedLength: 6 },
+  "21": { key: "sn", label: "SN", variableLength: true },
+};
+
 const refs = {
   form: document.getElementById("barcode-tool-form"),
   data: document.getElementById("barcode-data"),
@@ -139,12 +146,71 @@ function normalizeGs1DataMatrixEntry(rawValue) {
     };
   }
 
+  const fields = parseGs1AiFields(text.replace(/\s+/g, ""));
+  const requiredKeys = ["gtin"];
+  const missingKeys = requiredKeys.filter((key) => !fields[key]);
+
+  if (missingKeys.length > 0) {
+    return {
+      valid: false,
+      message: "Include at least a GTIN using AI (01) in each GS1 row.",
+    };
+  }
+
   return {
     valid: true,
     normalizedText: text.replace(/\s+/g, ""),
     formatLabel: "GS1 DataMatrix",
     note: "Square GS1 DataMatrix preview.",
+    fields,
   };
+}
+
+function parseGs1AiFields(gs1Text) {
+  const matches = [...gs1Text.matchAll(/\((\d{2,4})\)/g)];
+  const result = {};
+
+  matches.forEach((match, index) => {
+    const ai = match[1];
+    const nextMatch = matches[index + 1];
+    const start = match.index + match[0].length;
+    const end = nextMatch ? nextMatch.index : gs1Text.length;
+    const value = gs1Text.slice(start, end);
+    const spec = GS1_LABEL_AI_MAP[ai];
+
+    if (!spec || !value) {
+      return;
+    }
+
+    result[spec.key] = value;
+  });
+
+  return result;
+}
+
+function formatGs1Expiry(value) {
+  if (!value || value.length < 4) {
+    return value || "";
+  }
+
+  const year = `20${value.slice(0, 2)}`;
+  const month = value.slice(2, 4);
+  const day = value.slice(4, 6);
+
+  if (!day || day === "00") {
+    return `${year}-${month}`;
+  }
+
+  return `${year}-${month}-${day}`;
+}
+
+function escapeMarkup(value) {
+  return String(value || "")
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;")
+    .replace(/'/g, "&#39;");
 }
 
 function encodeCode128Numeric(value) {
@@ -242,6 +308,61 @@ function buildSvgMarkup(entry, options) {
 </svg>`;
 }
 
+function buildGs1LabelAssets(entry, options) {
+  const matrixSvg = buildSvgMarkup(entry, {
+    ...options,
+    showText: false,
+  });
+
+  const fields = entry.fields || {};
+  const sn = fields.sn || "—";
+  const exp = fields.exp ? formatGs1Expiry(fields.exp) : "—";
+  const lot = fields.lot || "—";
+  const gtin = fields.gtin || "—";
+
+  const previewMarkup = `
+    <div class="gs1-label-preview">
+      <div class="gs1-label-line gs1-label-line--top"><strong>SN:</strong> ${escapeMarkup(sn)}</div>
+      <div class="gs1-label-middle">
+        <div class="gs1-label-matrix">${matrixSvg}</div>
+        <div class="gs1-label-side">
+          <div class="gs1-label-line"><strong>EXP:</strong> ${escapeMarkup(exp)}</div>
+          <div class="gs1-label-line"><strong>LOT:</strong> ${escapeMarkup(lot)}</div>
+        </div>
+      </div>
+      <div class="gs1-label-line gs1-label-line--bottom"><strong>GTIN:</strong> ${escapeMarkup(gtin)}</div>
+    </div>
+  `;
+
+  const parser = new DOMParser();
+  const matrixDoc = parser.parseFromString(matrixSvg, "image/svg+xml");
+  const svgRoot = matrixDoc.documentElement;
+  const viewBox = (svgRoot.getAttribute("viewBox") || "0 0 180 180").split(/\s+/).map(Number);
+  const matrixWidth = viewBox[2] || 180;
+  const matrixHeight = viewBox[3] || 180;
+  const matrixInner = svgRoot.innerHTML;
+
+  const labelWidth = 460;
+  const labelHeight = 250;
+  const labelSvg = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ${labelWidth} ${labelHeight}" width="${labelWidth}" height="${labelHeight}" role="img" aria-label="GS1 DataMatrix label for ${escapeMarkup(gtin)}">
+    <rect width="${labelWidth}" height="${labelHeight}" fill="#ffffff"></rect>
+    <text x="20" y="36" font-family="Arial, sans-serif" font-size="24" font-weight="700" fill="#16303b">SN: ${escapeMarkup(sn)}</text>
+    <g transform="translate(20,56)">
+      <svg viewBox="0 0 ${matrixWidth} ${matrixHeight}" width="150" height="150" aria-hidden="true">
+        ${matrixInner}
+      </svg>
+    </g>
+    <text x="190" y="106" font-family="Arial, sans-serif" font-size="24" font-weight="700" fill="#16303b">EXP: ${escapeMarkup(exp)}</text>
+    <text x="190" y="146" font-family="Arial, sans-serif" font-size="24" font-weight="700" fill="#16303b">LOT: ${escapeMarkup(lot)}</text>
+    <text x="20" y="228" font-family="Arial, sans-serif" font-size="24" font-weight="700" fill="#16303b">GTIN: ${escapeMarkup(gtin)}</text>
+  </svg>`;
+
+  return {
+    previewMarkup,
+    downloadSvg: labelSvg,
+  };
+}
+
 function createDownloadButton(entry, svgMarkup) {
   const button = document.createElement("button");
   button.type = "button";
@@ -267,7 +388,7 @@ function renderResults(entries, options) {
   entries.forEach((entry) => {
     const svgMarkup = buildSvgMarkup(entry, options);
     const card = document.createElement("article");
-    card.className = "barcode-result-card";
+    card.className = `barcode-result-card${entry.kind === "gs1datamatrix" ? " is-gs1-label" : ""}`;
 
     const meta = document.createElement("div");
     meta.className = "barcode-result-meta";
@@ -281,11 +402,18 @@ function renderResults(entries, options) {
 
     const artboard = document.createElement("div");
     artboard.className = "barcode-artboard";
-    artboard.innerHTML = svgMarkup;
+    let downloadMarkup = svgMarkup;
+    if (entry.kind === "gs1datamatrix") {
+      const labelAssets = buildGs1LabelAssets(entry, options);
+      artboard.innerHTML = labelAssets.previewMarkup;
+      downloadMarkup = labelAssets.downloadSvg;
+    } else {
+      artboard.innerHTML = svgMarkup;
+    }
 
     const actions = document.createElement("div");
     actions.className = "barcode-card-actions";
-    actions.appendChild(createDownloadButton(entry, svgMarkup));
+    actions.appendChild(createDownloadButton(entry, downloadMarkup));
 
     card.appendChild(meta);
     card.appendChild(artboard);
@@ -396,11 +524,14 @@ function syncExampleDataHint() {
       "Enter one GS1 barcode string per line using bracketed AI notation, for example (01)00012345678905(17)270101(10)BATCH123.";
     refs.toolNote.textContent =
       "This option renders a square GS1 DataMatrix symbol in the browser. Use standard GS1 AI notation with parentheses for each row.";
+    refs.showText.checked = false;
+    refs.showText.parentElement.hidden = true;
   } else {
     refs.formatHint.textContent =
       "Enter one UPC / GTIN value per line. You can paste either the base digits or the full code with check digit.";
     refs.toolNote.textContent =
       "Rendering uses a numeric Code 128 barcode preview so the tool can handle bulk UPC and GTIN values in one workflow. Check digits are still validated according to the selected UPC / GTIN format.";
+    refs.showText.parentElement.hidden = false;
   }
 }
 

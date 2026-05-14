@@ -401,6 +401,48 @@ body.sticky-actions-visible .sticky-action-bar {
   margin: 0 auto;
 }
 
+.barcode-result-card.is-gs1-label .barcode-artboard {
+  padding: 0.65rem;
+}
+
+.gs1-label-preview {
+  display: grid;
+  gap: 0.45rem;
+  padding: 0.35rem;
+  background: #fff;
+  color: #16303b;
+  font-family: Arial, sans-serif;
+}
+
+.gs1-label-middle {
+  display: grid;
+  grid-template-columns: minmax(108px, 128px) minmax(0, 1fr);
+  gap: 0.9rem;
+  align-items: start;
+}
+
+.gs1-label-matrix svg {
+  width: 100%;
+  max-width: 126px;
+  margin: 0;
+}
+
+.gs1-label-line {
+  font-size: 1.05rem;
+  font-weight: 700;
+  line-height: 1.25;
+}
+
+.gs1-label-line strong {
+  font-weight: 800;
+}
+
+.gs1-label-side {
+  display: grid;
+  gap: 0.55rem;
+  padding-top: 0.2rem;
+}
+
 .barcode-card-actions {
   display: flex;
   justify-content: flex-end;
