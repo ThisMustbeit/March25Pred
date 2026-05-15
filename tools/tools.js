@@ -42,6 +42,8 @@ const GS1_WORD_LAYOUT = {
   },
 };
 
+const GS1_SVG_SCALE = 100;
+
 const GS1_LABEL_AI_MAP = {
   "01": { key: "gtin", label: "GTIN", fixedLength: 14 },
   "10": { key: "lot", label: "LOT", variableLength: true },
@@ -479,8 +481,8 @@ function buildGs1LabelAssets(entry, options) {
   const matrixHeight = viewBox[3] || 180;
   const matrixInner = svgRoot.innerHTML;
 
-  const labelWidth = 442;
-  const labelHeight = 211;
+  const labelWidth = Number((GS1_WORD_LAYOUT.pageWidthIn * GS1_SVG_SCALE).toFixed(2));
+  const labelHeight = Number((GS1_WORD_LAYOUT.pageHeightIn * GS1_SVG_SCALE).toFixed(2));
   const labelSvg = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ${labelWidth} ${labelHeight}" width="${labelWidth}" height="${labelHeight}" role="img" aria-label="GS1 DataMatrix label for ${escapeMarkup(gtin)}">
     <rect width="${labelWidth}" height="${labelHeight}" fill="#ffffff"></rect>
     <g transform="translate(18,24)">
