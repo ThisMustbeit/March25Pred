@@ -304,6 +304,10 @@ body.sticky-actions-visible .sticky-action-bar {
   font-size: 0.92rem;
 }
 
+.gs1-datamatrix-fields[hidden] {
+  display: none !important;
+}
+
 .barcode-field input,
 .barcode-field select,
 .barcode-field textarea {
@@ -520,6 +524,16 @@ body.sticky-actions-visible .sticky-action-bar {
 .tool-card p {
   color: var(--muted);
   line-height: 1.55;
+}
+
+.tool-card-link {
+  display: grid;
+  gap: 0.95rem;
+}
+
+.tool-card-actions {
+  display: flex;
+  justify-content: flex-start;
 }
 
 .auth-shell {

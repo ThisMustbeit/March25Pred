@@ -23,7 +23,11 @@ const TOOL_DEFAULTS = {
     upc: "12345678901\n123456789012",
     gtin13: "123456789012\n400638133393",
     gtin14: "1234567890123\n01234567890123",
-    gs1datamatrix: "(01)00012345678905(17)270101(10)BATCH123\n(01)00312345678904(21)SN123456",
+    gs1datamatrix: {
+      productCode: "00063691029279",
+      expiry: "2028-05",
+      lot: "AD95561",
+    },
   },
 };
 
@@ -31,13 +35,16 @@ const GS1_LABEL_AI_MAP = {
   "01": { key: "gtin", label: "GTIN", fixedLength: 14 },
   "10": { key: "lot", label: "LOT", variableLength: true },
   "17": { key: "exp", label: "EXP", fixedLength: 6 },
-  "21": { key: "sn", label: "SN", variableLength: true },
 };
 
 const refs = {
   form: document.getElementById("barcode-tool-form"),
   data: document.getElementById("barcode-data"),
   format: document.getElementById("barcode-format"),
+  gs1Fields: document.getElementById("gs1-datamatrix-fields"),
+  gs1ProductCode: document.getElementById("gs1-product-code"),
+  gs1Expiry: document.getElementById("gs1-expiry"),
+  gs1Lot: document.getElementById("gs1-lot"),
   moduleWidth: document.getElementById("barcode-module-width"),
   barcodeHeight: document.getElementById("barcode-height"),
   fontSize: document.getElementById("barcode-font-size"),
@@ -163,6 +170,103 @@ function normalizeGs1DataMatrixEntry(rawValue) {
     formatLabel: "GS1 DataMatrix",
     note: "Square GS1 DataMatrix preview.",
     fields,
+  };
+}
+
+function normalizeGs1ProductCode(rawValue) {
+  const digits = normalizeDigits(rawValue);
+
+  if (!digits) {
+    return {
+      valid: false,
+      message: "Enter a DIN, UPC, or GTIN value.",
+    };
+  }
+
+  if (![8, 12, 13, 14].includes(digits.length)) {
+    return {
+      valid: false,
+      message: "DIN / UPC / GTIN should be 8, 12, 13, or 14 digits.",
+    };
+  }
+
+  return {
+    valid: true,
+    gtin14: digits.padStart(14, "0"),
+    displayCode: digits,
+  };
+}
+
+function normalizeGs1Expiry(rawValue) {
+  const value = String(rawValue || "").trim();
+
+  if (!value) {
+    return {
+      valid: false,
+      message: "Enter an expiry month for GS1 DataMatrix.",
+    };
+  }
+
+  const match = value.match(/^(\d{4})-(\d{2})$/);
+  if (!match) {
+    return {
+      valid: false,
+      message: "Expiry should use a valid year-month value.",
+    };
+  }
+
+  return {
+    valid: true,
+    aiValue: `${match[1].slice(2)}${match[2]}00`,
+    displayValue: value,
+  };
+}
+
+function normalizeGs1Lot(rawValue) {
+  const value = String(rawValue || "").trim();
+
+  if (!value) {
+    return {
+      valid: false,
+      message: "Enter a lot value for GS1 DataMatrix.",
+    };
+  }
+
+  return {
+    valid: true,
+    aiValue: value,
+  };
+}
+
+function buildGs1EntryFromFields() {
+  const product = normalizeGs1ProductCode(refs.gs1ProductCode.value);
+  if (!product.valid) {
+    return product;
+  }
+
+  const expiry = normalizeGs1Expiry(refs.gs1Expiry.value);
+  if (!expiry.valid) {
+    return expiry;
+  }
+
+  const lot = normalizeGs1Lot(refs.gs1Lot.value);
+  if (!lot.valid) {
+    return lot;
+  }
+
+  const normalizedText = `(01)${product.gtin14}(17)${expiry.aiValue}(10)${lot.aiValue}`;
+  return {
+    valid: true,
+    kind: "gs1datamatrix",
+    normalizedText,
+    formatLabel: "GS1 DataMatrix",
+    note: "Square GS1 DataMatrix preview.",
+    fields: {
+      gtin: product.gtin14,
+      exp: expiry.aiValue,
+      lot: lot.aiValue,
+    },
+    displayText: `${product.displayCode} • ${expiry.displayValue} • ${lot.aiValue}`,
   };
 }
 
@@ -315,22 +419,20 @@ function buildGs1LabelAssets(entry, options) {
   });
 
   const fields = entry.fields || {};
-  const sn = fields.sn || "—";
-  const exp = fields.exp ? formatGs1Expiry(fields.exp) : "—";
-  const lot = fields.lot || "—";
-  const gtin = fields.gtin || "—";
+  const exp = fields.exp ? formatGs1Expiry(fields.exp) : "-";
+  const lot = fields.lot || "-";
+  const gtin = fields.gtin || "-";
 
   const previewMarkup = `
     <div class="gs1-label-preview">
-      <div class="gs1-label-line gs1-label-line--top"><strong>SN:</strong> ${escapeMarkup(sn)}</div>
       <div class="gs1-label-middle">
         <div class="gs1-label-matrix">${matrixSvg}</div>
         <div class="gs1-label-side">
+          <div class="gs1-label-line"><strong>DIN/UPC/GTIN:</strong> ${escapeMarkup(gtin)}</div>
           <div class="gs1-label-line"><strong>EXP:</strong> ${escapeMarkup(exp)}</div>
           <div class="gs1-label-line"><strong>LOT:</strong> ${escapeMarkup(lot)}</div>
         </div>
       </div>
-      <div class="gs1-label-line gs1-label-line--bottom"><strong>GTIN:</strong> ${escapeMarkup(gtin)}</div>
     </div>
   `;
 
@@ -343,18 +445,18 @@ function buildGs1LabelAssets(entry, options) {
   const matrixInner = svgRoot.innerHTML;
 
   const labelWidth = 460;
-  const labelHeight = 250;
+  const labelHeight = 220;
   const labelSvg = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ${labelWidth} ${labelHeight}" width="${labelWidth}" height="${labelHeight}" role="img" aria-label="GS1 DataMatrix label for ${escapeMarkup(gtin)}">
     <rect width="${labelWidth}" height="${labelHeight}" fill="#ffffff"></rect>
-    <text x="20" y="36" font-family="Arial, sans-serif" font-size="24" font-weight="700" fill="#16303b">SN: ${escapeMarkup(sn)}</text>
-    <g transform="translate(20,56)">
+    <g transform="translate(20,34)">
       <svg viewBox="0 0 ${matrixWidth} ${matrixHeight}" width="150" height="150" aria-hidden="true">
         ${matrixInner}
       </svg>
     </g>
-    <text x="190" y="106" font-family="Arial, sans-serif" font-size="24" font-weight="700" fill="#16303b">EXP: ${escapeMarkup(exp)}</text>
-    <text x="190" y="146" font-family="Arial, sans-serif" font-size="24" font-weight="700" fill="#16303b">LOT: ${escapeMarkup(lot)}</text>
-    <text x="20" y="228" font-family="Arial, sans-serif" font-size="24" font-weight="700" fill="#16303b">GTIN: ${escapeMarkup(gtin)}</text>
+    <text x="190" y="74" font-family="Arial, sans-serif" font-size="22" font-weight="700" fill="#16303b">DIN/UPC/GTIN:</text>
+    <text x="190" y="102" font-family="Arial, sans-serif" font-size="20" font-weight="700" fill="#16303b">${escapeMarkup(gtin)}</text>
+    <text x="190" y="138" font-family="Arial, sans-serif" font-size="22" font-weight="700" fill="#16303b">EXP: ${escapeMarkup(exp)}</text>
+    <text x="190" y="176" font-family="Arial, sans-serif" font-size="22" font-weight="700" fill="#16303b">LOT: ${escapeMarkup(lot)}</text>
   </svg>`;
 
   return {
@@ -395,7 +497,7 @@ function renderResults(entries, options) {
     meta.innerHTML = `
       <div>
         <h3>${entry.formatLabel}</h3>
-        <p>${entry.normalizedDigits || entry.normalizedText}</p>
+        <p>${entry.displayText || entry.normalizedDigits || entry.normalizedText}</p>
       </div>
       <span class="status-pill status-pill-soft">${entry.note}</span>
     `;
@@ -455,6 +557,26 @@ function generateBarcodes(event) {
     .map((line) => line.trim())
     .filter(Boolean);
 
+  if (refs.format.value === "gs1datamatrix") {
+    const gs1Entry = buildGs1EntryFromFields();
+    if (!gs1Entry.valid) {
+      clearResults();
+      setStatus(gs1Entry.message, "error");
+      return;
+    }
+
+    try {
+      renderResults([gs1Entry], getRenderOptions());
+    } catch (error) {
+      clearResults();
+      setStatus(error instanceof Error ? error.message : "Unable to generate the selected barcode format.", "error");
+      return;
+    }
+
+    setStatus("Generated 1 barcode preview.", "success");
+    return;
+  }
+
   if (rawLines.length === 0) {
     clearResults();
     setStatus("Add at least one UPC or GTIN value before generating barcodes.", "error");
@@ -495,7 +617,17 @@ function generateBarcodes(event) {
 
 function loadExample() {
   const format = refs.format.value || TOOL_DEFAULTS.format;
-  refs.data.value = TOOL_DEFAULTS.exampleData[format];
+  if (format === "gs1datamatrix") {
+    refs.data.value = "";
+    refs.gs1ProductCode.value = TOOL_DEFAULTS.exampleData.gs1datamatrix.productCode;
+    refs.gs1Expiry.value = TOOL_DEFAULTS.exampleData.gs1datamatrix.expiry;
+    refs.gs1Lot.value = TOOL_DEFAULTS.exampleData.gs1datamatrix.lot;
+  } else {
+    refs.data.value = TOOL_DEFAULTS.exampleData[format];
+    refs.gs1ProductCode.value = "";
+    refs.gs1Expiry.value = "";
+    refs.gs1Lot.value = "";
+  }
   refs.moduleWidth.value = TOOL_DEFAULTS.moduleWidth;
   refs.barcodeHeight.value = TOOL_DEFAULTS.barcodeHeight;
   refs.fontSize.value = TOOL_DEFAULTS.fontSize;
@@ -505,6 +637,9 @@ function loadExample() {
 
 function clearTool() {
   refs.data.value = "";
+  refs.gs1ProductCode.value = "";
+  refs.gs1Expiry.value = "";
+  refs.gs1Lot.value = "";
   refs.format.value = TOOL_DEFAULTS.format;
   refs.moduleWidth.value = TOOL_DEFAULTS.moduleWidth;
   refs.barcodeHeight.value = TOOL_DEFAULTS.barcodeHeight;
@@ -520,13 +655,17 @@ function syncExampleDataHint() {
   refs.data.placeholder = TOOL_DEFAULTS.exampleData[format];
 
   if (format === "gs1datamatrix") {
+    refs.gs1Fields.hidden = false;
+    refs.data.parentElement.hidden = true;
     refs.formatHint.textContent =
-      "Enter one GS1 barcode string per line using bracketed AI notation, for example (01)00012345678905(17)270101(10)BATCH123.";
+      "Enter a DIN, UPC, or GTIN together with expiry and lot. The GS1 DataMatrix payload will be built automatically.";
     refs.toolNote.textContent =
-      "This option renders a square GS1 DataMatrix symbol in the browser. Use standard GS1 AI notation with parentheses for each row.";
+      "This option renders a square GS1 DataMatrix symbol in the browser using product code, expiry, and lot values. Serial number is not used in this mode.";
     refs.showText.checked = false;
     refs.showText.parentElement.hidden = true;
   } else {
+    refs.gs1Fields.hidden = true;
+    refs.data.parentElement.hidden = false;
     refs.formatHint.textContent =
       "Enter one UPC / GTIN value per line. You can paste either the base digits or the full code with check digit.";
     refs.toolNote.textContent =

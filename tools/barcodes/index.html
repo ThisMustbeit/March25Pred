@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Barcode Maker | CalendRx</title>
+  <link rel="icon" href="/website-icon.png" type="image/png">
+  <link rel="shortcut icon" href="/website-icon.png" type="image/png">
+  <link rel="apple-touch-icon" href="/website-icon.png">
+  <link rel="stylesheet" href="/style.css">
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/bwip-js/4.7.0/bwip-js-min.js" defer></script>
+  <script src="/tools/tools.js" defer></script>
+</head>
+<body>
+  <div class="app-shell">
+    <nav class="site-nav" aria-label="Primary">
+      <div class="site-nav-inner">
+        <a href="/" class="site-nav-link">Taper Planner</a>
+        <a href="/tools/" class="site-nav-link">Other Pharmacy Tools</a>
+      </div>
+    </nav>
+
+    <main>
+      <section class="hero tools-hero">
+        <div class="hero-brand">
+          <img src="/website-icon.png" alt="CalendRx logo" class="hero-logo">
+          <div class="hero-brand-copy">
+            <h1>UPC &amp; GTIN Barcode Maker</h1>
+            <p class="hero-copy">
+              Create clean barcode previews for bulk UPC and GTIN values, validate check digits, and download SVG
+              output for each entry while this tool is still in protected development.
+            </p>
+          </div>
+        </div>
+        <div class="protected-note">
+          <span class="status-pill">Protected</span>
+          <p>Internal workspace for in-progress pharmacy tooling.</p>
+        </div>
+      </section>
+
+      <section class="card tools-card">
+        <div class="section-heading">
+          <div>
+            <p class="section-kicker">Protected Tool</p>
+            <h2>Barcode Builder</h2>
+          </div>
+        </div>
+
+        <div class="barcode-builder">
+          <section class="barcode-panel">
+            <div class="barcode-panel-head">
+              <h3>Input</h3>
+              <p>Paste one code per line. The tool will validate the right length and compute or verify the check digit.</p>
+            </div>
+
+            <form id="barcode-tool-form" class="barcode-form" novalidate>
+              <label class="barcode-field barcode-field-wide">
+                <span>Barcode Data</span>
+                <textarea
+                  id="barcode-data"
+                  name="barcodeData"
+                  rows="8"
+                  spellcheck="false"
+                  placeholder="12345678901&#10;123456789012&#10;0123456789012"
+                  required
+                ></textarea>
+              </label>
+              <div id="gs1-datamatrix-fields" class="gs1-datamatrix-fields" hidden>
+                <div class="barcode-form-grid">
+                  <label class="barcode-field">
+                    <span>DIN / UPC / GTIN</span>
+                    <input id="gs1-product-code" name="gs1ProductCode" type="text" inputmode="numeric" autocomplete="off" spellcheck="false" placeholder="00063691029279">
+                  </label>
+
+                  <label class="barcode-field">
+                    <span>Expiry</span>
+                    <input id="gs1-expiry" name="gs1Expiry" type="month">
+                  </label>
+
+                  <label class="barcode-field barcode-field-wide">
+                    <span>Lot</span>
+                    <input id="gs1-lot" name="gs1Lot" type="text" autocomplete="off" spellcheck="false" placeholder="AD95561">
+                  </label>
+                </div>
+              </div>
+              <p id="barcode-format-hint" class="barcode-format-hint">
+                Enter one UPC / GTIN value per line. You can paste either the base digits or the full code with check digit.
+              </p>
+
+              <div class="barcode-form-grid">
+                <label class="barcode-field">
+                  <span>Format</span>
+                  <select id="barcode-format" name="barcodeFormat">
+                    <option value="upc">UPC-A</option>
+                    <option value="gtin13">GTIN-13</option>
+                    <option value="gtin14">GTIN-14</option>
+                    <option value="gs1datamatrix">GS1 DataMatrix (Square)</option>
+                  </select>
+                </label>
+
+                <label class="barcode-field">
+                  <span>Module Width (px)</span>
+                  <input id="barcode-module-width" name="moduleWidth" type="number" min="1" max="6" step="0.1" value="2.2">
+                </label>
+
+                <label class="barcode-field">
+                  <span>Barcode Height (px)</span>
+                  <input id="barcode-height" name="barcodeHeight" type="number" min="40" max="260" step="1" value="88">
+                </label>
+
+                <label class="barcode-field">
+                  <span>Font Size (px)</span>
+                  <input id="barcode-font-size" name="fontSize" type="number" min="10" max="28" step="1" value="16">
+                </label>
+              </div>
+
+              <label class="checkbox-row">
+                <input id="barcode-show-text" name="showText" type="checkbox" checked>
+                <span>Show code below barcode</span>
+              </label>
+
+              <div class="tool-note">
+                <p id="barcode-tool-note">
+                  Rendering uses a numeric Code 128 barcode preview so the tool can handle bulk UPC and GTIN values in
+                  one workflow. Check digits are still validated according to the selected UPC / GTIN format.
+                </p>
+              </div>
+
+              <div class="barcode-actions">
+                <button id="barcode-generate-button" type="submit" class="button">Generate Barcodes</button>
+                <button id="barcode-load-example-button" type="button" class="button button-secondary">Load Example</button>
+                <button id="barcode-clear-button" type="button" class="button button-secondary">Clear</button>
+                <button id="barcode-print-button" type="button" class="button button-secondary">Print Sheet</button>
+              </div>
+
+              <div id="barcode-status" class="barcode-status" aria-live="polite"></div>
+            </form>
+          </section>
+
+          <section id="barcode-preview-card" class="barcode-panel" hidden>
+            <div class="barcode-panel-head">
+              <h3>Preview</h3>
+              <p id="barcode-summary">Generated previews will appear here.</p>
+            </div>
+            <div id="barcode-preview-grid" class="barcode-preview-grid"></div>
+          </section>
+        </div>
+      </section>
+    </main>
+  </div>
+</body>
+</html>
