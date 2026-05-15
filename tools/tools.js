@@ -31,6 +31,17 @@ const TOOL_DEFAULTS = {
   },
 };
 
+const GS1_WORD_LAYOUT = {
+  pageWidthIn: 6623 / 1440,
+  pageHeightIn: 3164 / 1440,
+  marginsIn: {
+    top: 691 / 1440,
+    right: 0,
+    bottom: 0,
+    left: 0,
+  },
+};
+
 const GS1_LABEL_AI_MAP = {
   "01": { key: "gtin", label: "GTIN", fixedLength: 14 },
   "10": { key: "lot", label: "LOT", variableLength: true },
@@ -715,7 +726,7 @@ function printSheet() {
   if (isGs1Mode) {
     gs1PrintStyleNode = document.createElement("style");
     gs1PrintStyleNode.setAttribute("data-gs1-print-style", "true");
-    gs1PrintStyleNode.textContent = "@page { size: 4.599in 2.197in; margin: 0; }";
+    gs1PrintStyleNode.textContent = `@page { size: ${GS1_WORD_LAYOUT.pageWidthIn.toFixed(3)}in ${GS1_WORD_LAYOUT.pageHeightIn.toFixed(3)}in; margin: ${GS1_WORD_LAYOUT.marginsIn.top.toFixed(3)}in ${GS1_WORD_LAYOUT.marginsIn.right.toFixed(3)}in ${GS1_WORD_LAYOUT.marginsIn.bottom.toFixed(3)}in ${GS1_WORD_LAYOUT.marginsIn.left.toFixed(3)}in; }`;
     document.head.appendChild(gs1PrintStyleNode);
   }
 

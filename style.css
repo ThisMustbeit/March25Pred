@@ -535,8 +535,8 @@ body.sticky-actions-visible .sticky-action-bar {
 
   body.barcode-gs1-mode .gs1-label-preview {
     width: 4.599in;
-    min-height: 2.197in;
-    padding: 0.13in 0.12in 0.08in 0.12in !important;
+    min-height: 0 !important;
+    padding: 0 !important;
   }
 
   body.barcode-gs1-mode .gs1-label-middle {
