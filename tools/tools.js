@@ -61,6 +61,8 @@ const refs = {
   summary: document.getElementById("barcode-summary"),
 };
 
+let gs1PrintStyleNode = null;
+
 function getFormatConfig(format) {
   const configs = {
     upc: { label: "UPC-A", length: 12, baseLength: 11 },
@@ -466,19 +468,19 @@ function buildGs1LabelAssets(entry, options) {
   const matrixHeight = viewBox[3] || 180;
   const matrixInner = svgRoot.innerHTML;
 
-  const labelWidth = 460;
-  const labelHeight = 220;
+  const labelWidth = 442;
+  const labelHeight = 211;
   const labelSvg = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ${labelWidth} ${labelHeight}" width="${labelWidth}" height="${labelHeight}" role="img" aria-label="GS1 DataMatrix label for ${escapeMarkup(gtin)}">
     <rect width="${labelWidth}" height="${labelHeight}" fill="#ffffff"></rect>
-    <g transform="translate(20,34)">
-      <svg viewBox="0 0 ${matrixWidth} ${matrixHeight}" width="150" height="150" aria-hidden="true">
+    <g transform="translate(18,24)">
+      <svg viewBox="0 0 ${matrixWidth} ${matrixHeight}" width="115" height="115" aria-hidden="true">
         ${matrixInner}
       </svg>
     </g>
-    <text x="190" y="74" font-family="Arial, sans-serif" font-size="22" font-weight="700" fill="#16303b">DIN/UPC/GTIN:</text>
-    <text x="190" y="102" font-family="Arial, sans-serif" font-size="20" font-weight="700" fill="#16303b">${escapeMarkup(gtin)}</text>
-    <text x="190" y="138" font-family="Arial, sans-serif" font-size="22" font-weight="700" fill="#16303b">EXP: ${escapeMarkup(exp)}</text>
-    <text x="190" y="176" font-family="Arial, sans-serif" font-size="22" font-weight="700" fill="#16303b">LOT: ${escapeMarkup(lot)}</text>
+    <text x="144" y="36" font-family="Arial, sans-serif" font-size="13" font-weight="700" fill="#000000">DIN/UPC/GTIN:</text>
+    <text x="144" y="58" font-family="Arial, sans-serif" font-size="14" font-weight="700" fill="#000000">${escapeMarkup(gtin)}</text>
+    <text x="144" y="93" font-family="Arial, sans-serif" font-size="13" font-weight="700" fill="#000000">EXP: ${escapeMarkup(exp)}</text>
+    <text x="144" y="128" font-family="Arial, sans-serif" font-size="13" font-weight="700" fill="#000000">LOT: ${escapeMarkup(lot)}</text>
   </svg>`;
 
   return {
@@ -508,6 +510,7 @@ function createDownloadButton(entry, svgMarkup) {
 
 function renderResults(entries, options) {
   refs.previewGrid.innerHTML = "";
+  document.body.classList.toggle("barcode-gs1-mode", entries.length > 0 && entries.every((entry) => entry.kind === "gs1datamatrix"));
 
   entries.forEach((entry) => {
     const svgMarkup = buildSvgMarkup(entry, options);
@@ -558,6 +561,7 @@ function clearResults() {
   refs.previewGrid.innerHTML = "";
   refs.previewCard.hidden = true;
   refs.summary.textContent = "Generated previews will appear here.";
+  document.body.classList.remove("barcode-gs1-mode");
 }
 
 function getRenderOptions() {
@@ -701,7 +705,26 @@ function printSheet() {
     setStatus("Generate barcodes before printing the sheet.", "error");
     return;
   }
+
+  const isGs1Mode = refs.format.value === "gs1datamatrix" && document.body.classList.contains("barcode-gs1-mode");
+  if (gs1PrintStyleNode) {
+    gs1PrintStyleNode.remove();
+    gs1PrintStyleNode = null;
+  }
+
+  if (isGs1Mode) {
+    gs1PrintStyleNode = document.createElement("style");
+    gs1PrintStyleNode.setAttribute("data-gs1-print-style", "true");
+    gs1PrintStyleNode.textContent = "@page { size: 4.599in 2.197in; margin: 0; }";
+    document.head.appendChild(gs1PrintStyleNode);
+  }
+
   window.print();
+
+  if (gs1PrintStyleNode) {
+    gs1PrintStyleNode.remove();
+    gs1PrintStyleNode = null;
+  }
 }
 
 function initialize() {

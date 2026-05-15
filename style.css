@@ -411,30 +411,31 @@ body.sticky-actions-visible .sticky-action-bar {
 
 .gs1-label-preview {
   display: grid;
-  gap: 0.45rem;
-  padding: 0.35rem;
+  gap: 0.2rem;
+  padding: 0.15rem;
   background: #fff;
-  color: #16303b;
+  color: #000;
   font-family: Arial, sans-serif;
 }
 
 .gs1-label-middle {
   display: grid;
-  grid-template-columns: minmax(108px, 128px) minmax(0, 1fr);
-  gap: 0.9rem;
+  grid-template-columns: 118px minmax(0, 1fr);
+  gap: 0.55rem;
   align-items: start;
 }
 
 .gs1-label-matrix svg {
   width: 100%;
-  max-width: 126px;
+  max-width: 115px;
   margin: 0;
 }
 
 .gs1-label-line {
-  font-size: 1.05rem;
+  font-size: 0.92rem;
   font-weight: 700;
-  line-height: 1.25;
+  line-height: 1.2;
+  color: #000;
 }
 
 .gs1-label-line strong {
@@ -443,8 +444,8 @@ body.sticky-actions-visible .sticky-action-bar {
 
 .gs1-label-side {
   display: grid;
-  gap: 0.55rem;
-  padding-top: 0.2rem;
+  gap: 0.45rem;
+  padding-top: 0.05rem;
 }
 
 .barcode-card-actions {
@@ -487,6 +488,79 @@ body.sticky-actions-visible .sticky-action-bar {
     overflow: visible;
     padding: 0.25in 0;
   }
+
+  body.barcode-gs1-mode {
+    background: #fff !important;
+  }
+
+  body.barcode-gs1-mode .site-nav,
+  body.barcode-gs1-mode .tools-hero,
+  body.barcode-gs1-mode .barcode-builder > .barcode-panel:first-child,
+  body.barcode-gs1-mode .barcode-panel-head,
+  body.barcode-gs1-mode .barcode-card-actions,
+  body.barcode-gs1-mode .section-heading {
+    display: none !important;
+  }
+
+  body.barcode-gs1-mode .app-shell,
+  body.barcode-gs1-mode main,
+  body.barcode-gs1-mode .tools-card,
+  body.barcode-gs1-mode .barcode-builder,
+  body.barcode-gs1-mode .barcode-panel,
+  body.barcode-gs1-mode .barcode-preview-grid,
+  body.barcode-gs1-mode .barcode-result-card,
+  body.barcode-gs1-mode .barcode-artboard {
+    margin: 0 !important;
+    padding: 0 !important;
+    gap: 0 !important;
+    width: auto !important;
+    min-width: 0 !important;
+    border: none !important;
+    box-shadow: none !important;
+    background: #fff !important;
+  }
+
+  body.barcode-gs1-mode .barcode-preview-grid {
+    display: block !important;
+  }
+
+  body.barcode-gs1-mode .barcode-result-card {
+    break-inside: avoid;
+    page-break-inside: avoid;
+  }
+
+  body.barcode-gs1-mode .barcode-artboard {
+    padding: 0 !important;
+  }
+
+  body.barcode-gs1-mode .gs1-label-preview {
+    width: 4.599in;
+    min-height: 2.197in;
+    padding: 0.13in 0.12in 0.08in 0.12in !important;
+  }
+
+  body.barcode-gs1-mode .gs1-label-middle {
+    grid-template-columns: 1.2in minmax(0, 1fr);
+    gap: 0.12in;
+    align-items: start;
+  }
+
+  body.barcode-gs1-mode .gs1-label-matrix svg {
+    width: 1.08in !important;
+    max-width: 1.08in !important;
+  }
+
+  body.barcode-gs1-mode .gs1-label-side {
+    gap: 0.09in;
+    padding-top: 0.02in;
+  }
+
+  body.barcode-gs1-mode .gs1-label-line {
+    font-size: 10.5pt !important;
+    line-height: 1.15 !important;
+    color: #000 !important;
+  }
+
 }
 
 .tools-grid {
