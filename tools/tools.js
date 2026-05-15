@@ -25,7 +25,7 @@ const TOOL_DEFAULTS = {
     gtin14: "1234567890123\n01234567890123",
     gs1datamatrix: {
       productCode: "00063691029279",
-      expiry: "2028-05",
+      expiry: "2028-05-05",
       lot: "AD95561",
     },
   },
@@ -203,21 +203,29 @@ function normalizeGs1Expiry(rawValue) {
   if (!value) {
     return {
       valid: false,
-      message: "Enter an expiry month for GS1 DataMatrix.",
+      message: "Enter an expiry date for GS1 DataMatrix.",
     };
   }
 
-  const match = value.match(/^(\d{4})-(\d{2})$/);
+  const match = value.match(/^(\d{4})-(\d{2})-(\d{2})$/);
   if (!match) {
     return {
       valid: false,
-      message: "Expiry should use a valid year-month value.",
+      message: "Expiry should use a valid date.",
+    };
+  }
+
+  const expiryDate = new Date(`${match[1]}-${match[2]}-${match[3]}T00:00:00`);
+  if (Number.isNaN(expiryDate.getTime())) {
+    return {
+      valid: false,
+      message: "Expiry should use a valid date.",
     };
   }
 
   return {
     valid: true,
-    aiValue: `${match[1].slice(2)}${match[2]}00`,
+    aiValue: `${match[1].slice(2)}${match[2]}${match[3]}`,
     displayValue: value,
   };
 }
@@ -293,7 +301,7 @@ function parseGs1AiFields(gs1Text) {
 }
 
 function formatGs1Expiry(value) {
-  if (!value || value.length < 4) {
+  if (!value || value.length < 6) {
     return value || "";
   }
 
@@ -301,11 +309,25 @@ function formatGs1Expiry(value) {
   const month = value.slice(2, 4);
   const day = value.slice(4, 6);
 
-  if (!day || day === "00") {
-    return `${year}-${month}`;
-  }
-
   return `${year}-${month}-${day}`;
+}
+
+function getGs1ExpiryDateBounds() {
+  const today = new Date();
+  const maxDate = new Date(today);
+  maxDate.setFullYear(maxDate.getFullYear() + 15);
+
+  const formatDate = (date) => {
+    const year = date.getFullYear();
+    const month = String(date.getMonth() + 1).padStart(2, "0");
+    const day = String(date.getDate()).padStart(2, "0");
+    return `${year}-${month}-${day}`;
+  };
+
+  return {
+    min: formatDate(today),
+    max: formatDate(maxDate),
+  };
 }
 
 function escapeMarkup(value) {
@@ -658,9 +680,9 @@ function syncExampleDataHint() {
     refs.gs1Fields.hidden = false;
     refs.data.parentElement.hidden = true;
     refs.formatHint.textContent =
-      "Enter a DIN, UPC, or GTIN together with expiry and lot. The GS1 DataMatrix payload will be built automatically.";
+      "Enter a DIN, UPC, or GTIN together with expiry date and lot. The GS1 DataMatrix payload will be built automatically.";
     refs.toolNote.textContent =
-      "This option renders a square GS1 DataMatrix symbol in the browser using product code, expiry, and lot values. Serial number is not used in this mode.";
+      "This option renders a square GS1 DataMatrix symbol in the browser using product code, expiry date, and lot values. Serial number is not used in this mode.";
     refs.showText.checked = false;
     refs.showText.parentElement.hidden = true;
   } else {
@@ -683,6 +705,9 @@ function printSheet() {
 }
 
 function initialize() {
+  const expiryBounds = getGs1ExpiryDateBounds();
+  refs.gs1Expiry.min = expiryBounds.min;
+  refs.gs1Expiry.max = expiryBounds.max;
   refs.form.addEventListener("submit", generateBarcodes);
   refs.loadExampleButton.addEventListener("click", loadExample);
   refs.clearButton.addEventListener("click", clearTool);
