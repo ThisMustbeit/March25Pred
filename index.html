@@ -287,29 +287,34 @@
                 <p class="help-text">
                   The starting dose begins on the taper start date. Blank repeats are treated as 1 for later segments.
                 </p>
-                <div id="mobile-advanced-taper-target"></div>
-                <div class="table-scroll">
-                  <table class="input-table">
-                    <thead>
-                      <tr>
-                        <th>Segment</th>
-                        <th>Start Dose</th>
-                        <th>Dose Change (mg)</th>
-                        <th>Days Per Step</th>
-                        <th>Repeats</th>
-                        <th>End Dose</th>
-                        <th class="action-col"> </th>
-                      </tr>
-                    </thead>
-    <tbody id="custom-segment-body"></tbody>
-                    <tfoot>
-                      <tr>
-                        <td colspan="7" class="custom-table-footer">
-                          <button id="add-segment-row" type="button" class="icon-button" aria-label="Add custom taper row" data-icon="+">+</button>
-                        </td>
-                      </tr>
-                    </tfoot>
-                  </table>
+                <div class="advanced-taper-workspace">
+                  <div class="advanced-taper-editor">
+                    <div id="mobile-advanced-taper-target"></div>
+                    <div class="table-scroll">
+                      <table class="input-table">
+                        <thead>
+                          <tr>
+                            <th>Segment</th>
+                            <th>Start Dose</th>
+                            <th>Dose Change (mg)</th>
+                            <th>Days Per Step</th>
+                            <th>Repeats</th>
+                            <th>End Dose</th>
+                            <th class="action-col"> </th>
+                          </tr>
+                        </thead>
+                        <tbody id="custom-segment-body"></tbody>
+                        <tfoot>
+                          <tr>
+                            <td colspan="7" class="custom-table-footer">
+                              <button id="add-segment-row" type="button" class="icon-button" aria-label="Add custom taper row" data-icon="+">+</button>
+                            </td>
+                          </tr>
+                        </tfoot>
+                      </table>
+                    </div>
+                  </div>
+                  <aside id="advanced-calendar-preview" class="advanced-calendar-preview" aria-live="polite"></aside>
                 </div>
               </fieldset>
             </div>

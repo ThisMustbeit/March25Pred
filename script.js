@@ -1251,6 +1251,7 @@ const DOMRefs = {
   addSegmentRowButton: document.getElementById("add-segment-row"),
   customOverridePanel: document.getElementById("custom-override-panel"),
   customSegmentBody: document.getElementById("custom-segment-body"),
+  advancedCalendarPreview: document.getElementById("advanced-calendar-preview"),
   segmentRowTemplate: document.getElementById("segment-row-template"),
   validationSummary: document.getElementById("validation-summary"),
   results: document.getElementById("results"),
@@ -1700,6 +1701,66 @@ const DOMBuilders = {
           </div>
         </div>
       </section>
+    `;
+  },
+
+  advancedPreviewCellMarkup(cell) {
+    const classes = ["advanced-preview-day"];
+    if (!cell.inCurrentMonth) classes.push("is-outside-month");
+
+    const hasVisibleDose = CalendarLogic.hasVisibleCalendarDose(cell.scheduleRow);
+    const doseLine = hasVisibleDose ? Formatters.dose(cell.scheduleRow.doseMg) : "";
+
+    return `
+      <article class="${classes.join(" ")}">
+        <div class="advanced-preview-date">${cell.date.getDate()}</div>
+        <div class="advanced-preview-dose">${Html.escape(doseLine)}</div>
+      </article>
+    `;
+  },
+
+  advancedPreviewMonthMarkup(calendar) {
+    return `
+      <section class="advanced-preview-month">
+        <div class="advanced-preview-month-title">${Html.escape(Formatters.monthYear(calendar.monthStart))}</div>
+        <div class="advanced-preview-weekdays" aria-hidden="true">
+          <div>Su</div>
+          <div>Mo</div>
+          <div>Tu</div>
+          <div>We</div>
+          <div>Th</div>
+          <div>Fr</div>
+          <div>Sa</div>
+        </div>
+        <div class="advanced-preview-grid">
+          ${calendar.weeks.flat().map(DOMBuilders.advancedPreviewCellMarkup).join("")}
+        </div>
+      </section>
+    `;
+  },
+
+  advancedPreviewMarkup(calendars, scheduleRows) {
+    const firstDate = scheduleRows[0]?.date || null;
+    const lastDate = scheduleRows[scheduleRows.length - 1]?.date || null;
+    const rangeLabel =
+      firstDate && lastDate ? Formatters.shortDateRange(firstDate, lastDate) : "";
+
+    return `
+      <div class="advanced-preview-shell">
+        <div class="advanced-preview-header">
+          <p class="advanced-preview-kicker">Live Dose Preview</p>
+          <h3>Calendar Review</h3>
+          <p class="advanced-preview-note">Shows total daily dose only while you build the advanced taper.</p>
+          ${
+            rangeLabel
+              ? `<p class="advanced-preview-range">${Html.escape(rangeLabel)}</p>`
+              : ""
+          }
+        </div>
+        <div class="advanced-preview-months">
+          ${calendars.map(DOMBuilders.advancedPreviewMonthMarkup).join("")}
+        </div>
+      </div>
     `;
   },
 
@@ -2257,6 +2318,7 @@ const UISetup = {
     if (!isVisible) {
       UISetup.closeCustomSegmentSettings();
     }
+    UISetup.syncAdvancedCalendarPreview();
   },
 
   syncMobileFieldPlacement() {
@@ -2429,6 +2491,7 @@ const UISetup = {
         fields.endDoseEl.textContent = "";
         fields.segmentDateRangeEl.textContent = "";
       });
+      UISetup.syncAdvancedCalendarPreview();
       return;
     }
 
@@ -2479,6 +2542,94 @@ const UISetup = {
 
       runningDose = endDose;
     });
+
+    UISetup.syncAdvancedCalendarPreview();
+  },
+
+  renderAdvancedCalendarPreviewPlaceholder(message) {
+    if (!DOMRefs.advancedCalendarPreview) return;
+
+    DOMRefs.advancedCalendarPreview.innerHTML = `
+      <div class="advanced-preview-shell advanced-preview-shell--placeholder">
+        <div class="advanced-preview-header">
+          <p class="advanced-preview-kicker">Live Dose Preview</p>
+          <h3>Calendar Review</h3>
+          <p class="advanced-preview-note">${Html.escape(message)}</p>
+        </div>
+      </div>
+    `;
+  },
+
+  buildAdvancedPreviewInputs() {
+    const taperStartDate = InputFactory.parseDate(DOMRefs.form.taperStartDate.value);
+    const startingDose = NumberUtils.parseOptionalNumber(DOMRefs.form.startingDose.value);
+    const customSegments = InputFactory.readCustomSegments([]).filter(Boolean);
+
+    if (!taperStartDate || startingDose == null || customSegments.length === 0) {
+      return null;
+    }
+
+    return {
+      taperStartDate,
+      startingDose,
+      customSegments,
+      useCustomOverride: true,
+      minDoseClamp: Number(APP_CONFIG.defaults.taper.minDoseClamp),
+      maxDoseClamp: Number(APP_CONFIG.defaults.taper.maxDoseClamp),
+    };
+  },
+
+  syncAdvancedCalendarPreview() {
+    if (!DOMRefs.advancedCalendarPreview) return;
+
+    const isAdvancedMode = DOMRefs.useCustomOverrideInput.value === "true";
+    DOMRefs.advancedCalendarPreview.classList.toggle("is-hidden", !isAdvancedMode);
+
+    if (!isAdvancedMode) {
+      DOMRefs.advancedCalendarPreview.innerHTML = "";
+      return;
+    }
+
+    const previewInputs = UISetup.buildAdvancedPreviewInputs();
+    if (!previewInputs) {
+      UISetup.renderAdvancedCalendarPreviewPlaceholder(
+        "Add the taper start date, starting dose, and at least one complete segment to see the live calendar."
+      );
+      return;
+    }
+
+    const totalDays = Templates.totalTaperDays(previewInputs);
+    if (!totalDays) {
+      UISetup.renderAdvancedCalendarPreviewPlaceholder(
+        "Give the starting dose or a later segment at least one active day to preview the taper."
+      );
+      return;
+    }
+
+    const previewRows = [];
+    for (let dayIndex = 0; dayIndex < totalDays; dayIndex += 1) {
+      const date = DateUtils.addDays(previewInputs.taperStartDate, dayIndex);
+      const doseMg = Templates.customDose(dayIndex, previewInputs);
+
+      if (NumberUtils.isNearZero(doseMg)) {
+        break;
+      }
+
+      previewRows.push({ date, doseMg });
+    }
+
+    if (previewRows.length === 0) {
+      UISetup.renderAdvancedCalendarPreviewPlaceholder(
+        "The preview will appear once the taper includes at least one non-zero day."
+      );
+      return;
+    }
+
+    const calendars = CalendarLogic.generateCalendarRange(previewInputs, previewRows);
+    DOMRefs.advancedCalendarPreview.innerHTML = DOMBuilders.advancedPreviewMarkup(
+      calendars,
+      previewRows
+    );
   },
 
   rebuildCustomSegmentRows(valuesList = []) {
@@ -2623,6 +2774,8 @@ const AppController = {
       DOMRefs.mobilePrintLayoutSelect?.addEventListener("change", () =>
         DOMRenderer.syncPrintLayoutControls("mobile")
       );
+      DOMRefs.form.taperStartDate.addEventListener("input", UISetup.syncCustomSegmentDoseHelpers);
+      DOMRefs.form.taperStartDate.addEventListener("change", UISetup.syncCustomSegmentDoseHelpers);
       DOMRefs.form.startingDose.addEventListener("input", UISetup.syncCustomSegmentDoseHelpers);
       DOMRefs.form.startingDose.addEventListener("input", () => UISetup.syncStandardTaperDerivedFields("auto"));
       DOMRefs.form.tabletStrengthA.addEventListener("input", UISetup.syncCustomSegmentStrengthSelectors);
