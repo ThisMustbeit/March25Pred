@@ -258,6 +258,41 @@ const Formatters = {
     });
   },
 
+  shortDateRange(startDate, endDate) {
+    if (!startDate || !endDate) return "";
+
+    const start = DateUtils.normalize(startDate);
+    const end = DateUtils.normalize(endDate);
+    const sameYear = start.getFullYear() === end.getFullYear();
+    const sameMonth = sameYear && start.getMonth() === end.getMonth();
+
+    if (sameMonth) {
+      return `${start.toLocaleDateString(undefined, {
+        month: "short",
+      })} ${start.getDate()}-${end.getDate()}, ${start.getFullYear()}`;
+    }
+
+    if (sameYear) {
+      return `${start.toLocaleDateString(undefined, {
+        month: "short",
+        day: "numeric",
+      })} to ${end.toLocaleDateString(undefined, {
+        month: "short",
+        day: "numeric",
+      })}, ${start.getFullYear()}`;
+    }
+
+    return `${start.toLocaleDateString(undefined, {
+      month: "short",
+      day: "numeric",
+      year: "numeric",
+    })} to ${end.toLocaleDateString(undefined, {
+      month: "short",
+      day: "numeric",
+      year: "numeric",
+    })}`;
+  },
+
   dose(value) {
     const normalized = Number(value);
     const text = Number.isInteger(normalized)
@@ -272,6 +307,25 @@ const Formatters = {
       return String(normalized);
     }
     return normalized.toFixed(1).replace(/\.0$/, "");
+  },
+
+  ordinal(value) {
+    const normalized = Number(value);
+    const mod100 = normalized % 100;
+    if (mod100 >= 11 && mod100 <= 13) {
+      return `${normalized}th`;
+    }
+
+    switch (normalized % 10) {
+      case 1:
+        return `${normalized}st`;
+      case 2:
+        return `${normalized}nd`;
+      case 3:
+        return `${normalized}rd`;
+      default:
+        return `${normalized}th`;
+    }
   },
 
   plural(word, count) {
@@ -2037,7 +2091,7 @@ const UISetup = {
   },
 
   syncPreviewModeButtons() {
-    const activeMode = DOMRefs.previewModeInput?.value || "full";
+    const activeMode = DOMRefs.previewModeInput?.value || "guided";
 
     DOMRefs.previewModeButtons.forEach((button) => {
       const isActive = button.dataset.previewMode === activeMode;
@@ -2243,6 +2297,9 @@ const UISetup = {
       doseChangeInput: row.querySelector(".segment-dose-change"),
       daysPerStepInput: row.querySelector(".segment-days-per-step"),
       repeatsInput: row.querySelector(".segment-repeats"),
+      segmentLabelEl: row.querySelector(".segment-label"),
+      segmentDateRangeEl: row.querySelector(".segment-date-range"),
+      segmentGuidanceEl: row.querySelector(".segment-guidance"),
       startDoseEl: row.querySelector(".helper-dose-start"),
       endDoseEl: row.querySelector(".helper-dose-end"),
       settingsButton: row.querySelector(".segment-settings-button"),
@@ -2280,10 +2337,19 @@ const UISetup = {
       const fields = UISetup.getCustomRowFields(row);
       const isFirstSegment = index === 0;
 
-      row.querySelector(".segment-label").textContent = `Segment ${index + 1}`;
+      fields.segmentLabelEl.textContent = isFirstSegment
+        ? "Starting dose"
+        : `${Formatters.ordinal(index)} Segment`;
       row.classList.toggle("is-first-segment", isFirstSegment);
-      fields.settingsButton.setAttribute("aria-label", `Settings for Segment ${index + 1}`);
-      fields.deleteButton.setAttribute("aria-label", `Delete Segment ${index + 1}`);
+      fields.segmentGuidanceEl.hidden = !isFirstSegment;
+      fields.settingsButton.setAttribute(
+        "aria-label",
+        `Settings for ${isFirstSegment ? "Starting dose" : `${Formatters.ordinal(index)} Segment`}`
+      );
+      fields.deleteButton.setAttribute(
+        "aria-label",
+        `Delete ${isFirstSegment ? "Starting dose" : `${Formatters.ordinal(index)} Segment`}`
+      );
       fields.doseChangeInput.name = `customDoseChange${index}`;
       fields.daysPerStepInput.name = `customDaysPerStep${index}`;
       fields.repeatsInput.name = `customRepeats${index}`;
@@ -2353,12 +2419,15 @@ const UISetup = {
 
   syncCustomSegmentDoseHelpers() {
     const startingDose = NumberUtils.parseOptionalNumber(DOMRefs.form.startingDose.value);
+    const taperStartDate = InputFactory.parseDate(DOMRefs.form.taperStartDate.value);
     const rows = [...DOMRefs.customSegmentBody.querySelectorAll("tr")];
 
     if (startingDose == null) {
       rows.forEach((row) => {
-        row.querySelector(".helper-dose-start").textContent = "";
-        row.querySelector(".helper-dose-end").textContent = "";
+        const fields = UISetup.getCustomRowFields(row);
+        fields.startDoseEl.textContent = "";
+        fields.endDoseEl.textContent = "";
+        fields.segmentDateRangeEl.textContent = "";
       });
       return;
     }
@@ -2368,6 +2437,8 @@ const UISetup = {
       Number(APP_CONFIG.defaults.taper.minDoseClamp),
       Number(APP_CONFIG.defaults.taper.maxDoseClamp)
     );
+    let segmentStartDate = taperStartDate ? DateUtils.normalize(taperStartDate) : null;
+    let timelineIsValid = Boolean(segmentStartDate);
 
     rows.forEach((row) => {
       const fields = UISetup.getCustomRowFields(row);
@@ -2381,6 +2452,8 @@ const UISetup = {
       if (doseChange == null || repeats == null) {
         fields.startDoseEl.textContent = "";
         fields.endDoseEl.textContent = "";
+        fields.segmentDateRangeEl.textContent = "";
+        timelineIsValid = false;
         return;
       }
 
@@ -2393,6 +2466,17 @@ const UISetup = {
 
       fields.startDoseEl.textContent = Formatters.dose(startDose);
       fields.endDoseEl.textContent = Formatters.dose(endDose);
+      const durationDays = (NumberUtils.parseOptionalInteger(fields.daysPerStepInput.value.trim()) || 0) * repeats;
+
+      if (timelineIsValid && durationDays > 0) {
+        const segmentEndDate = DateUtils.addDays(segmentStartDate, durationDays - 1);
+        fields.segmentDateRangeEl.textContent = Formatters.shortDateRange(segmentStartDate, segmentEndDate);
+        segmentStartDate = DateUtils.addDays(segmentEndDate, 1);
+      } else {
+        fields.segmentDateRangeEl.textContent = "";
+        timelineIsValid = false;
+      }
+
       runningDose = endDose;
     });
   },
@@ -2506,7 +2590,7 @@ const UISetup = {
 const AppController = {
   initialize() {
       UISetup.applyDefaults();
-      UISetup.setPreviewMode(window.matchMedia("(max-width: 768px)").matches ? "guided" : "full");
+      UISetup.setPreviewMode("guided");
       MobileFlow.syncForViewport();
       DOMRefs.form.addEventListener("submit", AppController.handleGenerate);
       DOMRefs.form.addEventListener("reset", AppController.handleReset);

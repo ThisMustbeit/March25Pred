@@ -94,7 +94,7 @@
                     Full Workspace
                   </button>
                 </div>
-                <input id="preview-mode" name="previewMode" type="hidden" value="full">
+                <input id="preview-mode" name="previewMode" type="hidden" value="guided">
               </div>
             </div>
             <div class="taper-mode-strip" aria-label="Taper mode">
@@ -285,7 +285,7 @@
               <fieldset class="group group-wide">
                 <legend>Custom Taper Override</legend>
                 <p class="help-text">
-                  Segment 1 starts on the taper start date and always uses the starting dose. Blank repeats are treated as 1.
+                  The starting dose begins on the taper start date. Blank repeats are treated as 1 for later segments.
                 </p>
                 <div id="mobile-advanced-taper-target"></div>
                 <div class="table-scroll">
@@ -476,7 +476,14 @@
 
   <template id="segment-row-template">
     <tr class="custom-segment-row">
-      <td class="segment-label"></td>
+      <td class="segment-label-cell">
+        <div class="segment-label"></div>
+        <div class="segment-date-range"></div>
+        <div class="segment-guidance">
+          <span class="segment-guidance-line segment-guidance-start">1. What is the starting dose?</span>
+          <span class="segment-guidance-line segment-guidance-days">2. For how many days should the starting dose go for?</span>
+        </div>
+      </td>
       <td class="dose-helper"><span class="helper-dose helper-dose-start"></span></td>
       <td class="segment-dose-change-cell">
         <input class="segment-dose-change" type="number" step="0.1" min="-1000" max="1000">

@@ -1809,6 +1809,34 @@ body.guided-preview-active.mobile-step-3 .custom-override-panel .segment-setting
   vertical-align: middle;
 }
 
+.segment-label-cell {
+  min-width: 180px;
+}
+
+.segment-label {
+  font-weight: 700;
+  color: var(--accent-dark);
+}
+
+.segment-date-range {
+  margin-top: 0.22rem;
+  font-size: 0.78rem;
+  line-height: 1.35;
+  color: var(--muted);
+}
+
+.segment-guidance {
+  display: none;
+  margin-top: 0.45rem;
+  font-size: 0.78rem;
+  line-height: 1.4;
+  color: var(--muted);
+}
+
+.segment-guidance-line {
+  display: block;
+}
+
 .segment-dose-static {
   display: none;
   color: var(--muted);
@@ -2455,6 +2483,16 @@ body.guided-preview-active.mobile-step-3 .custom-override-panel .segment-setting
     font-weight: 700;
     color: var(--accent-dark);
     padding-bottom: 0.1rem;
+  }
+
+  body.mobile-flow-active.mobile-step-3 .custom-override-panel .segment-date-range {
+    margin-top: 0.28rem;
+    font-size: 0.8rem;
+  }
+
+  body.mobile-flow-active.mobile-step-3 .custom-override-panel .segment-guidance {
+    display: block;
+    margin-top: 0.42rem;
   }
 
   body.mobile-flow-active.mobile-step-3 .custom-override-panel .input-table td:nth-child(2),
