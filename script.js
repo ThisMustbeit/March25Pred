@@ -537,8 +537,17 @@ const ConfigCode = {
   captureCurrentState() {
     const customSegments = [...DOMRefs.customSegmentBody.querySelectorAll("tr")].map((row, index) => {
       const fields = UISetup.getCustomRowFields(row);
+      const signedDoseChange =
+        index === 0
+          ? "0"
+          : String(
+              InputFactory.signedDoseChange(
+                NumberUtils.parseOptionalNumber(fields.doseChangeInput.value),
+                UISetup.getCustomSegmentDirection(fields)
+              ) ?? ""
+            );
       return {
-        doseChange: index === 0 ? "0" : fields.doseChangeInput.value,
+        doseChange: signedDoseChange,
         daysPerStep: fields.daysPerStepInput.value,
         repeats: index === 0 ? "1" : fields.repeatsInput.value,
         allowedStrengthKeys: fields.strengthOptions
@@ -1314,6 +1323,7 @@ const DOMRefs = {
   mobileStartingDoseHome: document.getElementById("mobile-starting-dose-home"),
   mobileStartingDoseTarget: document.getElementById("mobile-starting-dose-target"),
   mobileAdvancedTaperTarget: document.getElementById("mobile-advanced-taper-target"),
+  mobileAdvancedStartingDoseTarget: document.getElementById("mobile-advanced-starting-dose-target"),
 };
 
 const MobileFlow = {
@@ -1533,7 +1543,13 @@ const InputFactory = {
       if (allBlank) return null;
 
       const segment = {
-        doseChange: index === 0 ? 0 : NumberUtils.parseOptionalNumber(doseChangeValue),
+        doseChange:
+          index === 0
+            ? 0
+            : InputFactory.signedDoseChange(
+                NumberUtils.parseOptionalNumber(doseChangeValue),
+                UISetup.getCustomSegmentDirection(fields)
+              ),
         daysPerStep: daysValue === "" ? 0 : NumberUtils.parseOptionalInteger(daysValue),
         repeats: index === 0 ? 1 : repeatsValue === "" ? 1 : NumberUtils.parseOptionalInteger(repeatsValue),
         allowedStrengthKeys: fields.strengthOptions
@@ -2168,8 +2184,15 @@ const UISetup = {
       DOMRefs.previewModeInput.value = normalized;
     }
 
+    if (normalized === "guided" && MobileFlow.currentStep === 4 && DOMRefs.results?.classList.contains("is-hidden")) {
+      MobileFlow.currentStep = 1;
+    }
+
     UISetup.syncPreviewModeButtons();
+    UISetup.syncCustomOverrideVisibility();
     MobileFlow.syncForViewport();
+    DOMRenderer.syncLayoutControls();
+    DOMRenderer.syncStickyActionBarVisibility();
   },
 
   syncDoseChangeDirectionButtons() {
@@ -2331,32 +2354,60 @@ const UISetup = {
       const isAdvancedMode = DOMRefs.useCustomOverrideInput.value === "true";
       const mobileTaperContainer = isAdvancedMode ? DOMRefs.customOverrideFieldset : DOMRefs.primaryTaperGroup;
       const mobileStartingDoseAnchor = isAdvancedMode
+        ? DOMRefs.mobileAdvancedStartingDoseTarget
+        : DOMRefs.mobileStartingDoseTarget;
+      const mobileTaperModeAnchor = isAdvancedMode
         ? DOMRefs.mobileAdvancedTaperTarget
         : DOMRefs.mobileStartingDoseTarget;
 
-      if (mobileTaperContainer && mobileStartingDoseAnchor && startingDoseLabel.parentElement !== mobileTaperContainer) {
-        mobileTaperContainer.insertBefore(startingDoseLabel, mobileStartingDoseAnchor.nextSibling);
+      if (mobileTaperContainer && mobileStartingDoseAnchor) {
+        const desiredStartingDoseSibling = mobileStartingDoseAnchor.nextSibling;
+        if (
+          startingDoseLabel.parentElement !== mobileTaperContainer ||
+          startingDoseLabel.previousElementSibling !== mobileStartingDoseAnchor
+        ) {
+          mobileTaperContainer.insertBefore(startingDoseLabel, desiredStartingDoseSibling);
+        }
       }
 
-      if (mobileTaperContainer && DOMRefs.taperModeStrip.parentElement !== mobileTaperContainer) {
-        mobileTaperContainer.insertBefore(DOMRefs.taperModeStrip, mobileStartingDoseAnchor || mobileTaperContainer.firstChild);
+      if (mobileTaperContainer) {
+        const desiredTaperModeAnchor = mobileTaperModeAnchor || mobileTaperContainer.firstChild;
+        if (
+          DOMRefs.taperModeStrip.parentElement !== mobileTaperContainer ||
+          DOMRefs.taperModeStrip.nextElementSibling !== desiredTaperModeAnchor
+        ) {
+          mobileTaperContainer.insertBefore(DOMRefs.taperModeStrip, desiredTaperModeAnchor);
+        }
       }
 
       return;
     }
 
-    if (DOMRefs.mobileStartingDoseHome && taperStartDateLabel && startingDoseLabel.parentElement !== DOMRefs.medStartGroup) {
-      DOMRefs.medStartGroup.insertBefore(startingDoseLabel, taperStartDateLabel);
+    if (DOMRefs.mobileStartingDoseHome && taperStartDateLabel) {
+      if (
+        startingDoseLabel.parentElement !== DOMRefs.medStartGroup ||
+        startingDoseLabel.previousElementSibling !== DOMRefs.mobileStartingDoseHome
+      ) {
+        DOMRefs.medStartGroup.insertBefore(startingDoseLabel, taperStartDateLabel);
+      }
     }
 
-    if (DOMRefs.taperModeStrip.parentElement !== DOMRefs.mobileTaperModeHome.parentElement) {
-      DOMRefs.mobileTaperModeHome.parentElement.insertBefore(DOMRefs.taperModeStrip, DOMRefs.mobileTaperModeHome.nextSibling);
+    if (
+      DOMRefs.taperModeStrip.parentElement !== DOMRefs.mobileTaperModeHome.parentElement ||
+      DOMRefs.taperModeStrip.previousElementSibling !== DOMRefs.mobileTaperModeHome
+    ) {
+      DOMRefs.mobileTaperModeHome.parentElement.insertBefore(
+        DOMRefs.taperModeStrip,
+        DOMRefs.mobileTaperModeHome.nextSibling
+      );
     }
   },
 
   getCustomRowFields(row) {
     return {
       doseChangeInput: row.querySelector(".segment-dose-change"),
+      doseChangeDirectionInput: row.querySelector(".segment-dose-direction"),
+      doseChangeDirectionButtons: [...row.querySelectorAll(".segment-direction-button")],
       daysPerStepInput: row.querySelector(".segment-days-per-step"),
       repeatsInput: row.querySelector(".segment-repeats"),
       segmentLabelEl: row.querySelector(".segment-label"),
@@ -2373,6 +2424,24 @@ const UISetup = {
     };
   },
 
+  getCustomSegmentDirection(fields) {
+    return fields.doseChangeDirectionInput?.value === "increase" ? "increase" : "reduce";
+  },
+
+  setCustomSegmentDirection(fields, direction) {
+    const normalized = direction === "increase" ? "increase" : "reduce";
+
+    if (fields.doseChangeDirectionInput) {
+      fields.doseChangeDirectionInput.value = normalized;
+    }
+
+    fields.doseChangeDirectionButtons.forEach((button) => {
+      const isActive = button.dataset.segmentDirection === normalized;
+      button.classList.toggle("is-active", isActive);
+      button.setAttribute("aria-pressed", String(isActive));
+    });
+  },
+
   createCustomSegmentRow() {
     return DOMRefs.segmentRowTemplate.content.firstElementChild.cloneNode(true);
   },
@@ -2385,7 +2454,14 @@ const UISetup = {
     const row = UISetup.createCustomSegmentRow();
     const fields = UISetup.getCustomRowFields(row);
 
-    fields.doseChangeInput.value = values[0] ?? "";
+    const rawDoseChangeValue = values[0] ?? "";
+    const numericDoseChange = NumberUtils.parseOptionalNumber(rawDoseChangeValue);
+    fields.doseChangeInput.value =
+      numericDoseChange == null ? rawDoseChangeValue : String(Math.abs(numericDoseChange));
+    UISetup.setCustomSegmentDirection(
+      fields,
+      numericDoseChange != null && numericDoseChange > 0 ? "increase" : "reduce"
+    );
     fields.daysPerStepInput.value = values[1] ?? "";
     fields.repeatsInput.value = values[2] ?? "";
 
@@ -2417,9 +2493,13 @@ const UISetup = {
       fields.repeatsInput.name = `customRepeats${index}`;
       fields.doseChangeInput.disabled = isFirstSegment;
       fields.repeatsInput.disabled = isFirstSegment;
+      fields.doseChangeDirectionButtons.forEach((button) => {
+        button.disabled = isFirstSegment;
+      });
 
       if (isFirstSegment) {
         fields.doseChangeInput.value = "0";
+        UISetup.setCustomSegmentDirection(fields, "reduce");
         fields.repeatsInput.value = "1";
       }
     });
@@ -2508,7 +2588,10 @@ const UISetup = {
       const isFirstSegment = row.classList.contains("is-first-segment");
       const doseChange = isFirstSegment
         ? 0
-        : NumberUtils.parseOptionalNumber(fields.doseChangeInput.value.trim());
+        : InputFactory.signedDoseChange(
+            NumberUtils.parseOptionalNumber(fields.doseChangeInput.value.trim()),
+            UISetup.getCustomSegmentDirection(fields)
+          );
       const repeatsValue = isFirstSegment ? "1" : fields.repeatsInput.value.trim();
       const repeats = isFirstSegment ? 1 : repeatsValue === "" ? 1 : NumberUtils.parseOptionalInteger(repeatsValue);
 
@@ -2985,6 +3068,16 @@ const AppController = {
   },
 
   handleCustomSegmentRowClick(event) {
+    const directionButton = event.target.closest(".segment-direction-button");
+    if (directionButton) {
+      const row = directionButton.closest("tr");
+      const fields = UISetup.getCustomRowFields(row);
+      if (directionButton.disabled) return;
+      UISetup.setCustomSegmentDirection(fields, directionButton.dataset.segmentDirection);
+      UISetup.syncCustomSegmentDoseHelpers();
+      return;
+    }
+
     const settingsButton = event.target.closest(".segment-settings-button");
     if (settingsButton) {
       const row = settingsButton.closest("tr");

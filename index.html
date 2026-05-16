@@ -290,6 +290,7 @@
                 <div class="advanced-taper-workspace">
                   <div class="advanced-taper-editor">
                     <div id="mobile-advanced-taper-target"></div>
+                    <div id="mobile-advanced-starting-dose-target"></div>
                     <div class="table-scroll">
                       <table class="input-table">
                         <thead>
@@ -491,7 +492,26 @@
       </td>
       <td class="dose-helper"><span class="helper-dose helper-dose-start"></span></td>
       <td class="segment-dose-change-cell">
-        <input class="segment-dose-change" type="number" step="0.1" min="-1000" max="1000">
+        <div class="segment-dose-change-control">
+          <div class="direction-toggle segment-direction-toggle" role="group" aria-label="Segment dose change direction">
+            <button
+              type="button"
+              class="direction-toggle-button segment-direction-button is-active"
+              data-segment-direction="reduce"
+            >
+              Reduce by
+            </button>
+            <button
+              type="button"
+              class="direction-toggle-button segment-direction-button"
+              data-segment-direction="increase"
+            >
+              Increase by
+            </button>
+          </div>
+          <input class="segment-dose-change" type="number" step="0.1" min="0" max="1000">
+          <input class="segment-dose-direction" type="hidden" value="reduce">
+        </div>
         <span class="segment-dose-static">Starting dose</span>
       </td>
       <td><input class="segment-days-per-step" type="number" step="1" min="1" max="365"></td>

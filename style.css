@@ -700,7 +700,8 @@ body.sticky-actions-visible .sticky-action-bar {
 #mobile-starting-dose-home,
 #mobile-starting-dose-target,
 #mobile-taper-mode-home,
-#mobile-advanced-taper-target {
+#mobile-advanced-taper-target,
+#mobile-advanced-starting-dose-target {
   display: none;
 }
 
@@ -1236,6 +1237,10 @@ body.guided-preview-active .form-grid {
   margin: 0 auto;
 }
 
+body.guided-preview-active.mobile-step-3 .form-grid {
+  max-width: 1260px;
+}
+
 body.guided-preview-active .group {
   min-width: 0;
 }
@@ -1286,6 +1291,11 @@ body.guided-preview-active.mobile-step-3 .paired-field-action {
 
 body.guided-preview-active.mobile-step-3 .custom-override-panel .table-scroll {
   overflow: visible;
+}
+
+body.guided-preview-active.mobile-step-3 .advanced-taper-workspace {
+  grid-template-columns: minmax(0, 2.15fr) minmax(330px, 1fr);
+  gap: 1.35rem;
 }
 
 body.guided-preview-active.mobile-step-3 .custom-override-panel .input-table,
@@ -1959,6 +1969,12 @@ body.guided-preview-active.mobile-step-3 .custom-override-panel .segment-setting
 }
 
 .segment-label {
+  display: inline-flex;
+  align-items: center;
+  padding: 0.36rem 0.72rem;
+  border-radius: 999px;
+  background: #edf5f9;
+  border: 1px solid rgba(178, 198, 208, 0.72);
   font-weight: 700;
   color: var(--accent-dark);
 }
@@ -1988,13 +2004,32 @@ body.guided-preview-active.mobile-step-3 .custom-override-panel .segment-setting
   font-weight: 600;
 }
 
+.segment-dose-change-control {
+  display: grid;
+  gap: 0.5rem;
+}
+
+.segment-direction-toggle {
+  min-width: 0;
+  padding: 0.18rem;
+  width: 100%;
+}
+
+.segment-direction-button {
+  min-width: 0;
+  padding: 0.56rem 0.55rem;
+  font-size: 0.88rem;
+  white-space: normal;
+  line-height: 1.2;
+}
+
 .segment-repeats-static {
   display: none;
   color: var(--muted);
   font-weight: 600;
 }
 
-.custom-segment-row.is-first-segment .segment-dose-change {
+.custom-segment-row.is-first-segment .segment-dose-change-control {
   display: none;
 }
 
@@ -2208,8 +2243,8 @@ body.guided-preview-active.mobile-step-3 .custom-override-panel .segment-setting
 }
 
 .segment-label {
-  font-weight: 600;
-  color: var(--muted);
+  font-weight: 700;
+  color: var(--accent-dark);
   white-space: nowrap;
 }
 
