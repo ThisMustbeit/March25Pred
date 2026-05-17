@@ -1440,6 +1440,9 @@ body.guided-preview-active.mobile-step-3 .custom-override-panel .segment-setting
 
 .advanced-calendar-preview {
   min-width: 0;
+  position: sticky;
+  top: 5.35rem;
+  align-self: start;
 }
 
 .advanced-calendar-preview.is-hidden {
@@ -1447,15 +1450,11 @@ body.guided-preview-active.mobile-step-3 .custom-override-panel .segment-setting
 }
 
 .advanced-preview-shell {
-  position: sticky;
-  top: 5.35rem;
   border: 1px solid rgba(178, 198, 208, 0.56);
   border-radius: 18px;
   background: linear-gradient(180deg, rgba(255, 255, 255, 0.98) 0%, #f5fafc 100%);
   box-shadow: 0 12px 28px rgba(18, 59, 86, 0.08);
   padding: 1rem;
-  max-height: calc(100vh - 6.5rem);
-  overflow: auto;
 }
 
 .advanced-preview-shell--placeholder {
@@ -1568,7 +1567,11 @@ body.guided-preview-active.mobile-step-3 .custom-override-panel .segment-setting
 
   .advanced-preview-shell {
     position: static;
-    max-height: none;
+  }
+
+  .advanced-calendar-preview {
+    position: static;
+    top: auto;
   }
 }
 
