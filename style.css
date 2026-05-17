@@ -1298,6 +1298,12 @@ body.guided-preview-active.mobile-step-3 .advanced-taper-workspace {
   gap: 1.35rem;
 }
 
+body.guided-preview-active.mobile-step-3 .advanced-calendar-preview {
+  position: sticky;
+  top: 5.35rem;
+  align-self: start;
+}
+
 body.guided-preview-active.mobile-step-3 .custom-override-panel .input-table,
 body.guided-preview-active.mobile-step-3 .custom-override-panel .input-table tr,
 body.guided-preview-active.mobile-step-3 .custom-override-panel .input-table td {
@@ -1432,6 +1438,7 @@ body.guided-preview-active.mobile-step-3 .custom-override-panel .segment-setting
   grid-template-columns: minmax(0, 1.7fr) minmax(280px, 0.9fr);
   gap: 1.25rem;
   align-items: start;
+  overflow: visible;
 }
 
 .advanced-taper-editor {
@@ -1443,6 +1450,8 @@ body.guided-preview-active.mobile-step-3 .custom-override-panel .segment-setting
   position: sticky;
   top: 5.35rem;
   align-self: start;
+  height: fit-content;
+  overflow: visible;
 }
 
 .advanced-calendar-preview.is-hidden {
