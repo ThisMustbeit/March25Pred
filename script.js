@@ -2868,6 +2868,7 @@ const AppController = {
       DOMRefs.form.tabletStrengthC.addEventListener("input", UISetup.syncCustomSegmentStrengthSelectors);
       DOMRefs.form.addEventListener("input", UISetup.syncInputUnitAffixes);
       DOMRefs.form.addEventListener("change", UISetup.syncInputUnitAffixes);
+      DOMRefs.form.addEventListener("wheel", AppController.handleNumberInputWheel, { capture: true });
       DOMRefs.form.doseChangePerStep.addEventListener("input", () => UISetup.syncStandardTaperDerivedFields("auto"));
       DOMRefs.form.totalSteps.addEventListener("input", AppController.handleTotalStepsInput);
       DOMRefs.finalDoseInput.addEventListener("input", AppController.handleFinalDoseInput);
@@ -3012,6 +3013,15 @@ const AppController = {
     if (event.key !== "Enter") return;
     event.preventDefault();
     AppController.handleApplyConfigCode();
+  },
+
+  handleNumberInputWheel(event) {
+    const numberInput = event.target.closest('input[type="number"]');
+    if (!numberInput) return;
+
+    if (document.activeElement === numberInput) {
+      numberInput.blur();
+    }
   },
 
   handleAddCustomRow() {
