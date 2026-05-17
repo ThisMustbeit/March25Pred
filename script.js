@@ -2352,7 +2352,9 @@ const UISetup = {
 
     if (MobileFlow.isActive()) {
       const isAdvancedMode = DOMRefs.useCustomOverrideInput.value === "true";
-      const mobileTaperContainer = isAdvancedMode ? DOMRefs.customOverrideFieldset : DOMRefs.primaryTaperGroup;
+      const mobileTaperContainer = isAdvancedMode
+        ? DOMRefs.mobileAdvancedTaperTarget?.parentElement || DOMRefs.customOverrideFieldset
+        : DOMRefs.primaryTaperGroup;
       const mobileStartingDoseAnchor = isAdvancedMode
         ? DOMRefs.mobileAdvancedStartingDoseTarget
         : DOMRefs.mobileStartingDoseTarget;
