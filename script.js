@@ -2412,8 +2412,11 @@ const UISetup = {
       doseChangeDirectionButtons: [...row.querySelectorAll(".segment-direction-button")],
       daysPerStepInput: row.querySelector(".segment-days-per-step"),
       repeatsInput: row.querySelector(".segment-repeats"),
+      segmentBadgeEl: row.querySelector(".segment-badge"),
       segmentLabelEl: row.querySelector(".segment-label"),
       segmentDateRangeEl: row.querySelector(".segment-date-range"),
+      segmentSequenceEl: row.querySelector(".segment-sequence"),
+      segmentSequenceNoteEl: row.querySelector(".segment-sequence-note"),
       segmentGuidanceEl: row.querySelector(".segment-guidance"),
       startDoseEl: row.querySelector(".helper-dose-start"),
       endDoseEl: row.querySelector(".helper-dose-end"),
@@ -2476,10 +2479,12 @@ const UISetup = {
     [...DOMRefs.customSegmentBody.querySelectorAll("tr")].forEach((row, index) => {
       const fields = UISetup.getCustomRowFields(row);
       const isFirstSegment = index === 0;
+      const badgeLabel = isFirstSegment ? "Baseline" : `Segment ${index}`;
 
       fields.segmentLabelEl.textContent = isFirstSegment
         ? "Starting dose"
         : `${Formatters.ordinal(index)} Segment`;
+      fields.segmentBadgeEl.textContent = badgeLabel;
       row.classList.toggle("is-first-segment", isFirstSegment);
       fields.segmentGuidanceEl.hidden = !isFirstSegment;
       fields.settingsButton.setAttribute(
@@ -2601,6 +2606,8 @@ const UISetup = {
         fields.startDoseEl.textContent = "";
         fields.endDoseEl.textContent = "";
         fields.segmentDateRangeEl.textContent = "";
+        fields.segmentSequenceEl.textContent = "";
+        fields.segmentSequenceNoteEl.textContent = "";
         timelineIsValid = false;
         return;
       }
@@ -2615,6 +2622,41 @@ const UISetup = {
       fields.startDoseEl.textContent = Formatters.dose(startDose);
       fields.endDoseEl.textContent = Formatters.dose(endDose);
       const durationDays = (NumberUtils.parseOptionalInteger(fields.daysPerStepInput.value.trim()) || 0) * repeats;
+
+      if (isFirstSegment) {
+        fields.segmentSequenceEl.textContent = startDose == null ? "" : Formatters.dose(startDose);
+        fields.segmentSequenceNoteEl.textContent =
+          durationDays > 0 ? `Continue for ${durationDays} day${durationDays === 1 ? "" : "s"}` : "";
+      } else {
+        const previewDoses = [startDose];
+        let previewDose = startDose;
+        for (let repeatIndex = 0; repeatIndex < repeats; repeatIndex += 1) {
+          previewDose = NumberUtils.clamp(
+            previewDose + doseChange,
+            Number(APP_CONFIG.defaults.taper.minDoseClamp),
+            Number(APP_CONFIG.defaults.taper.maxDoseClamp)
+          );
+          previewDoses.push(previewDose);
+        }
+
+        const displayDoses =
+          previewDoses.length <= 4
+            ? previewDoses
+            : [previewDoses[0], previewDoses[1], previewDoses[2], previewDoses[previewDoses.length - 1]];
+
+        fields.segmentSequenceEl.textContent = displayDoses.map((dose) => Formatters.dose(dose)).join(" \u2192 ");
+        const directionLabel = doseChange < 0 ? "Reduce by" : doseChange > 0 ? "Increase by" : "Hold";
+        const amountLabel =
+          doseChange === 0 ? "No dose change" : `${directionLabel} ${Formatters.dose(Math.abs(doseChange))}`;
+        const cadenceLabel =
+          durationDays > 0
+            ? `${amountLabel} every ${NumberUtils.parseOptionalInteger(fields.daysPerStepInput.value.trim()) || 0} day${
+                (NumberUtils.parseOptionalInteger(fields.daysPerStepInput.value.trim()) || 0) === 1 ? "" : "s"
+              }`
+            : amountLabel;
+        const repeatsLabel = repeats > 1 ? ` across ${repeats} repeats` : "";
+        fields.segmentSequenceNoteEl.textContent = `${cadenceLabel}${repeatsLabel}`;
+      }
 
       if (timelineIsValid && durationDays > 0) {
         const segmentEndDate = DateUtils.addDays(segmentStartDate, durationDays - 1);
