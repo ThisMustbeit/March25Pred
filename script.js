@@ -1295,6 +1295,7 @@ const DOMRefs = {
   strengthLabelA: document.getElementById("strength-label-a"),
   strengthLabelB: document.getElementById("strength-label-b"),
   strengthLabelC: document.getElementById("strength-label-c"),
+  startingDoseLabel: document.getElementById("starting-dose-label"),
   strengthRowA: document.getElementById("strength-label-a")?.closest("label"),
   strengthRowB: document.getElementById("strength-label-b")?.closest("label"),
   strengthRowC: document.getElementById("strength-label-c")?.closest("label"),
@@ -2346,11 +2347,20 @@ const UISetup = {
     DOMRefs.primaryTaperGroup.classList.toggle("is-hidden", isVisible);
     DOMRefs.formGrid.classList.toggle("is-advanced-mode", isVisible);
     UISetup.syncTaperModeButtons();
+    UISetup.syncStartingDosePrompt();
     UISetup.syncMobileFieldPlacement();
     if (!isVisible) {
       UISetup.closeCustomSegmentSettings();
     }
     UISetup.syncAdvancedCalendarPreview();
+  },
+
+  syncStartingDosePrompt() {
+    if (!DOMRefs.startingDoseLabel) return;
+    const isAdvancedMode = DOMRefs.useCustomOverrideInput.value === "true";
+    DOMRefs.startingDoseLabel.textContent = isAdvancedMode
+      ? "What is the starting dose of the medication?"
+      : "Starting Daily Dose (mg)";
   },
 
   syncMobileFieldPlacement() {
@@ -2816,6 +2826,7 @@ const UISetup = {
       UISetup.syncTotalStepsMode();
       UISetup.syncStandardTaperDerivedFields("steps");
       UISetup.syncTaperModeButtons();
+      UISetup.syncStartingDosePrompt();
       UISetup.syncMedicationLabels();
       UISetup.syncCustomOverrideVisibility();
       UISetup.syncInputUnitAffixes();

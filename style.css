@@ -1439,6 +1439,10 @@ body.guided-preview-active.mobile-step-3 .custom-override-panel .input-table tr.
   content: "Options";
 }
 
+body.guided-preview-active.mobile-step-3 .custom-override-panel .input-table tr.custom-segment-row:not(.is-first-segment) td:nth-child(4)::before {
+  content: "Days Per Step";
+}
+
 body.guided-preview-active.mobile-step-3 .custom-override-panel .input-table tr.custom-segment-row.is-first-segment .segment-sequence {
   font-size: 1.6rem;
 }
@@ -1457,7 +1461,7 @@ body.guided-preview-active.mobile-step-3 .custom-override-panel .input-table td:
 }
 
 body.guided-preview-active.mobile-step-3 .custom-override-panel .input-table td:nth-child(4)::before {
-  content: "Days Per Step";
+  content: "What is the duration of the starting / initial dosage?";
 }
 
 body.guided-preview-active.mobile-step-3 .custom-override-panel .input-table td:nth-child(5)::before {
@@ -2823,7 +2827,7 @@ body.guided-preview-active.mobile-step-3 .custom-override-panel .segment-setting
   }
 
   body.mobile-flow-active.mobile-step-3 .custom-override-panel .input-table td:nth-child(4)::before {
-    content: "Days Per Step";
+    content: "What is the duration of the starting / initial dosage?";
   }
 
   body.mobile-flow-active.mobile-step-3 .custom-override-panel .input-table td:nth-child(5)::before {
@@ -2890,6 +2894,10 @@ body.guided-preview-active.mobile-step-3 .custom-override-panel .segment-setting
 
   body.mobile-flow-active.mobile-step-3 .custom-override-panel .input-table tr.custom-segment-row.is-first-segment td:nth-child(7)::before {
     content: "Options";
+  }
+
+  body.mobile-flow-active.mobile-step-3 .custom-override-panel .input-table tr.custom-segment-row:not(.is-first-segment) td:nth-child(4)::before {
+    content: "Days Per Step";
   }
 
   body.mobile-flow-active.mobile-step-3 .custom-override-panel .input-table tr.custom-segment-row.is-first-segment .segment-sequence {
