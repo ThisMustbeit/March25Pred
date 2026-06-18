@@ -1,0 +1,1311 @@
+﻿[
+    {
+        "Cell":  "A1",
+        "Style":  73,
+        "Type":  "s",
+        "Formula":  null,
+        "Value":  "Taper Calendar Generator"
+    },
+    {
+        "Cell":  "B1",
+        "Style":  74,
+        "Type":  null,
+        "Formula":  null,
+        "Value":  null
+    },
+    {
+        "Cell":  "C1",
+        "Style":  74,
+        "Type":  null,
+        "Formula":  null,
+        "Value":  null
+    },
+    {
+        "Cell":  "D1",
+        "Style":  74,
+        "Type":  null,
+        "Formula":  null,
+        "Value":  null
+    },
+    {
+        "Cell":  "A2",
+        "Style":  96,
+        "Type":  "s",
+        "Formula":  null,
+        "Value":  "Author: Antoine Morcos (can by reached at Antoine.Morcos@dal.ca) - Excel Spreadsheet last update as of March 23rd 2026!"
+    },
+    {
+        "Cell":  "B2",
+        "Style":  96,
+        "Type":  null,
+        "Formula":  null,
+        "Value":  null
+    },
+    {
+        "Cell":  "C2",
+        "Style":  96,
+        "Type":  null,
+        "Formula":  null,
+        "Value":  null
+    },
+    {
+        "Cell":  "D2",
+        "Style":  96,
+        "Type":  null,
+        "Formula":  null,
+        "Value":  null
+    },
+    {
+        "Cell":  "A3",
+        "Style":  75,
+        "Type":  "s",
+        "Formula":  null,
+        "Value":  "User Inputs (edit yellow cells)"
+    },
+    {
+        "Cell":  "B3",
+        "Style":  75,
+        "Type":  null,
+        "Formula":  null,
+        "Value":  null
+    },
+    {
+        "Cell":  "C3",
+        "Style":  75,
+        "Type":  null,
+        "Formula":  null,
+        "Value":  null
+    },
+    {
+        "Cell":  "D3",
+        "Style":  75,
+        "Type":  null,
+        "Formula":  null,
+        "Value":  null
+    },
+    {
+        "Cell":  "A4",
+        "Style":  27,
+        "Type":  "s",
+        "Formula":  null,
+        "Value":  "Display Calendar Month"
+    },
+    {
+        "Cell":  "B4",
+        "Style":  28,
+        "Type":  null,
+        "Formula":  null,
+        "Value":  "46113"
+    },
+    {
+        "Cell":  "C4",
+        "Style":  2,
+        "Type":  null,
+        "Formula":  null,
+        "Value":  null
+    },
+    {
+        "Cell":  "L4",
+        "Style":  75,
+        "Type":  "s",
+        "Formula":  null,
+        "Value":  "Dispensed Qty"
+    },
+    {
+        "Cell":  "M4",
+        "Style":  75,
+        "Type":  null,
+        "Formula":  null,
+        "Value":  null
+    },
+    {
+        "Cell":  "N4",
+        "Style":  75,
+        "Type":  null,
+        "Formula":  null,
+        "Value":  null
+    },
+    {
+        "Cell":  "O4",
+        "Style":  75,
+        "Type":  null,
+        "Formula":  null,
+        "Value":  null
+    },
+    {
+        "Cell":  "A5",
+        "Style":  27,
+        "Type":  "s",
+        "Formula":  null,
+        "Value":  "Taper start date"
+    },
+    {
+        "Cell":  "B5",
+        "Style":  34,
+        "Type":  null,
+        "Formula":  null,
+        "Value":  "46113"
+    },
+    {
+        "Cell":  "C5",
+        "Style":  2,
+        "Type":  null,
+        "Formula":  null,
+        "Value":  null
+    },
+    {
+        "Cell":  "N5",
+        "Style":  43,
+        "Type":  "s",
+        "Formula":  null,
+        "Value":  "Strength"
+    },
+    {
+        "Cell":  "O5",
+        "Style":  43,
+        "Type":  "s",
+        "Formula":  null,
+        "Value":  "Qty"
+    },
+    {
+        "Cell":  "A6",
+        "Style":  1,
+        "Type":  "s",
+        "Formula":  null,
+        "Value":  "Starting daily dose (mg)"
+    },
+    {
+        "Cell":  "B6",
+        "Style":  29,
+        "Type":  null,
+        "Formula":  null,
+        "Value":  "50"
+    },
+    {
+        "Cell":  "C6",
+        "Style":  2,
+        "Type":  null,
+        "Formula":  null,
+        "Value":  null
+    },
+    {
+        "Cell":  "L6",
+        "Style":  77,
+        "Type":  "s",
+        "Formula":  null,
+        "Value":  "Tablet A Strength"
+    },
+    {
+        "Cell":  "M6",
+        "Style":  78,
+        "Type":  null,
+        "Formula":  null,
+        "Value":  null
+    },
+    {
+        "Cell":  "N6",
+        "Style":  44,
+        "Type":  null,
+        "Formula":  "B10",
+        "Value":  "5"
+    },
+    {
+        "Cell":  "O6",
+        "Style":  45,
+        "Type":  null,
+        "Formula":  "SUM(Schedule!E2:E401)",
+        "Value":  "518"
+    },
+    {
+        "Cell":  "A7",
+        "Style":  27,
+        "Type":  "s",
+        "Formula":  null,
+        "Value":  "Dose change per step (mg)  (negative = taper OFF, positive = taper ON)"
+    },
+    {
+        "Cell":  "B7",
+        "Style":  30,
+        "Type":  null,
+        "Formula":  null,
+        "Value":  "-4"
+    },
+    {
+        "Cell":  "C7",
+        "Style":  2,
+        "Type":  null,
+        "Formula":  null,
+        "Value":  null
+    },
+    {
+        "Cell":  "L7",
+        "Style":  77,
+        "Type":  "s",
+        "Formula":  null,
+        "Value":  "Tablet B Strength"
+    },
+    {
+        "Cell":  "M7",
+        "Style":  78,
+        "Type":  null,
+        "Formula":  null,
+        "Value":  null
+    },
+    {
+        "Cell":  "N7",
+        "Style":  44,
+        "Type":  null,
+        "Formula":  "E10",
+        "Value":  "5"
+    },
+    {
+        "Cell":  "O7",
+        "Style":  45,
+        "Type":  null,
+        "Formula":  "SUM(Schedule!G2:G401)",
+        "Value":  "0"
+    },
+    {
+        "Cell":  "A8",
+        "Style":  1,
+        "Type":  "s",
+        "Formula":  null,
+        "Value":  "Days per step"
+    },
+    {
+        "Cell":  "B8",
+        "Style":  31,
+        "Type":  null,
+        "Formula":  null,
+        "Value":  "2"
+    },
+    {
+        "Cell":  "C8",
+        "Style":  2,
+        "Type":  null,
+        "Formula":  null,
+        "Value":  null
+    },
+    {
+        "Cell":  "L8",
+        "Style":  77,
+        "Type":  "s",
+        "Formula":  null,
+        "Value":  "Tablet C Strength"
+    },
+    {
+        "Cell":  "M8",
+        "Style":  78,
+        "Type":  null,
+        "Formula":  null,
+        "Value":  null
+    },
+    {
+        "Cell":  "N8",
+        "Style":  44,
+        "Type":  null,
+        "Formula":  "E11",
+        "Value":  "1"
+    },
+    {
+        "Cell":  "O8",
+        "Style":  45,
+        "Type":  null,
+        "Formula":  "SUM(Schedule!I2:I401)",
+        "Value":  "0"
+    },
+    {
+        "Cell":  "A9",
+        "Style":  27,
+        "Type":  "s",
+        "Formula":  null,
+        "Value":  "Total Taper Steps (til Discontinuation)"
+    },
+    {
+        "Cell":  "B9",
+        "Style":  32,
+        "Type":  null,
+        "Formula":  null,
+        "Value":  "30"
+    },
+    {
+        "Cell":  "C9",
+        "Style":  2,
+        "Type":  null,
+        "Formula":  null,
+        "Value":  null
+    },
+    {
+        "Cell":  "D9",
+        "Style":  22,
+        "Type":  "s",
+        "Formula":  null,
+        "Value":  "No. of Required Steps til Discontinuation"
+    },
+    {
+        "Cell":  "E9",
+        "Style":  32,
+        "Type":  null,
+        "Formula":  "ROUNDUP(ABS(B6/B7),0)",
+        "Value":  "13"
+    },
+    {
+        "Cell":  "A10",
+        "Style":  27,
+        "Type":  "s",
+        "Formula":  null,
+        "Value":  "Tablet A strength (mg) - Largest tablet"
+    },
+    {
+        "Cell":  "B10",
+        "Style":  29,
+        "Type":  null,
+        "Formula":  null,
+        "Value":  "5"
+    },
+    {
+        "Cell":  "C10",
+        "Style":  2,
+        "Type":  null,
+        "Formula":  null,
+        "Value":  null
+    },
+    {
+        "Cell":  "D10",
+        "Style":  22,
+        "Type":  "s",
+        "Formula":  null,
+        "Value":  "Tablet B strength (mg) - smaller tablet"
+    },
+    {
+        "Cell":  "E10",
+        "Style":  35,
+        "Type":  null,
+        "Formula":  null,
+        "Value":  "5"
+    },
+    {
+        "Cell":  "A11",
+        "Style":  1,
+        "Type":  "s",
+        "Formula":  null,
+        "Value":  "Minimum dose clamp (mg)"
+    },
+    {
+        "Cell":  "B11",
+        "Style":  33,
+        "Type":  null,
+        "Formula":  null,
+        "Value":  "0"
+    },
+    {
+        "Cell":  "C11",
+        "Style":  2,
+        "Type":  null,
+        "Formula":  null,
+        "Value":  null
+    },
+    {
+        "Cell":  "D11",
+        "Style":  22,
+        "Type":  "s",
+        "Formula":  null,
+        "Value":  "Tablet C strength (mg) - Smallest tablet"
+    },
+    {
+        "Cell":  "E11",
+        "Style":  35,
+        "Type":  null,
+        "Formula":  null,
+        "Value":  "1"
+    },
+    {
+        "Cell":  "A12",
+        "Style":  1,
+        "Type":  "s",
+        "Formula":  null,
+        "Value":  "Maximum dose clamp (mg)"
+    },
+    {
+        "Cell":  "B12",
+        "Style":  33,
+        "Type":  null,
+        "Formula":  null,
+        "Value":  "1000"
+    },
+    {
+        "Cell":  "C12",
+        "Style":  2,
+        "Type":  null,
+        "Formula":  null,
+        "Value":  null
+    },
+    {
+        "Cell":  "A13",
+        "Style":  1,
+        "Type":  "s",
+        "Formula":  null,
+        "Value":  "Tablet rounding increment (optional, e.g., 0.5). Leave blank for exact"
+    },
+    {
+        "Cell":  "B13",
+        "Style":  3,
+        "Type":  null,
+        "Formula":  null,
+        "Value":  null
+    },
+    {
+        "Cell":  "A15",
+        "Style":  76,
+        "Type":  "s",
+        "Formula":  null,
+        "Value":  "Derived (do not edit)"
+    },
+    {
+        "Cell":  "B15",
+        "Style":  74,
+        "Type":  null,
+        "Formula":  null,
+        "Value":  null
+    },
+    {
+        "Cell":  "C15",
+        "Style":  74,
+        "Type":  null,
+        "Formula":  null,
+        "Value":  null
+    },
+    {
+        "Cell":  "D15",
+        "Style":  74,
+        "Type":  null,
+        "Formula":  null,
+        "Value":  null
+    },
+    {
+        "Cell":  "G15",
+        "Style":  72,
+        "Type":  "s",
+        "Formula":  null,
+        "Value":  "Dispensing summary"
+    },
+    {
+        "Cell":  "H15",
+        "Style":  72,
+        "Type":  null,
+        "Formula":  null,
+        "Value":  null
+    },
+    {
+        "Cell":  "A16",
+        "Style":  1,
+        "Type":  "s",
+        "Formula":  null,
+        "Value":  "First day of display month"
+    },
+    {
+        "Cell":  "B16",
+        "Style":  4,
+        "Type":  null,
+        "Formula":  "$B$4-DAY($B$4)+1",
+        "Value":  "46113"
+    },
+    {
+        "Cell":  "G16",
+        "Style":  36,
+        "Type":  "s",
+        "Formula":  null,
+        "Value":  "Total tablets to dispense"
+    },
+    {
+        "Cell":  "H16",
+        "Style":  41,
+        "Type":  null,
+        "Formula":  null,
+        "Value":  null
+    },
+    {
+        "Cell":  "A17",
+        "Style":  1,
+        "Type":  "s",
+        "Formula":  null,
+        "Value":  "Offset to Sunday (0=Sun)"
+    },
+    {
+        "Cell":  "B17",
+        "Style":  5,
+        "Type":  null,
+        "Formula":  "WEEKDAY($B$16,1)-1",
+        "Value":  "3"
+    },
+    {
+        "Cell":  "G17",
+        "Style":  36,
+        "Type":  "s",
+        "Formula":  null,
+        "Value":  "Total mg dispensed"
+    },
+    {
+        "Cell":  "H17",
+        "Style":  41,
+        "Type":  null,
+        "Formula":  "H16*$B$10",
+        "Value":  "0"
+    },
+    {
+        "Cell":  "A18",
+        "Style":  1,
+        "Type":  "s",
+        "Formula":  null,
+        "Value":  "Grid start date (Sunday)"
+    },
+    {
+        "Cell":  "B18",
+        "Style":  4,
+        "Type":  null,
+        "Formula":  "$B$16-$B$17",
+        "Value":  "46110"
+    },
+    {
+        "Cell":  "G18",
+        "Style":  36,
+        "Type":  "s",
+        "Formula":  null,
+        "Value":  "Last daily dose (mg)"
+    },
+    {
+        "Cell":  "H18",
+        "Style":  41,
+        "Type":  null,
+        "Formula":  "IF($B$19=0,\"\",INDEX(Schedule!$D:$D,$B$19+1))",
+        "Value":  "0"
+    },
+    {
+        "Cell":  "A19",
+        "Style":  1,
+        "Type":  "s",
+        "Formula":  null,
+        "Value":  "Total days in taper"
+    },
+    {
+        "Cell":  "B19",
+        "Style":  5,
+        "Type":  null,
+        "Formula":  "IF($B$25=\"Yes\",SUMPRODUCT($C$29:$C$38,$D$29:$D$38),$B$8*$B$9)",
+        "Value":  "154"
+    },
+    {
+        "Cell":  "A20",
+        "Style":  1,
+        "Type":  "s",
+        "Formula":  null,
+        "Value":  "Taper end date (exclusive)"
+    },
+    {
+        "Cell":  "B20",
+        "Style":  4,
+        "Type":  null,
+        "Formula":  "$B$5+$B$19",
+        "Value":  "46267"
+    },
+    {
+        "Cell":  "A21",
+        "Style":  null,
+        "Type":  "s",
+        "Formula":  null,
+        "Value":  "Next month first day"
+    },
+    {
+        "Cell":  "B21",
+        "Style":  null,
+        "Type":  null,
+        "Formula":  "( $B$16+32 )-DAY( $B$16+32 )+1",
+        "Value":  "46143"
+    },
+    {
+        "Cell":  "A22",
+        "Style":  null,
+        "Type":  "s",
+        "Formula":  null,
+        "Value":  "Display month end (exclusive)"
+    },
+    {
+        "Cell":  "B22",
+        "Style":  null,
+        "Type":  null,
+        "Formula":  "$B$21",
+        "Value":  "46143"
+    },
+    {
+        "Cell":  "A24",
+        "Style":  72,
+        "Type":  "s",
+        "Formula":  null,
+        "Value":  "Custom taper override (optional)"
+    },
+    {
+        "Cell":  "B24",
+        "Style":  72,
+        "Type":  null,
+        "Formula":  null,
+        "Value":  null
+    },
+    {
+        "Cell":  "C24",
+        "Style":  72,
+        "Type":  null,
+        "Formula":  null,
+        "Value":  null
+    },
+    {
+        "Cell":  "D24",
+        "Style":  72,
+        "Type":  null,
+        "Formula":  null,
+        "Value":  null
+    },
+    {
+        "Cell":  "E24",
+        "Style":  72,
+        "Type":  null,
+        "Formula":  null,
+        "Value":  null
+    },
+    {
+        "Cell":  "F24",
+        "Style":  72,
+        "Type":  null,
+        "Formula":  null,
+        "Value":  null
+    },
+    {
+        "Cell":  "A25",
+        "Style":  36,
+        "Type":  "s",
+        "Formula":  null,
+        "Value":  "Enable custom override"
+    },
+    {
+        "Cell":  "B25",
+        "Style":  37,
+        "Type":  "s",
+        "Formula":  null,
+        "Value":  "Yes"
+    },
+    {
+        "Cell":  "C25",
+        "Style":  71,
+        "Type":  "s",
+        "Formula":  null,
+        "Value":  "Yes = use the custom rows below. No = use the usual taper fields in rows 7–9."
+    },
+    {
+        "Cell":  "D25",
+        "Style":  71,
+        "Type":  null,
+        "Formula":  null,
+        "Value":  null
+    },
+    {
+        "Cell":  "E25",
+        "Style":  71,
+        "Type":  null,
+        "Formula":  null,
+        "Value":  null
+    },
+    {
+        "Cell":  "F25",
+        "Style":  71,
+        "Type":  null,
+        "Formula":  null,
+        "Value":  null
+    },
+    {
+        "Cell":  "A26",
+        "Style":  71,
+        "Type":  "s",
+        "Formula":  null,
+        "Value":  "Row 1 takes effect on the taper start date. Use 0 mg in the first row if you want to hold the starting dose first. \"Repeats\" means how many times to apply the same change for the same number of days."
+    },
+    {
+        "Cell":  "B26",
+        "Style":  71,
+        "Type":  null,
+        "Formula":  null,
+        "Value":  null
+    },
+    {
+        "Cell":  "C26",
+        "Style":  71,
+        "Type":  null,
+        "Formula":  null,
+        "Value":  null
+    },
+    {
+        "Cell":  "D26",
+        "Style":  71,
+        "Type":  null,
+        "Formula":  null,
+        "Value":  null
+    },
+    {
+        "Cell":  "E26",
+        "Style":  71,
+        "Type":  null,
+        "Formula":  null,
+        "Value":  null
+    },
+    {
+        "Cell":  "F26",
+        "Style":  71,
+        "Type":  null,
+        "Formula":  null,
+        "Value":  null
+    },
+    {
+        "Cell":  "A27",
+        "Style":  71,
+        "Type":  null,
+        "Formula":  null,
+        "Value":  null
+    },
+    {
+        "Cell":  "B27",
+        "Style":  71,
+        "Type":  null,
+        "Formula":  null,
+        "Value":  null
+    },
+    {
+        "Cell":  "C27",
+        "Style":  71,
+        "Type":  null,
+        "Formula":  null,
+        "Value":  null
+    },
+    {
+        "Cell":  "D27",
+        "Style":  71,
+        "Type":  null,
+        "Formula":  null,
+        "Value":  null
+    },
+    {
+        "Cell":  "E27",
+        "Style":  71,
+        "Type":  null,
+        "Formula":  null,
+        "Value":  null
+    },
+    {
+        "Cell":  "F27",
+        "Style":  71,
+        "Type":  null,
+        "Formula":  null,
+        "Value":  null
+    },
+    {
+        "Cell":  "A28",
+        "Style":  38,
+        "Type":  "s",
+        "Formula":  null,
+        "Value":  "Segment"
+    },
+    {
+        "Cell":  "B28",
+        "Style":  38,
+        "Type":  "s",
+        "Formula":  null,
+        "Value":  "Dose change (mg)"
+    },
+    {
+        "Cell":  "C28",
+        "Style":  38,
+        "Type":  "s",
+        "Formula":  null,
+        "Value":  "Days per step"
+    },
+    {
+        "Cell":  "D28",
+        "Style":  38,
+        "Type":  "s",
+        "Formula":  null,
+        "Value":  "Repeats"
+    },
+    {
+        "Cell":  "E28",
+        "Style":  38,
+        "Type":  "s",
+        "Formula":  null,
+        "Value":  "Dose before (mg)"
+    },
+    {
+        "Cell":  "F28",
+        "Style":  38,
+        "Type":  "s",
+        "Formula":  null,
+        "Value":  "Dose after (mg)"
+    },
+    {
+        "Cell":  "A29",
+        "Style":  36,
+        "Type":  "s",
+        "Formula":  null,
+        "Value":  "Taper Step 0"
+    },
+    {
+        "Cell":  "B29",
+        "Style":  39,
+        "Type":  null,
+        "Formula":  null,
+        "Value":  "0"
+    },
+    {
+        "Cell":  "C29",
+        "Style":  40,
+        "Type":  null,
+        "Formula":  null,
+        "Value":  "7"
+    },
+    {
+        "Cell":  "D29",
+        "Style":  40,
+        "Type":  null,
+        "Formula":  null,
+        "Value":  "1"
+    },
+    {
+        "Cell":  "E29",
+        "Style":  41,
+        "Type":  null,
+        "Formula":  "IF(COUNTA(B29:D29)=0,\"\",MIN($B$12,MAX($B$11,$B$6)))",
+        "Value":  "50"
+    },
+    {
+        "Cell":  "F29",
+        "Style":  41,
+        "Type":  null,
+        "Formula":  "IF(E29=\"\",\"\",MIN($B$12,MAX($B$11,E29+B29*D29)))",
+        "Value":  "50"
+    },
+    {
+        "Cell":  "A30",
+        "Style":  36,
+        "Type":  "s",
+        "Formula":  null,
+        "Value":  "Taper Step 1"
+    },
+    {
+        "Cell":  "B30",
+        "Style":  39,
+        "Type":  null,
+        "Formula":  null,
+        "Value":  "-10"
+    },
+    {
+        "Cell":  "C30",
+        "Style":  40,
+        "Type":  null,
+        "Formula":  null,
+        "Value":  "7"
+    },
+    {
+        "Cell":  "D30",
+        "Style":  40,
+        "Type":  null,
+        "Formula":  null,
+        "Value":  "1"
+    },
+    {
+        "Cell":  "E30",
+        "Style":  41,
+        "Type":  null,
+        "Formula":  "IF(COUNTA(B30:D30)=0,\"\",MIN($B$12,MAX($B$11,$B$6+SUMPRODUCT($B$29:B29,$D$29:D29))))",
+        "Value":  "50"
+    },
+    {
+        "Cell":  "F30",
+        "Style":  41,
+        "Type":  null,
+        "Formula":  "",
+        "Value":  "40"
+    },
+    {
+        "Cell":  "A31",
+        "Style":  36,
+        "Type":  "s",
+        "Formula":  null,
+        "Value":  "Taper Step 2"
+    },
+    {
+        "Cell":  "B31",
+        "Style":  39,
+        "Type":  null,
+        "Formula":  null,
+        "Value":  "-5"
+    },
+    {
+        "Cell":  "C31",
+        "Style":  40,
+        "Type":  null,
+        "Formula":  null,
+        "Value":  "14"
+    },
+    {
+        "Cell":  "D31",
+        "Style":  40,
+        "Type":  null,
+        "Formula":  null,
+        "Value":  "10"
+    },
+    {
+        "Cell":  "E31",
+        "Style":  41,
+        "Type":  null,
+        "Formula":  "IF(COUNTA(B31:D31)=0,\"\",MIN($B$12,MAX($B$11,$B$6+SUMPRODUCT($B$29:B30,$D$29:D30))))",
+        "Value":  "40"
+    },
+    {
+        "Cell":  "F31",
+        "Style":  41,
+        "Type":  null,
+        "Formula":  "",
+        "Value":  "0"
+    },
+    {
+        "Cell":  "A32",
+        "Style":  36,
+        "Type":  "s",
+        "Formula":  null,
+        "Value":  "Taper Step 3"
+    },
+    {
+        "Cell":  "B32",
+        "Style":  39,
+        "Type":  null,
+        "Formula":  null,
+        "Value":  null
+    },
+    {
+        "Cell":  "C32",
+        "Style":  40,
+        "Type":  null,
+        "Formula":  null,
+        "Value":  null
+    },
+    {
+        "Cell":  "D32",
+        "Style":  40,
+        "Type":  null,
+        "Formula":  null,
+        "Value":  null
+    },
+    {
+        "Cell":  "E32",
+        "Style":  41,
+        "Type":  "str",
+        "Formula":  "IF(COUNTA(B32:D32)=0,\"\",MIN($B$12,MAX($B$11,$B$6+SUMPRODUCT($B$29:B31,$D$29:D31))))",
+        "Value":  ""
+    },
+    {
+        "Cell":  "F32",
+        "Style":  41,
+        "Type":  "str",
+        "Formula":  "",
+        "Value":  ""
+    },
+    {
+        "Cell":  "A33",
+        "Style":  36,
+        "Type":  "s",
+        "Formula":  null,
+        "Value":  "Taper Step 4"
+    },
+    {
+        "Cell":  "B33",
+        "Style":  39,
+        "Type":  null,
+        "Formula":  null,
+        "Value":  null
+    },
+    {
+        "Cell":  "C33",
+        "Style":  40,
+        "Type":  null,
+        "Formula":  null,
+        "Value":  null
+    },
+    {
+        "Cell":  "D33",
+        "Style":  40,
+        "Type":  null,
+        "Formula":  null,
+        "Value":  null
+    },
+    {
+        "Cell":  "E33",
+        "Style":  41,
+        "Type":  "str",
+        "Formula":  "IF(COUNTA(B33:D33)=0,\"\",MIN($B$12,MAX($B$11,$B$6+SUMPRODUCT($B$29:B32,$D$29:D32))))",
+        "Value":  ""
+    },
+    {
+        "Cell":  "F33",
+        "Style":  41,
+        "Type":  "str",
+        "Formula":  "",
+        "Value":  ""
+    },
+    {
+        "Cell":  "A34",
+        "Style":  36,
+        "Type":  "s",
+        "Formula":  null,
+        "Value":  "Taper Step 5"
+    },
+    {
+        "Cell":  "B34",
+        "Style":  39,
+        "Type":  null,
+        "Formula":  null,
+        "Value":  null
+    },
+    {
+        "Cell":  "C34",
+        "Style":  40,
+        "Type":  null,
+        "Formula":  null,
+        "Value":  null
+    },
+    {
+        "Cell":  "D34",
+        "Style":  40,
+        "Type":  null,
+        "Formula":  null,
+        "Value":  null
+    },
+    {
+        "Cell":  "E34",
+        "Style":  41,
+        "Type":  "str",
+        "Formula":  "IF(COUNTA(B34:D34)=0,\"\",MIN($B$12,MAX($B$11,$B$6+SUMPRODUCT($B$29:B33,$D$29:D33))))",
+        "Value":  ""
+    },
+    {
+        "Cell":  "F34",
+        "Style":  41,
+        "Type":  "str",
+        "Formula":  "",
+        "Value":  ""
+    },
+    {
+        "Cell":  "A35",
+        "Style":  36,
+        "Type":  "s",
+        "Formula":  null,
+        "Value":  "Taper Step 6"
+    },
+    {
+        "Cell":  "B35",
+        "Style":  39,
+        "Type":  null,
+        "Formula":  null,
+        "Value":  null
+    },
+    {
+        "Cell":  "C35",
+        "Style":  40,
+        "Type":  null,
+        "Formula":  null,
+        "Value":  null
+    },
+    {
+        "Cell":  "D35",
+        "Style":  40,
+        "Type":  null,
+        "Formula":  null,
+        "Value":  null
+    },
+    {
+        "Cell":  "E35",
+        "Style":  41,
+        "Type":  "str",
+        "Formula":  "IF(COUNTA(B35:D35)=0,\"\",MIN($B$12,MAX($B$11,$B$6+SUMPRODUCT($B$29:B34,$D$29:D34))))",
+        "Value":  ""
+    },
+    {
+        "Cell":  "F35",
+        "Style":  41,
+        "Type":  "str",
+        "Formula":  "",
+        "Value":  ""
+    },
+    {
+        "Cell":  "A36",
+        "Style":  36,
+        "Type":  "s",
+        "Formula":  null,
+        "Value":  "Taper Step 7"
+    },
+    {
+        "Cell":  "B36",
+        "Style":  39,
+        "Type":  null,
+        "Formula":  null,
+        "Value":  null
+    },
+    {
+        "Cell":  "C36",
+        "Style":  40,
+        "Type":  null,
+        "Formula":  null,
+        "Value":  null
+    },
+    {
+        "Cell":  "D36",
+        "Style":  40,
+        "Type":  null,
+        "Formula":  null,
+        "Value":  null
+    },
+    {
+        "Cell":  "E36",
+        "Style":  41,
+        "Type":  "str",
+        "Formula":  "IF(COUNTA(B36:D36)=0,\"\",MIN($B$12,MAX($B$11,$B$6+SUMPRODUCT($B$29:B35,$D$29:D35))))",
+        "Value":  ""
+    },
+    {
+        "Cell":  "F36",
+        "Style":  41,
+        "Type":  "str",
+        "Formula":  "",
+        "Value":  ""
+    },
+    {
+        "Cell":  "A37",
+        "Style":  36,
+        "Type":  "s",
+        "Formula":  null,
+        "Value":  "Taper Step 8"
+    },
+    {
+        "Cell":  "B37",
+        "Style":  39,
+        "Type":  null,
+        "Formula":  null,
+        "Value":  null
+    },
+    {
+        "Cell":  "C37",
+        "Style":  40,
+        "Type":  null,
+        "Formula":  null,
+        "Value":  null
+    },
+    {
+        "Cell":  "D37",
+        "Style":  40,
+        "Type":  null,
+        "Formula":  null,
+        "Value":  null
+    },
+    {
+        "Cell":  "E37",
+        "Style":  41,
+        "Type":  "str",
+        "Formula":  "IF(COUNTA(B37:D37)=0,\"\",MIN($B$12,MAX($B$11,$B$6+SUMPRODUCT($B$29:B36,$D$29:D36))))",
+        "Value":  ""
+    },
+    {
+        "Cell":  "F37",
+        "Style":  41,
+        "Type":  "str",
+        "Formula":  "",
+        "Value":  ""
+    },
+    {
+        "Cell":  "A38",
+        "Style":  36,
+        "Type":  "s",
+        "Formula":  null,
+        "Value":  "Taper Step 9"
+    },
+    {
+        "Cell":  "B38",
+        "Style":  39,
+        "Type":  null,
+        "Formula":  null,
+        "Value":  null
+    },
+    {
+        "Cell":  "C38",
+        "Style":  40,
+        "Type":  null,
+        "Formula":  null,
+        "Value":  null
+    },
+    {
+        "Cell":  "D38",
+        "Style":  40,
+        "Type":  null,
+        "Formula":  null,
+        "Value":  null
+    },
+    {
+        "Cell":  "E38",
+        "Style":  41,
+        "Type":  "str",
+        "Formula":  "IF(COUNTA(B38:D38)=0,\"\",MIN($B$12,MAX($B$11,$B$6+SUMPRODUCT($B$29:B37,$D$29:D37))))",
+        "Value":  ""
+    },
+    {
+        "Cell":  "F38",
+        "Style":  41,
+        "Type":  "str",
+        "Formula":  "",
+        "Value":  ""
+    },
+    {
+        "Cell":  "A39",
+        "Style":  71,
+        "Type":  "s",
+        "Formula":  null,
+        "Value":  "Example: -10 mg for 14 days once; then -5 mg every 7 days for 4 repeats; then -1 mg every 7 days for 3 repeats."
+    },
+    {
+        "Cell":  "B39",
+        "Style":  71,
+        "Type":  null,
+        "Formula":  null,
+        "Value":  null
+    },
+    {
+        "Cell":  "C39",
+        "Style":  71,
+        "Type":  null,
+        "Formula":  null,
+        "Value":  null
+    },
+    {
+        "Cell":  "D39",
+        "Style":  71,
+        "Type":  null,
+        "Formula":  null,
+        "Value":  null
+    },
+    {
+        "Cell":  "E39",
+        "Style":  71,
+        "Type":  null,
+        "Formula":  null,
+        "Value":  null
+    },
+    {
+        "Cell":  "F39",
+        "Style":  71,
+        "Type":  null,
+        "Formula":  null,
+        "Value":  null
+    }
+]

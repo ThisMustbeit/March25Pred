@@ -1,0 +1,1276 @@
+﻿[
+    {
+        "Cell":  "A1",
+        "Style":  94,
+        "Type":  "s",
+        "Formula":  null,
+        "Value":  "Medication Taper Calendar"
+    },
+    {
+        "Cell":  "B1",
+        "Style":  74,
+        "Type":  null,
+        "Formula":  null,
+        "Value":  null
+    },
+    {
+        "Cell":  "C1",
+        "Style":  74,
+        "Type":  null,
+        "Formula":  null,
+        "Value":  null
+    },
+    {
+        "Cell":  "D1",
+        "Style":  74,
+        "Type":  null,
+        "Formula":  null,
+        "Value":  null
+    },
+    {
+        "Cell":  "E1",
+        "Style":  74,
+        "Type":  null,
+        "Formula":  null,
+        "Value":  null
+    },
+    {
+        "Cell":  "F1",
+        "Style":  74,
+        "Type":  null,
+        "Formula":  null,
+        "Value":  null
+    },
+    {
+        "Cell":  "G1",
+        "Style":  74,
+        "Type":  null,
+        "Formula":  null,
+        "Value":  null
+    },
+    {
+        "Cell":  "A2",
+        "Style":  95,
+        "Type":  null,
+        "Formula":  "Inputs!$B$16",
+        "Value":  "46113"
+    },
+    {
+        "Cell":  "B2",
+        "Style":  74,
+        "Type":  null,
+        "Formula":  null,
+        "Value":  null
+    },
+    {
+        "Cell":  "C2",
+        "Style":  74,
+        "Type":  null,
+        "Formula":  null,
+        "Value":  null
+    },
+    {
+        "Cell":  "D2",
+        "Style":  74,
+        "Type":  null,
+        "Formula":  null,
+        "Value":  null
+    },
+    {
+        "Cell":  "E2",
+        "Style":  74,
+        "Type":  null,
+        "Formula":  null,
+        "Value":  null
+    },
+    {
+        "Cell":  "F2",
+        "Style":  74,
+        "Type":  null,
+        "Formula":  null,
+        "Value":  null
+    },
+    {
+        "Cell":  "G2",
+        "Style":  74,
+        "Type":  null,
+        "Formula":  null,
+        "Value":  null
+    },
+    {
+        "Cell":  "A3",
+        "Style":  6,
+        "Type":  "s",
+        "Formula":  null,
+        "Value":  "Sunday"
+    },
+    {
+        "Cell":  "B3",
+        "Style":  6,
+        "Type":  "s",
+        "Formula":  null,
+        "Value":  "Monday"
+    },
+    {
+        "Cell":  "C3",
+        "Style":  6,
+        "Type":  "s",
+        "Formula":  null,
+        "Value":  "Tuesday"
+    },
+    {
+        "Cell":  "D3",
+        "Style":  6,
+        "Type":  "s",
+        "Formula":  null,
+        "Value":  "Wednesday"
+    },
+    {
+        "Cell":  "E3",
+        "Style":  6,
+        "Type":  "s",
+        "Formula":  null,
+        "Value":  "Thursday"
+    },
+    {
+        "Cell":  "F3",
+        "Style":  6,
+        "Type":  "s",
+        "Formula":  null,
+        "Value":  "Friday"
+    },
+    {
+        "Cell":  "G3",
+        "Style":  6,
+        "Type":  "s",
+        "Formula":  null,
+        "Value":  "Saturday"
+    },
+    {
+        "Cell":  "A4",
+        "Style":  11,
+        "Type":  "str",
+        "Formula":  "IF(AND(Inputs!$B$18+0\u003e=Inputs!$B$16,Inputs!$B$18+0\u003cInputs!$B$22),Inputs!$B$18+0,\"\")",
+        "Value":  ""
+    },
+    {
+        "Cell":  "B4",
+        "Style":  12,
+        "Type":  "str",
+        "Formula":  "IF(AND(Inputs!$B$18+1\u003e=Inputs!$B$16,Inputs!$B$18+1\u003cInputs!$B$22),Inputs!$B$18+1,\"\")",
+        "Value":  ""
+    },
+    {
+        "Cell":  "C4",
+        "Style":  12,
+        "Type":  "str",
+        "Formula":  "IF(AND(Inputs!$B$18+2\u003e=Inputs!$B$16,Inputs!$B$18+2\u003cInputs!$B$22),Inputs!$B$18+2,\"\")",
+        "Value":  ""
+    },
+    {
+        "Cell":  "D4",
+        "Style":  12,
+        "Type":  null,
+        "Formula":  "IF(AND(Inputs!$B$18+3\u003e=Inputs!$B$16,Inputs!$B$18+3\u003cInputs!$B$22),Inputs!$B$18+3,\"\")",
+        "Value":  "46113"
+    },
+    {
+        "Cell":  "E4",
+        "Style":  12,
+        "Type":  null,
+        "Formula":  "IF(AND(Inputs!$B$18+4\u003e=Inputs!$B$16,Inputs!$B$18+4\u003cInputs!$B$22),Inputs!$B$18+4,\"\")",
+        "Value":  "46114"
+    },
+    {
+        "Cell":  "F4",
+        "Style":  12,
+        "Type":  null,
+        "Formula":  "IF(AND(Inputs!$B$18+5\u003e=Inputs!$B$16,Inputs!$B$18+5\u003cInputs!$B$22),Inputs!$B$18+5,\"\")",
+        "Value":  "46115"
+    },
+    {
+        "Cell":  "G4",
+        "Style":  13,
+        "Type":  null,
+        "Formula":  "IF(AND(Inputs!$B$18+6\u003e=Inputs!$B$16,Inputs!$B$18+6\u003cInputs!$B$22),Inputs!$B$18+6,\"\")",
+        "Value":  "46116"
+    },
+    {
+        "Cell":  "A5",
+        "Style":  89,
+        "Type":  "str",
+        "Formula":  "IF(A4=\"\",\"\",IFERROR(VLOOKUP(A4,Schedule!$A:$K,9,FALSE),\"\"))",
+        "Value":  ""
+    },
+    {
+        "Cell":  "B5",
+        "Style":  89,
+        "Type":  "str",
+        "Formula":  "IF(B4=\"\",\"\",IFERROR(VLOOKUP(B4,Schedule!$A:$K,9,FALSE),\"\"))",
+        "Value":  ""
+    },
+    {
+        "Cell":  "C5",
+        "Style":  89,
+        "Type":  "str",
+        "Formula":  "IF(C4=\"\",\"\",IFERROR(VLOOKUP(C4,Schedule!$A:$K,9,FALSE),\"\"))",
+        "Value":  ""
+    },
+    {
+        "Cell":  "D5",
+        "Style":  89,
+        "Type":  null,
+        "Formula":  "IF(D4=\"\",\"\",IFERROR(VLOOKUP(D4,Schedule!$A:$K,9,FALSE),\"\"))",
+        "Value":  "0"
+    },
+    {
+        "Cell":  "E5",
+        "Style":  89,
+        "Type":  null,
+        "Formula":  "IF(E4=\"\",\"\",IFERROR(VLOOKUP(E4,Schedule!$A:$K,9,FALSE),\"\"))",
+        "Value":  "0"
+    },
+    {
+        "Cell":  "F5",
+        "Style":  89,
+        "Type":  null,
+        "Formula":  "IF(F4=\"\",\"\",IFERROR(VLOOKUP(F4,Schedule!$A:$K,9,FALSE),\"\"))",
+        "Value":  "0"
+    },
+    {
+        "Cell":  "G5",
+        "Style":  89,
+        "Type":  null,
+        "Formula":  "IF(G4=\"\",\"\",IFERROR(VLOOKUP(G4,Schedule!$A:$K,9,FALSE),\"\"))",
+        "Value":  "0"
+    },
+    {
+        "Cell":  "A6",
+        "Style":  90,
+        "Type":  null,
+        "Formula":  null,
+        "Value":  null
+    },
+    {
+        "Cell":  "B6",
+        "Style":  90,
+        "Type":  null,
+        "Formula":  null,
+        "Value":  null
+    },
+    {
+        "Cell":  "C6",
+        "Style":  90,
+        "Type":  null,
+        "Formula":  null,
+        "Value":  null
+    },
+    {
+        "Cell":  "D6",
+        "Style":  90,
+        "Type":  null,
+        "Formula":  null,
+        "Value":  null
+    },
+    {
+        "Cell":  "E6",
+        "Style":  90,
+        "Type":  null,
+        "Formula":  null,
+        "Value":  null
+    },
+    {
+        "Cell":  "F6",
+        "Style":  90,
+        "Type":  null,
+        "Formula":  null,
+        "Value":  null
+    },
+    {
+        "Cell":  "G6",
+        "Style":  90,
+        "Type":  null,
+        "Formula":  null,
+        "Value":  null
+    },
+    {
+        "Cell":  "A7",
+        "Style":  14,
+        "Type":  null,
+        "Formula":  "IF(AND(Inputs!$B$18+7\u003e=Inputs!$B$16,Inputs!$B$18+7\u003cInputs!$B$22),Inputs!$B$18+7,\"\")",
+        "Value":  "46117"
+    },
+    {
+        "Cell":  "B7",
+        "Style":  15,
+        "Type":  null,
+        "Formula":  "IF(AND(Inputs!$B$18+8\u003e=Inputs!$B$16,Inputs!$B$18+8\u003cInputs!$B$22),Inputs!$B$18+8,\"\")",
+        "Value":  "46118"
+    },
+    {
+        "Cell":  "C7",
+        "Style":  15,
+        "Type":  null,
+        "Formula":  "IF(AND(Inputs!$B$18+9\u003e=Inputs!$B$16,Inputs!$B$18+9\u003cInputs!$B$22),Inputs!$B$18+9,\"\")",
+        "Value":  "46119"
+    },
+    {
+        "Cell":  "D7",
+        "Style":  15,
+        "Type":  null,
+        "Formula":  "IF(AND(Inputs!$B$18+10\u003e=Inputs!$B$16,Inputs!$B$18+10\u003cInputs!$B$22),Inputs!$B$18+10,\"\")",
+        "Value":  "46120"
+    },
+    {
+        "Cell":  "E7",
+        "Style":  15,
+        "Type":  null,
+        "Formula":  "IF(AND(Inputs!$B$18+11\u003e=Inputs!$B$16,Inputs!$B$18+11\u003cInputs!$B$22),Inputs!$B$18+11,\"\")",
+        "Value":  "46121"
+    },
+    {
+        "Cell":  "F7",
+        "Style":  15,
+        "Type":  null,
+        "Formula":  "IF(AND(Inputs!$B$18+12\u003e=Inputs!$B$16,Inputs!$B$18+12\u003cInputs!$B$22),Inputs!$B$18+12,\"\")",
+        "Value":  "46122"
+    },
+    {
+        "Cell":  "G7",
+        "Style":  16,
+        "Type":  null,
+        "Formula":  "IF(AND(Inputs!$B$18+13\u003e=Inputs!$B$16,Inputs!$B$18+13\u003cInputs!$B$22),Inputs!$B$18+13,\"\")",
+        "Value":  "46123"
+    },
+    {
+        "Cell":  "A8",
+        "Style":  87,
+        "Type":  null,
+        "Formula":  "IF(A7=\"\",\"\",IFERROR(VLOOKUP(A7,Schedule!$A:$K,9,FALSE),\"\"))",
+        "Value":  "0"
+    },
+    {
+        "Cell":  "B8",
+        "Style":  87,
+        "Type":  null,
+        "Formula":  "IF(B7=\"\",\"\",IFERROR(VLOOKUP(B7,Schedule!$A:$K,9,FALSE),\"\"))",
+        "Value":  "0"
+    },
+    {
+        "Cell":  "C8",
+        "Style":  87,
+        "Type":  null,
+        "Formula":  "IF(C7=\"\",\"\",IFERROR(VLOOKUP(C7,Schedule!$A:$K,9,FALSE),\"\"))",
+        "Value":  "0"
+    },
+    {
+        "Cell":  "D8",
+        "Style":  87,
+        "Type":  null,
+        "Formula":  "IF(D7=\"\",\"\",IFERROR(VLOOKUP(D7,Schedule!$A:$K,9,FALSE),\"\"))",
+        "Value":  "0"
+    },
+    {
+        "Cell":  "E8",
+        "Style":  87,
+        "Type":  null,
+        "Formula":  "IF(E7=\"\",\"\",IFERROR(VLOOKUP(E7,Schedule!$A:$K,9,FALSE),\"\"))",
+        "Value":  "0"
+    },
+    {
+        "Cell":  "F8",
+        "Style":  87,
+        "Type":  null,
+        "Formula":  "IF(F7=\"\",\"\",IFERROR(VLOOKUP(F7,Schedule!$A:$K,9,FALSE),\"\"))",
+        "Value":  "0"
+    },
+    {
+        "Cell":  "G8",
+        "Style":  87,
+        "Type":  null,
+        "Formula":  "IF(G7=\"\",\"\",IFERROR(VLOOKUP(G7,Schedule!$A:$K,9,FALSE),\"\"))",
+        "Value":  "0"
+    },
+    {
+        "Cell":  "A9",
+        "Style":  88,
+        "Type":  null,
+        "Formula":  null,
+        "Value":  null
+    },
+    {
+        "Cell":  "B9",
+        "Style":  88,
+        "Type":  null,
+        "Formula":  null,
+        "Value":  null
+    },
+    {
+        "Cell":  "C9",
+        "Style":  88,
+        "Type":  null,
+        "Formula":  null,
+        "Value":  null
+    },
+    {
+        "Cell":  "D9",
+        "Style":  88,
+        "Type":  null,
+        "Formula":  null,
+        "Value":  null
+    },
+    {
+        "Cell":  "E9",
+        "Style":  88,
+        "Type":  null,
+        "Formula":  null,
+        "Value":  null
+    },
+    {
+        "Cell":  "F9",
+        "Style":  88,
+        "Type":  null,
+        "Formula":  null,
+        "Value":  null
+    },
+    {
+        "Cell":  "G9",
+        "Style":  88,
+        "Type":  null,
+        "Formula":  null,
+        "Value":  null
+    },
+    {
+        "Cell":  "A10",
+        "Style":  14,
+        "Type":  null,
+        "Formula":  "IF(AND(Inputs!$B$18+14\u003e=Inputs!$B$16,Inputs!$B$18+14\u003cInputs!$B$22),Inputs!$B$18+14,\"\")",
+        "Value":  "46124"
+    },
+    {
+        "Cell":  "B10",
+        "Style":  15,
+        "Type":  null,
+        "Formula":  "IF(AND(Inputs!$B$18+15\u003e=Inputs!$B$16,Inputs!$B$18+15\u003cInputs!$B$22),Inputs!$B$18+15,\"\")",
+        "Value":  "46125"
+    },
+    {
+        "Cell":  "C10",
+        "Style":  15,
+        "Type":  null,
+        "Formula":  "IF(AND(Inputs!$B$18+16\u003e=Inputs!$B$16,Inputs!$B$18+16\u003cInputs!$B$22),Inputs!$B$18+16,\"\")",
+        "Value":  "46126"
+    },
+    {
+        "Cell":  "D10",
+        "Style":  15,
+        "Type":  null,
+        "Formula":  "IF(AND(Inputs!$B$18+17\u003e=Inputs!$B$16,Inputs!$B$18+17\u003cInputs!$B$22),Inputs!$B$18+17,\"\")",
+        "Value":  "46127"
+    },
+    {
+        "Cell":  "E10",
+        "Style":  15,
+        "Type":  null,
+        "Formula":  "IF(AND(Inputs!$B$18+18\u003e=Inputs!$B$16,Inputs!$B$18+18\u003cInputs!$B$22),Inputs!$B$18+18,\"\")",
+        "Value":  "46128"
+    },
+    {
+        "Cell":  "F10",
+        "Style":  15,
+        "Type":  null,
+        "Formula":  "IF(AND(Inputs!$B$18+19\u003e=Inputs!$B$16,Inputs!$B$18+19\u003cInputs!$B$22),Inputs!$B$18+19,\"\")",
+        "Value":  "46129"
+    },
+    {
+        "Cell":  "G10",
+        "Style":  16,
+        "Type":  null,
+        "Formula":  "IF(AND(Inputs!$B$18+20\u003e=Inputs!$B$16,Inputs!$B$18+20\u003cInputs!$B$22),Inputs!$B$18+20,\"\")",
+        "Value":  "46130"
+    },
+    {
+        "Cell":  "A11",
+        "Style":  87,
+        "Type":  null,
+        "Formula":  "IF(A10=\"\",\"\",IFERROR(VLOOKUP(A10,Schedule!$A:$K,9,FALSE),\"\"))",
+        "Value":  "0"
+    },
+    {
+        "Cell":  "B11",
+        "Style":  87,
+        "Type":  null,
+        "Formula":  "IF(B10=\"\",\"\",IFERROR(VLOOKUP(B10,Schedule!$A:$K,9,FALSE),\"\"))",
+        "Value":  "0"
+    },
+    {
+        "Cell":  "C11",
+        "Style":  87,
+        "Type":  null,
+        "Formula":  "IF(C10=\"\",\"\",IFERROR(VLOOKUP(C10,Schedule!$A:$K,9,FALSE),\"\"))",
+        "Value":  "0"
+    },
+    {
+        "Cell":  "D11",
+        "Style":  87,
+        "Type":  null,
+        "Formula":  "IF(D10=\"\",\"\",IFERROR(VLOOKUP(D10,Schedule!$A:$K,9,FALSE),\"\"))",
+        "Value":  "0"
+    },
+    {
+        "Cell":  "E11",
+        "Style":  87,
+        "Type":  null,
+        "Formula":  "IF(E10=\"\",\"\",IFERROR(VLOOKUP(E10,Schedule!$A:$K,9,FALSE),\"\"))",
+        "Value":  "0"
+    },
+    {
+        "Cell":  "F11",
+        "Style":  87,
+        "Type":  null,
+        "Formula":  "IF(F10=\"\",\"\",IFERROR(VLOOKUP(F10,Schedule!$A:$K,9,FALSE),\"\"))",
+        "Value":  "0"
+    },
+    {
+        "Cell":  "G11",
+        "Style":  87,
+        "Type":  null,
+        "Formula":  "IF(G10=\"\",\"\",IFERROR(VLOOKUP(G10,Schedule!$A:$K,9,FALSE),\"\"))",
+        "Value":  "0"
+    },
+    {
+        "Cell":  "A12",
+        "Style":  88,
+        "Type":  null,
+        "Formula":  null,
+        "Value":  null
+    },
+    {
+        "Cell":  "B12",
+        "Style":  88,
+        "Type":  null,
+        "Formula":  null,
+        "Value":  null
+    },
+    {
+        "Cell":  "C12",
+        "Style":  88,
+        "Type":  null,
+        "Formula":  null,
+        "Value":  null
+    },
+    {
+        "Cell":  "D12",
+        "Style":  88,
+        "Type":  null,
+        "Formula":  null,
+        "Value":  null
+    },
+    {
+        "Cell":  "E12",
+        "Style":  88,
+        "Type":  null,
+        "Formula":  null,
+        "Value":  null
+    },
+    {
+        "Cell":  "F12",
+        "Style":  88,
+        "Type":  null,
+        "Formula":  null,
+        "Value":  null
+    },
+    {
+        "Cell":  "G12",
+        "Style":  88,
+        "Type":  null,
+        "Formula":  null,
+        "Value":  null
+    },
+    {
+        "Cell":  "A13",
+        "Style":  14,
+        "Type":  null,
+        "Formula":  "IF(AND(Inputs!$B$18+21\u003e=Inputs!$B$16,Inputs!$B$18+21\u003cInputs!$B$22),Inputs!$B$18+21,\"\")",
+        "Value":  "46131"
+    },
+    {
+        "Cell":  "B13",
+        "Style":  15,
+        "Type":  null,
+        "Formula":  "IF(AND(Inputs!$B$18+22\u003e=Inputs!$B$16,Inputs!$B$18+22\u003cInputs!$B$22),Inputs!$B$18+22,\"\")",
+        "Value":  "46132"
+    },
+    {
+        "Cell":  "C13",
+        "Style":  15,
+        "Type":  null,
+        "Formula":  "IF(AND(Inputs!$B$18+23\u003e=Inputs!$B$16,Inputs!$B$18+23\u003cInputs!$B$22),Inputs!$B$18+23,\"\")",
+        "Value":  "46133"
+    },
+    {
+        "Cell":  "D13",
+        "Style":  15,
+        "Type":  null,
+        "Formula":  "IF(AND(Inputs!$B$18+24\u003e=Inputs!$B$16,Inputs!$B$18+24\u003cInputs!$B$22),Inputs!$B$18+24,\"\")",
+        "Value":  "46134"
+    },
+    {
+        "Cell":  "E13",
+        "Style":  15,
+        "Type":  null,
+        "Formula":  "IF(AND(Inputs!$B$18+25\u003e=Inputs!$B$16,Inputs!$B$18+25\u003cInputs!$B$22),Inputs!$B$18+25,\"\")",
+        "Value":  "46135"
+    },
+    {
+        "Cell":  "F13",
+        "Style":  15,
+        "Type":  null,
+        "Formula":  "IF(AND(Inputs!$B$18+26\u003e=Inputs!$B$16,Inputs!$B$18+26\u003cInputs!$B$22),Inputs!$B$18+26,\"\")",
+        "Value":  "46136"
+    },
+    {
+        "Cell":  "G13",
+        "Style":  16,
+        "Type":  null,
+        "Formula":  "IF(AND(Inputs!$B$18+27\u003e=Inputs!$B$16,Inputs!$B$18+27\u003cInputs!$B$22),Inputs!$B$18+27,\"\")",
+        "Value":  "46137"
+    },
+    {
+        "Cell":  "A14",
+        "Style":  87,
+        "Type":  null,
+        "Formula":  "IF(A13=\"\",\"\",IFERROR(VLOOKUP(A13,Schedule!$A:$K,9,FALSE),\"\"))",
+        "Value":  "0"
+    },
+    {
+        "Cell":  "B14",
+        "Style":  87,
+        "Type":  null,
+        "Formula":  "IF(B13=\"\",\"\",IFERROR(VLOOKUP(B13,Schedule!$A:$K,9,FALSE),\"\"))",
+        "Value":  "0"
+    },
+    {
+        "Cell":  "C14",
+        "Style":  87,
+        "Type":  null,
+        "Formula":  "IF(C13=\"\",\"\",IFERROR(VLOOKUP(C13,Schedule!$A:$K,9,FALSE),\"\"))",
+        "Value":  "0"
+    },
+    {
+        "Cell":  "D14",
+        "Style":  87,
+        "Type":  null,
+        "Formula":  "IF(D13=\"\",\"\",IFERROR(VLOOKUP(D13,Schedule!$A:$K,9,FALSE),\"\"))",
+        "Value":  "0"
+    },
+    {
+        "Cell":  "E14",
+        "Style":  87,
+        "Type":  null,
+        "Formula":  "IF(E13=\"\",\"\",IFERROR(VLOOKUP(E13,Schedule!$A:$K,9,FALSE),\"\"))",
+        "Value":  "0"
+    },
+    {
+        "Cell":  "F14",
+        "Style":  87,
+        "Type":  null,
+        "Formula":  "IF(F13=\"\",\"\",IFERROR(VLOOKUP(F13,Schedule!$A:$K,9,FALSE),\"\"))",
+        "Value":  "0"
+    },
+    {
+        "Cell":  "G14",
+        "Style":  87,
+        "Type":  null,
+        "Formula":  "IF(G13=\"\",\"\",IFERROR(VLOOKUP(G13,Schedule!$A:$K,9,FALSE),\"\"))",
+        "Value":  "0"
+    },
+    {
+        "Cell":  "A15",
+        "Style":  88,
+        "Type":  null,
+        "Formula":  null,
+        "Value":  null
+    },
+    {
+        "Cell":  "B15",
+        "Style":  88,
+        "Type":  null,
+        "Formula":  null,
+        "Value":  null
+    },
+    {
+        "Cell":  "C15",
+        "Style":  88,
+        "Type":  null,
+        "Formula":  null,
+        "Value":  null
+    },
+    {
+        "Cell":  "D15",
+        "Style":  88,
+        "Type":  null,
+        "Formula":  null,
+        "Value":  null
+    },
+    {
+        "Cell":  "E15",
+        "Style":  88,
+        "Type":  null,
+        "Formula":  null,
+        "Value":  null
+    },
+    {
+        "Cell":  "F15",
+        "Style":  88,
+        "Type":  null,
+        "Formula":  null,
+        "Value":  null
+    },
+    {
+        "Cell":  "G15",
+        "Style":  88,
+        "Type":  null,
+        "Formula":  null,
+        "Value":  null
+    },
+    {
+        "Cell":  "A16",
+        "Style":  14,
+        "Type":  null,
+        "Formula":  "IF(AND(Inputs!$B$18+28\u003e=Inputs!$B$16,Inputs!$B$18+28\u003cInputs!$B$22),Inputs!$B$18+28,\"\")",
+        "Value":  "46138"
+    },
+    {
+        "Cell":  "B16",
+        "Style":  15,
+        "Type":  null,
+        "Formula":  "IF(AND(Inputs!$B$18+29\u003e=Inputs!$B$16,Inputs!$B$18+29\u003cInputs!$B$22),Inputs!$B$18+29,\"\")",
+        "Value":  "46139"
+    },
+    {
+        "Cell":  "C16",
+        "Style":  15,
+        "Type":  null,
+        "Formula":  "IF(AND(Inputs!$B$18+30\u003e=Inputs!$B$16,Inputs!$B$18+30\u003cInputs!$B$22),Inputs!$B$18+30,\"\")",
+        "Value":  "46140"
+    },
+    {
+        "Cell":  "D16",
+        "Style":  15,
+        "Type":  null,
+        "Formula":  "IF(AND(Inputs!$B$18+31\u003e=Inputs!$B$16,Inputs!$B$18+31\u003cInputs!$B$22),Inputs!$B$18+31,\"\")",
+        "Value":  "46141"
+    },
+    {
+        "Cell":  "E16",
+        "Style":  15,
+        "Type":  null,
+        "Formula":  "IF(AND(Inputs!$B$18+32\u003e=Inputs!$B$16,Inputs!$B$18+32\u003cInputs!$B$22),Inputs!$B$18+32,\"\")",
+        "Value":  "46142"
+    },
+    {
+        "Cell":  "F16",
+        "Style":  15,
+        "Type":  "str",
+        "Formula":  "IF(AND(Inputs!$B$18+33\u003e=Inputs!$B$16,Inputs!$B$18+33\u003cInputs!$B$22),Inputs!$B$18+33,\"\")",
+        "Value":  ""
+    },
+    {
+        "Cell":  "G16",
+        "Style":  16,
+        "Type":  "str",
+        "Formula":  "IF(AND(Inputs!$B$18+34\u003e=Inputs!$B$16,Inputs!$B$18+34\u003cInputs!$B$22),Inputs!$B$18+34,\"\")",
+        "Value":  ""
+    },
+    {
+        "Cell":  "A17",
+        "Style":  87,
+        "Type":  null,
+        "Formula":  "IF(A16=\"\",\"\",IFERROR(VLOOKUP(A16,Schedule!$A:$K,9,FALSE),\"\"))",
+        "Value":  "0"
+    },
+    {
+        "Cell":  "B17",
+        "Style":  87,
+        "Type":  null,
+        "Formula":  "IF(B16=\"\",\"\",IFERROR(VLOOKUP(B16,Schedule!$A:$K,9,FALSE),\"\"))",
+        "Value":  "0"
+    },
+    {
+        "Cell":  "C17",
+        "Style":  87,
+        "Type":  null,
+        "Formula":  "IF(C16=\"\",\"\",IFERROR(VLOOKUP(C16,Schedule!$A:$K,9,FALSE),\"\"))",
+        "Value":  "0"
+    },
+    {
+        "Cell":  "D17",
+        "Style":  87,
+        "Type":  null,
+        "Formula":  "IF(D16=\"\",\"\",IFERROR(VLOOKUP(D16,Schedule!$A:$K,9,FALSE),\"\"))",
+        "Value":  "0"
+    },
+    {
+        "Cell":  "E17",
+        "Style":  87,
+        "Type":  null,
+        "Formula":  "IF(E16=\"\",\"\",IFERROR(VLOOKUP(E16,Schedule!$A:$K,9,FALSE),\"\"))",
+        "Value":  "0"
+    },
+    {
+        "Cell":  "F17",
+        "Style":  87,
+        "Type":  "str",
+        "Formula":  "IF(F16=\"\",\"\",IFERROR(VLOOKUP(F16,Schedule!$A:$K,9,FALSE),\"\"))",
+        "Value":  ""
+    },
+    {
+        "Cell":  "G17",
+        "Style":  87,
+        "Type":  "str",
+        "Formula":  "IF(G16=\"\",\"\",IFERROR(VLOOKUP(G16,Schedule!$A:$K,9,FALSE),\"\"))",
+        "Value":  ""
+    },
+    {
+        "Cell":  "A18",
+        "Style":  88,
+        "Type":  null,
+        "Formula":  null,
+        "Value":  null
+    },
+    {
+        "Cell":  "B18",
+        "Style":  88,
+        "Type":  null,
+        "Formula":  null,
+        "Value":  null
+    },
+    {
+        "Cell":  "C18",
+        "Style":  88,
+        "Type":  null,
+        "Formula":  null,
+        "Value":  null
+    },
+    {
+        "Cell":  "D18",
+        "Style":  88,
+        "Type":  null,
+        "Formula":  null,
+        "Value":  null
+    },
+    {
+        "Cell":  "E18",
+        "Style":  88,
+        "Type":  null,
+        "Formula":  null,
+        "Value":  null
+    },
+    {
+        "Cell":  "F18",
+        "Style":  88,
+        "Type":  null,
+        "Formula":  null,
+        "Value":  null
+    },
+    {
+        "Cell":  "G18",
+        "Style":  88,
+        "Type":  null,
+        "Formula":  null,
+        "Value":  null
+    },
+    {
+        "Cell":  "A19",
+        "Style":  14,
+        "Type":  "str",
+        "Formula":  "IF(AND(Inputs!$B$18+35\u003e=Inputs!$B$16,Inputs!$B$18+35\u003cInputs!$B$22),Inputs!$B$18+35,\"\")",
+        "Value":  ""
+    },
+    {
+        "Cell":  "B19",
+        "Style":  15,
+        "Type":  "str",
+        "Formula":  "IF(AND(Inputs!$B$18+36\u003e=Inputs!$B$16,Inputs!$B$18+36\u003cInputs!$B$22),Inputs!$B$18+36,\"\")",
+        "Value":  ""
+    },
+    {
+        "Cell":  "C19",
+        "Style":  15,
+        "Type":  "str",
+        "Formula":  "IF(AND(Inputs!$B$18+37\u003e=Inputs!$B$16,Inputs!$B$18+37\u003cInputs!$B$22),Inputs!$B$18+37,\"\")",
+        "Value":  ""
+    },
+    {
+        "Cell":  "D19",
+        "Style":  15,
+        "Type":  "str",
+        "Formula":  "IF(AND(Inputs!$B$18+38\u003e=Inputs!$B$16,Inputs!$B$18+38\u003cInputs!$B$22),Inputs!$B$18+38,\"\")",
+        "Value":  ""
+    },
+    {
+        "Cell":  "E19",
+        "Style":  15,
+        "Type":  "str",
+        "Formula":  "IF(AND(Inputs!$B$18+39\u003e=Inputs!$B$16,Inputs!$B$18+39\u003cInputs!$B$22),Inputs!$B$18+39,\"\")",
+        "Value":  ""
+    },
+    {
+        "Cell":  "F19",
+        "Style":  15,
+        "Type":  "str",
+        "Formula":  "IF(AND(Inputs!$B$18+40\u003e=Inputs!$B$16,Inputs!$B$18+40\u003cInputs!$B$22),Inputs!$B$18+40,\"\")",
+        "Value":  ""
+    },
+    {
+        "Cell":  "G19",
+        "Style":  16,
+        "Type":  "str",
+        "Formula":  "IF(AND(Inputs!$B$18+41\u003e=Inputs!$B$16,Inputs!$B$18+41\u003cInputs!$B$22),Inputs!$B$18+41,\"\")",
+        "Value":  ""
+    },
+    {
+        "Cell":  "A20",
+        "Style":  91,
+        "Type":  "str",
+        "Formula":  "IF(A19=\"\",\"\",IFERROR(VLOOKUP(A19,Schedule!$A:$K,9,FALSE),\"\"))",
+        "Value":  ""
+    },
+    {
+        "Cell":  "B20",
+        "Style":  91,
+        "Type":  "str",
+        "Formula":  "IF(B19=\"\",\"\",IFERROR(VLOOKUP(B19,Schedule!$A:$K,9,FALSE),\"\"))",
+        "Value":  ""
+    },
+    {
+        "Cell":  "C20",
+        "Style":  91,
+        "Type":  "str",
+        "Formula":  "IF(C19=\"\",\"\",IFERROR(VLOOKUP(C19,Schedule!$A:$K,9,FALSE),\"\"))",
+        "Value":  ""
+    },
+    {
+        "Cell":  "D20",
+        "Style":  91,
+        "Type":  "str",
+        "Formula":  "IF(D19=\"\",\"\",IFERROR(VLOOKUP(D19,Schedule!$A:$K,9,FALSE),\"\"))",
+        "Value":  ""
+    },
+    {
+        "Cell":  "E20",
+        "Style":  91,
+        "Type":  "str",
+        "Formula":  "IF(E19=\"\",\"\",IFERROR(VLOOKUP(E19,Schedule!$A:$K,9,FALSE),\"\"))",
+        "Value":  ""
+    },
+    {
+        "Cell":  "F20",
+        "Style":  91,
+        "Type":  "str",
+        "Formula":  "IF(F19=\"\",\"\",IFERROR(VLOOKUP(F19,Schedule!$A:$K,9,FALSE),\"\"))",
+        "Value":  ""
+    },
+    {
+        "Cell":  "G20",
+        "Style":  91,
+        "Type":  "str",
+        "Formula":  "IF(G19=\"\",\"\",IFERROR(VLOOKUP(G19,Schedule!$A:$K,9,FALSE),\"\"))",
+        "Value":  ""
+    },
+    {
+        "Cell":  "A21",
+        "Style":  92,
+        "Type":  null,
+        "Formula":  null,
+        "Value":  null
+    },
+    {
+        "Cell":  "B21",
+        "Style":  92,
+        "Type":  null,
+        "Formula":  null,
+        "Value":  null
+    },
+    {
+        "Cell":  "C21",
+        "Style":  92,
+        "Type":  null,
+        "Formula":  null,
+        "Value":  null
+    },
+    {
+        "Cell":  "D21",
+        "Style":  92,
+        "Type":  null,
+        "Formula":  null,
+        "Value":  null
+    },
+    {
+        "Cell":  "E21",
+        "Style":  92,
+        "Type":  null,
+        "Formula":  null,
+        "Value":  null
+    },
+    {
+        "Cell":  "F21",
+        "Style":  92,
+        "Type":  null,
+        "Formula":  null,
+        "Value":  null
+    },
+    {
+        "Cell":  "G21",
+        "Style":  92,
+        "Type":  null,
+        "Formula":  null,
+        "Value":  null
+    },
+    {
+        "Cell":  "A23",
+        "Style":  93,
+        "Type":  "s",
+        "Formula":  null,
+        "Value":  "Notes:"
+    },
+    {
+        "Cell":  "B23",
+        "Style":  74,
+        "Type":  null,
+        "Formula":  null,
+        "Value":  null
+    },
+    {
+        "Cell":  "C23",
+        "Style":  74,
+        "Type":  null,
+        "Formula":  null,
+        "Value":  null
+    },
+    {
+        "Cell":  "D23",
+        "Style":  74,
+        "Type":  null,
+        "Formula":  null,
+        "Value":  null
+    },
+    {
+        "Cell":  "E23",
+        "Style":  74,
+        "Type":  null,
+        "Formula":  null,
+        "Value":  null
+    },
+    {
+        "Cell":  "F23",
+        "Style":  74,
+        "Type":  null,
+        "Formula":  null,
+        "Value":  null
+    },
+    {
+        "Cell":  "G23",
+        "Style":  74,
+        "Type":  null,
+        "Formula":  null,
+        "Value":  null
+    },
+    {
+        "Cell":  "A24",
+        "Style":  79,
+        "Type":  null,
+        "Formula":  null,
+        "Value":  null
+    },
+    {
+        "Cell":  "B24",
+        "Style":  80,
+        "Type":  null,
+        "Formula":  null,
+        "Value":  null
+    },
+    {
+        "Cell":  "C24",
+        "Style":  80,
+        "Type":  null,
+        "Formula":  null,
+        "Value":  null
+    },
+    {
+        "Cell":  "D24",
+        "Style":  80,
+        "Type":  null,
+        "Formula":  null,
+        "Value":  null
+    },
+    {
+        "Cell":  "E24",
+        "Style":  80,
+        "Type":  null,
+        "Formula":  null,
+        "Value":  null
+    },
+    {
+        "Cell":  "F24",
+        "Style":  80,
+        "Type":  null,
+        "Formula":  null,
+        "Value":  null
+    },
+    {
+        "Cell":  "G24",
+        "Style":  81,
+        "Type":  null,
+        "Formula":  null,
+        "Value":  null
+    },
+    {
+        "Cell":  "A25",
+        "Style":  82,
+        "Type":  null,
+        "Formula":  null,
+        "Value":  null
+    },
+    {
+        "Cell":  "B25",
+        "Style":  74,
+        "Type":  null,
+        "Formula":  null,
+        "Value":  null
+    },
+    {
+        "Cell":  "C25",
+        "Style":  74,
+        "Type":  null,
+        "Formula":  null,
+        "Value":  null
+    },
+    {
+        "Cell":  "D25",
+        "Style":  74,
+        "Type":  null,
+        "Formula":  null,
+        "Value":  null
+    },
+    {
+        "Cell":  "E25",
+        "Style":  74,
+        "Type":  null,
+        "Formula":  null,
+        "Value":  null
+    },
+    {
+        "Cell":  "F25",
+        "Style":  74,
+        "Type":  null,
+        "Formula":  null,
+        "Value":  null
+    },
+    {
+        "Cell":  "G25",
+        "Style":  83,
+        "Type":  null,
+        "Formula":  null,
+        "Value":  null
+    },
+    {
+        "Cell":  "A26",
+        "Style":  82,
+        "Type":  null,
+        "Formula":  null,
+        "Value":  null
+    },
+    {
+        "Cell":  "B26",
+        "Style":  74,
+        "Type":  null,
+        "Formula":  null,
+        "Value":  null
+    },
+    {
+        "Cell":  "C26",
+        "Style":  74,
+        "Type":  null,
+        "Formula":  null,
+        "Value":  null
+    },
+    {
+        "Cell":  "D26",
+        "Style":  74,
+        "Type":  null,
+        "Formula":  null,
+        "Value":  null
+    },
+    {
+        "Cell":  "E26",
+        "Style":  74,
+        "Type":  null,
+        "Formula":  null,
+        "Value":  null
+    },
+    {
+        "Cell":  "F26",
+        "Style":  74,
+        "Type":  null,
+        "Formula":  null,
+        "Value":  null
+    },
+    {
+        "Cell":  "G26",
+        "Style":  83,
+        "Type":  null,
+        "Formula":  null,
+        "Value":  null
+    },
+    {
+        "Cell":  "A27",
+        "Style":  84,
+        "Type":  null,
+        "Formula":  null,
+        "Value":  null
+    },
+    {
+        "Cell":  "B27",
+        "Style":  85,
+        "Type":  null,
+        "Formula":  null,
+        "Value":  null
+    },
+    {
+        "Cell":  "C27",
+        "Style":  85,
+        "Type":  null,
+        "Formula":  null,
+        "Value":  null
+    },
+    {
+        "Cell":  "D27",
+        "Style":  85,
+        "Type":  null,
+        "Formula":  null,
+        "Value":  null
+    },
+    {
+        "Cell":  "E27",
+        "Style":  85,
+        "Type":  null,
+        "Formula":  null,
+        "Value":  null
+    },
+    {
+        "Cell":  "F27",
+        "Style":  85,
+        "Type":  null,
+        "Formula":  null,
+        "Value":  null
+    },
+    {
+        "Cell":  "G27",
+        "Style":  86,
+        "Type":  null,
+        "Formula":  null,
+        "Value":  null
+    }
+]

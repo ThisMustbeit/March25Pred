@@ -1,0 +1,79 @@
+﻿[
+    {
+        "Cell":  "A2",
+        "Style":  25,
+        "Type":  "s",
+        "Formula":  null,
+        "Value":  "List of months for View Selection"
+    },
+    {
+        "Cell":  "A3",
+        "Style":  26,
+        "Type":  null,
+        "Formula":  "EOMONTH(TODAY(),-4)+1",
+        "Value":  "45992"
+    },
+    {
+        "Cell":  "A4",
+        "Style":  26,
+        "Type":  null,
+        "Formula":  "EOMONTH(TODAY(),-3)+1",
+        "Value":  "46023"
+    },
+    {
+        "Cell":  "A5",
+        "Style":  26,
+        "Type":  null,
+        "Formula":  "EOMONTH(TODAY(),-2)+1",
+        "Value":  "46054"
+    },
+    {
+        "Cell":  "A6",
+        "Style":  26,
+        "Type":  null,
+        "Formula":  "EOMONTH(TODAY(),-1)+1",
+        "Value":  "46082"
+    },
+    {
+        "Cell":  "A7",
+        "Style":  26,
+        "Type":  null,
+        "Formula":  "EOMONTH(TODAY(),0)+1",
+        "Value":  "46113"
+    },
+    {
+        "Cell":  "A8",
+        "Style":  26,
+        "Type":  null,
+        "Formula":  "EOMONTH(TODAY(),1)+1",
+        "Value":  "46143"
+    },
+    {
+        "Cell":  "A9",
+        "Style":  26,
+        "Type":  null,
+        "Formula":  "EOMONTH(TODAY(),2)+1",
+        "Value":  "46174"
+    },
+    {
+        "Cell":  "A10",
+        "Style":  26,
+        "Type":  null,
+        "Formula":  "EOMONTH(TODAY(),3)+1",
+        "Value":  "46204"
+    },
+    {
+        "Cell":  "A11",
+        "Style":  26,
+        "Type":  null,
+        "Formula":  "EOMONTH(TODAY(),4)+1",
+        "Value":  "46235"
+    },
+    {
+        "Cell":  "A12",
+        "Style":  26,
+        "Type":  null,
+        "Formula":  "EOMONTH(TODAY(),5)+1",
+        "Value":  "46266"
+    }
+]

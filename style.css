@@ -1294,7 +1294,7 @@ body.guided-preview-active.mobile-step-3 .custom-override-panel .table-scroll {
 }
 
 body.guided-preview-active.mobile-step-3 .advanced-taper-workspace {
-  grid-template-columns: minmax(0, 2.15fr) minmax(330px, 1fr);
+  grid-template-columns: minmax(0, 1.35fr) minmax(420px, 1fr);
   gap: 1.35rem;
 }
 
@@ -1426,6 +1426,26 @@ body.guided-preview-active.mobile-step-3 .custom-override-panel .segment-sequenc
 
 body.guided-preview-active.mobile-step-3 .custom-override-panel .segment-guidance {
   margin-top: 0.5rem;
+}
+
+body.guided-preview-active.mobile-step-3 .custom-override-panel .input-table tr.custom-segment-row.is-first-segment td:nth-child(2),
+body.guided-preview-active.mobile-step-3 .custom-override-panel .input-table tr.custom-segment-row.is-first-segment td:nth-child(3),
+body.guided-preview-active.mobile-step-3 .custom-override-panel .input-table tr.custom-segment-row.is-first-segment td:nth-child(5),
+body.guided-preview-active.mobile-step-3 .custom-override-panel .input-table tr.custom-segment-row.is-first-segment td:nth-child(6) {
+  display: none;
+}
+
+body.guided-preview-active.mobile-step-3 .custom-override-panel .input-table tr.custom-segment-row.is-first-segment td:nth-child(7)::before {
+  content: "Options";
+}
+
+body.guided-preview-active.mobile-step-3 .custom-override-panel .input-table tr.custom-segment-row.is-first-segment .segment-sequence {
+  font-size: 1.6rem;
+}
+
+body.guided-preview-active.mobile-step-3 .custom-override-panel .input-table tr.custom-segment-row.is-first-segment .segment-sequence-note {
+  border-bottom: 0;
+  padding-bottom: 0;
 }
 
 body.guided-preview-active.mobile-step-3 .custom-override-panel .input-table td:nth-child(2)::before {
@@ -1625,7 +1645,8 @@ body.guided-preview-active.mobile-step-3 .custom-override-panel .segment-setting
 
 .advanced-preview-day.is-outside-month {
   background: #f4f8fa;
-  color: #b0c0c8;
+  color: transparent;
+  border-style: dashed;
 }
 
 .advanced-preview-date {
@@ -2858,6 +2879,26 @@ body.guided-preview-active.mobile-step-3 .custom-override-panel .segment-setting
   body.mobile-flow-active.mobile-step-3 .custom-override-panel .segment-guidance {
     display: block;
     margin-top: 0.5rem;
+  }
+
+  body.mobile-flow-active.mobile-step-3 .custom-override-panel .input-table tr.custom-segment-row.is-first-segment td:nth-child(2),
+  body.mobile-flow-active.mobile-step-3 .custom-override-panel .input-table tr.custom-segment-row.is-first-segment td:nth-child(3),
+  body.mobile-flow-active.mobile-step-3 .custom-override-panel .input-table tr.custom-segment-row.is-first-segment td:nth-child(5),
+  body.mobile-flow-active.mobile-step-3 .custom-override-panel .input-table tr.custom-segment-row.is-first-segment td:nth-child(6) {
+    display: none;
+  }
+
+  body.mobile-flow-active.mobile-step-3 .custom-override-panel .input-table tr.custom-segment-row.is-first-segment td:nth-child(7)::before {
+    content: "Options";
+  }
+
+  body.mobile-flow-active.mobile-step-3 .custom-override-panel .input-table tr.custom-segment-row.is-first-segment .segment-sequence {
+    font-size: 1.28rem;
+  }
+
+  body.mobile-flow-active.mobile-step-3 .custom-override-panel .input-table tr.custom-segment-row.is-first-segment .segment-sequence-note {
+    border-bottom: 0;
+    padding-bottom: 0;
   }
 
   body.mobile-flow-active.mobile-step-3 .custom-override-panel .input-table td:nth-child(2),

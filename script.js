@@ -1724,6 +1724,15 @@ const DOMBuilders = {
     const classes = ["advanced-preview-day"];
     if (!cell.inCurrentMonth) classes.push("is-outside-month");
 
+    if (!cell.inCurrentMonth) {
+      return `
+        <article class="${classes.join(" ")}" aria-hidden="true">
+          <div class="advanced-preview-date"></div>
+          <div class="advanced-preview-dose"></div>
+        </article>
+      `;
+    }
+
     const hasVisibleDose = CalendarLogic.hasVisibleCalendarDose(cell.scheduleRow);
     const doseLine = hasVisibleDose ? Formatters.dose(cell.scheduleRow.doseMg) : "";
 
@@ -2639,10 +2648,7 @@ const UISetup = {
           previewDoses.push(previewDose);
         }
 
-        const displayDoses =
-          previewDoses.length <= 4
-            ? previewDoses
-            : [previewDoses[0], previewDoses[1], previewDoses[2], previewDoses[previewDoses.length - 1]];
+        const displayDoses = previewDoses.slice(0, 4);
 
         fields.segmentSequenceEl.textContent = displayDoses.map((dose) => Formatters.dose(dose)).join(" \u2192 ");
         const directionLabel = doseChange < 0 ? "Reduce by" : doseChange > 0 ? "Increase by" : "Hold";
@@ -2655,7 +2661,11 @@ const UISetup = {
               }`
             : amountLabel;
         const repeatsLabel = repeats > 1 ? ` across ${repeats} repeats` : "";
-        fields.segmentSequenceNoteEl.textContent = `${cadenceLabel}${repeatsLabel}`;
+        const overflowLabel =
+          previewDoses.length > displayDoses.length
+            ? `; preview shows first ${displayDoses.length} dose levels`
+            : "";
+        fields.segmentSequenceNoteEl.textContent = `${cadenceLabel}${repeatsLabel}${overflowLabel}`;
       }
 
       if (timelineIsValid && durationDays > 0) {
