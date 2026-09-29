@@ -4,10 +4,16 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Barcode Maker | CalendRx</title>
+  <script>
+    if (sessionStorage.getItem("calendrx_tools_dummy_access") !== "granted") {
+      document.documentElement.classList.add("tools-gate-pending");
+    }
+  </script>
   <link rel="icon" href="/website-icon.png" type="image/png">
   <link rel="shortcut icon" href="/website-icon.png" type="image/png">
   <link rel="apple-touch-icon" href="/website-icon.png">
   <link rel="stylesheet" href="/style.css">
+  <script src="/tools/access-gate.js" defer></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/bwip-js/4.7.0/bwip-js-min.js" defer></script>
   <script src="/tools/tools.js" defer></script>
 </head>

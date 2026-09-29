@@ -10,7 +10,7 @@ const APP_CONFIG = {
   },
   defaults: {
     taper: {
-      drugName: "Prednisone",
+      drugName: "",
       dosageForm: "tablet",
       solutionUnit: "ml",
       startingDose: "",

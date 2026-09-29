@@ -610,6 +610,10 @@ body.sticky-actions-visible .sticky-action-bar {
   justify-content: flex-start;
 }
 
+.tools-gate-pending body {
+  visibility: hidden;
+}
+
 .auth-shell {
   min-height: 100vh;
   padding: 2rem 1rem;
@@ -1089,6 +1093,11 @@ body.guided-preview-active.mobile-step-4 .mobile-results-actions {
   cursor: not-allowed;
 }
 
+#drug-name::placeholder {
+  color: var(--muted);
+  opacity: 0.75;
+}
+
 .input-with-unit {
   position: relative;
   width: 100%;
@@ -1237,7 +1246,7 @@ body.guided-preview-active .form-grid {
   margin: 0 auto;
 }
 
-body.guided-preview-active.mobile-step-3 .form-grid {
+body.guided-preview-active.mobile-step-3 .form-grid.is-advanced-mode {
   max-width: 1260px;
 }
 
@@ -1269,6 +1278,14 @@ body.guided-preview-active.mobile-step-3 .preview-mode-control {
 body.guided-preview-active.mobile-step-3 .direction-toggle,
 body.guided-preview-active.mobile-step-3 .step-change-control .direction-toggle {
   width: 100%;
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+body.guided-preview-active.mobile-step-3 .direction-toggle-button {
+  min-width: 0;
+  white-space: normal;
+  text-align: center;
 }
 
 body.guided-preview-active.mobile-step-3 .step-change-control,
