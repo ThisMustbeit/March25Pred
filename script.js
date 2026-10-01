@@ -2596,6 +2596,8 @@ const UISetup = {
         fields.startDoseEl.textContent = "";
         fields.endDoseEl.textContent = "";
         fields.segmentDateRangeEl.textContent = "";
+        fields.segmentSequenceEl.textContent = "";
+        fields.segmentSequenceNoteEl.textContent = "";
       });
       UISetup.syncAdvancedCalendarPreview();
       return;
@@ -2658,9 +2660,16 @@ const UISetup = {
           previewDoses.push(previewDose);
         }
 
-        const displayDoses = previewDoses.slice(0, 4);
+        const sequenceLines = [];
+        for (let startIndex = 0; startIndex < Math.max(1, previewDoses.length - 1); startIndex += 3) {
+          const lineDoses = previewDoses.slice(startIndex, startIndex + 4);
+          const continues = startIndex + 4 < previewDoses.length;
+          sequenceLines.push(
+            `${startIndex > 0 ? "..." : ""}${lineDoses.map((dose) => Formatters.dose(dose)).join(" \u2192 ")}${continues ? "..." : ""}`
+          );
+        }
 
-        fields.segmentSequenceEl.textContent = displayDoses.map((dose) => Formatters.dose(dose)).join(" \u2192 ");
+        fields.segmentSequenceEl.textContent = sequenceLines.join("\n");
         const directionLabel = doseChange < 0 ? "Reduce by" : doseChange > 0 ? "Increase by" : "Hold";
         const amountLabel =
           doseChange === 0 ? "No dose change" : `${directionLabel} ${Formatters.dose(Math.abs(doseChange))}`;
@@ -2671,11 +2680,7 @@ const UISetup = {
               }`
             : amountLabel;
         const repeatsLabel = repeats > 1 ? ` across ${repeats} repeats` : "";
-        const overflowLabel =
-          previewDoses.length > displayDoses.length
-            ? `; preview shows first ${displayDoses.length} dose levels`
-            : "";
-        fields.segmentSequenceNoteEl.textContent = `${cadenceLabel}${repeatsLabel}${overflowLabel}`;
+        fields.segmentSequenceNoteEl.textContent = `${cadenceLabel}${repeatsLabel}`;
       }
 
       if (timelineIsValid && durationDays > 0) {

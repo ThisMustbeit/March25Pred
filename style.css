@@ -2142,6 +2142,7 @@ body.guided-preview-active.mobile-step-3 .custom-override-panel .segment-setting
 
 .segment-sequence {
   margin-top: 0.7rem;
+  white-space: pre-line;
   font-size: 1rem;
   line-height: 1.32;
   font-weight: 700;
