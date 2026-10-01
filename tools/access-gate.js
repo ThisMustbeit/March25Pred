@@ -18,8 +18,17 @@ function renderToolsGate() {
         <form id="tools-gate-form" class="auth-form" novalidate>
           <label for="tools-gate-password">
             <span>Password</span>
-            <input id="tools-gate-password" name="password" type="password" autocomplete="current-password">
           </label>
+          <div class="password-field">
+            <input id="tools-gate-password" name="password" type="password" autocomplete="current-password">
+            <button type="button" class="password-toggle" aria-controls="tools-gate-password" aria-label="Show password" title="Show password">
+              <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+                <path d="M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7S2 12 2 12Z"/>
+                <circle cx="12" cy="12" r="3"/>
+                <path class="password-eye-slash" d="m3 3 18 18"/>
+              </svg>
+            </button>
+          </div>
           <div class="auth-actions">
             <button type="submit" class="button">Enter Tools</button>
             <a href="/" class="button button-secondary">Back to Planner</a>

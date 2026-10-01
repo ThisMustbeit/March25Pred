@@ -7,6 +7,8 @@ This project uses:
 - `index.html`
 - `style.css`
 - `script.js`
+- `tutorial.js`
+- `password-toggle.js`
 
 There is:
 
@@ -16,6 +18,12 @@ There is:
 - no build step required
 
 It is ready to deploy directly to GitHub and Cloudflare Pages as a static site.
+
+## Interactive Tutorial
+
+The Tutorial button in Taper Settings walks through a sample advanced taper on the actual form. It includes animated entry, field highlighting, Back, Next, Pause/Resume, and Exit. Exit restores the previous inputs; Keep this example retains the demonstration calendar. Include `tutorial.js` at the site root when deploying (and `password-toggle.js` for the Tools password controls).
+
+Run the tutorial interaction and schedule checks with `node analysis/tutorial-check.cjs`. These use a simulated DOM and the real schedule engine; they do not verify browser layout.
 
 ## Final Folder Structure
 

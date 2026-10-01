@@ -2089,7 +2089,12 @@ const DOMRenderer = {
     document.body.classList.toggle("mobile-step-3", isActive && MobileFlow.currentStep === 3);
     document.body.classList.toggle("mobile-step-4", isActive && MobileFlow.currentStep === 4);
 
-    DOMRefs.mobileStepCount.textContent = `Step ${MobileFlow.currentStep} of ${MobileFlow.steps.length}`;
+    const setupStepCount = MobileFlow.steps.length - 1;
+    const isSetupStep = MobileFlow.currentStep <= setupStepCount;
+    DOMRefs.mobileStepCount.hidden = !isSetupStep;
+    DOMRefs.mobileStepCount.textContent = isSetupStep
+      ? `Step ${MobileFlow.currentStep} of ${setupStepCount}`
+      : "";
     DOMRefs.mobileStepTitle.textContent = currentStep.title;
     DOMRefs.mobileStepDescription.textContent = currentStep.description;
 
@@ -2652,6 +2657,7 @@ const UISetup = {
         const previewDoses = [startDose];
         let previewDose = startDose;
         for (let repeatIndex = 0; repeatIndex < repeats; repeatIndex += 1) {
+          if (previewDose <= 0 && doseChange <= 0) break;
           previewDose = NumberUtils.clamp(
             previewDose + doseChange,
             Number(APP_CONFIG.defaults.taper.minDoseClamp),
@@ -2964,6 +2970,11 @@ const AppController = {
 
   handleGenerate(event) {
     event.preventDefault();
+    if (MobileFlow.isActive() && MobileFlow.currentStep < 3) {
+      AppController.handleMobileStepNext();
+      return;
+    }
+
     UIState.validationRequested = true;
     UIState.mobileValidationRequested = MobileFlow.isActive();
     const success = AppController.render();

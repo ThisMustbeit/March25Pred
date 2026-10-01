@@ -122,6 +122,7 @@
               </div>
             </div>
           </div>
+          <button id="tutorial-button" type="button" class="button button-secondary no-print">▶ Tutorial</button>
           <div class="form-actions no-print">
             <button id="generate-button" type="submit" form="taper-form" class="button">Generate Schedule</button>
             <button id="load-example-button" type="button" class="button button-secondary">Load an Example</button>
@@ -130,7 +131,7 @@
         </div>
 
         <div class="mobile-stepper no-print" aria-live="polite">
-          <p id="mobile-step-count" class="mobile-step-count">Step 1 of 4</p>
+          <p id="mobile-step-count" class="mobile-step-count">Step 1 of 3</p>
           <h3 id="mobile-step-title" class="mobile-step-title">Medication &amp; Start</h3>
           <p id="mobile-step-description" class="mobile-step-description">
             Enter the medication name, starting dose, and taper start date.
@@ -350,7 +351,6 @@
       <section id="results" class="results-stack">
         <div class="card mobile-results-actions no-print">
           <div class="mobile-results-header">
-            <p class="section-kicker">Step 4 of 4</p>
             <h2>Calendar &amp; Print</h2>
           </div>
           <div class="mobile-results-action-row">
@@ -563,5 +563,6 @@
   </template>
 
   <script src="script.js"></script>
+  <script src="tutorial.js"></script>
 </body>
 </html>
