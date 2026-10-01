@@ -8,6 +8,7 @@
   <link rel="shortcut icon" href="./website-icon.png" type="image/png">
   <link rel="apple-touch-icon" href="./website-icon.png">
   <link rel="stylesheet" href="style.css">
+  <link rel="stylesheet" href="print-calendar.css" media="print">
 </head>
 <body>
   <div id="sticky-action-bar" class="sticky-action-bar no-print" aria-hidden="true">
@@ -376,6 +377,27 @@
           <div id="summary-grid" class="summary-grid"></div>
         </section>
 
+        <section class="card print-preview-card no-print" aria-labelledby="print-preview-title">
+          <div class="section-heading">
+            <div>
+              <p class="section-kicker">Print Preview</p>
+              <h2 id="print-preview-title">Your printable calendar</h2>
+            </div>
+            <div class="print-preview-controls">
+              <label class="print-layout-picker"><span>Print Layout</span>
+                <select id="preview-print-layout"><option value="portrait">Portrait</option><option value="landscape" selected>Landscape</option></select>
+              </label>
+              <label class="print-layout-picker"><span>Zoom</span>
+                <select id="print-preview-zoom"><option value="fit">Fit to width</option><option value="0.5">50%</option><option value="0.75">75%</option><option value="1">100%</option><option value="1.25">125%</option></select>
+              </label>
+              <button id="preview-print-button" type="button" class="button">Print</button>
+            </div>
+          </div>
+          <p id="print-preview-status" class="help-text" aria-live="polite"></p>
+          <p class="print-preview-note">Letter paper with 0.35-inch margins. For matching output, use 100% scale and turn off browser headers and footers in the print dialog.</p>
+          <div id="print-preview-pages" class="print-preview-pages" tabindex="0" role="region" aria-label="Printable calendar pages"></div>
+        </section>
+
         <section class="card calendar-card">
           <div class="section-heading">
             <div>
@@ -563,6 +585,7 @@
   </template>
 
   <script src="script.js"></script>
+  <script src="print-preview.js"></script>
   <script src="tutorial.js"></script>
 </body>
 </html>

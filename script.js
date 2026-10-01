@@ -2063,6 +2063,7 @@ const DOMRenderer = {
       main: DOMRefs.printLayoutSelect,
       sticky: DOMRefs.stickyPrintLayoutSelect,
       mobile: DOMRefs.mobilePrintLayoutSelect,
+      preview: document.getElementById("preview-print-layout"),
     };
 
     const sourceSelect = selectMap[source] || DOMRefs.printLayoutSelect;

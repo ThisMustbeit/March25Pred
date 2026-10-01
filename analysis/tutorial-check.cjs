@@ -34,7 +34,11 @@ const selectors = ['#drug-name','#taper-start-date','#dosage-form','#tablet-stre
   '#custom-segment-body tr:first-child .segment-days-per-step',
   '#custom-segment-body tr:nth-child(2) .segment-dose-change',
   '#custom-segment-body tr:nth-child(2) .segment-days-per-step',
-  '#custom-segment-body tr:nth-child(2) .segment-repeats'];
+  '#custom-segment-body tr:nth-child(2) .segment-repeats',
+  '#dose-change-per-step','#days-per-step','#total-steps',
+  '#custom-segment-body tr:nth-child(3) .segment-dose-change',
+  '#custom-segment-body tr:nth-child(3) .segment-days-per-step',
+  '#custom-segment-body tr:nth-child(3) .segment-repeats'];
 const fields = selectors.map(get);
 fields.forEach((field,i) => field.type = i === 0 ? 'text' : i === 1 ? 'date' : i === 2 ? 'select-one' : 'number');
 const snapshot = () => fields.map(field => field.value);
@@ -57,25 +61,31 @@ function generate() {
   assert.equal(DOMRefs.useCustomOverrideInput.value,'true');
   const values = snapshot();
   assert.deepEqual(values.slice(0,1),['Prednisone']);
-  assert.deepEqual(values.slice(2),['tablet','50','5','50','7','10','7','5']);
+  assert.deepEqual(values.slice(2),['tablet','50','5','50','7','10','7','3','10','7','5','5','14','4']);
+  engine.demo = { startingDose:Number(values[5]),
+    customSegments:[
+      {doseChange:0,daysPerStep:Number(values[6]),repeats:1},
+      {doseChange:-Number(values[7]),daysPerStep:Number(values[8]),repeats:Number(values[9])},
+      {doseChange:-Number(values[13]),daysPerStep:Number(values[14]),repeats:Number(values[15])}
+    ] };
   // Run the tutorial values through the actual schedule engine.
   const result = vm.runInContext(`(() => {
     const inputs = {drugName:'Prednisone', dosageForm:'tablet', solutionUnit:'ml', taperStartDate:new Date(2026,9,1),
       startingDose:50, minDoseClamp:0, maxDoseClamp:1000, useCustomOverride:true, daysPerStep:7,
       strengths:[{key:'A',value:50},{key:'B',value:5}], allowPartialTablets:false,
-      customSegments:[{doseChange:0,daysPerStep:7,repeats:1},{doseChange:-10,daysPerStep:7,repeats:5}]};
+      ...demo};
     const rows = ScheduleLogic.generateScheduleRows(inputs);
     return {count:rows.length, doses:rows.filter((_,i) => i%7===0).map(row=>row.doseMg), warnings:rows.filter(row=>row.warning).length};
   })()`,engine);
-  assert.equal(result.count,35);
-  assert.equal(JSON.stringify(result.doses),'[50,40,30,20,10]');
+  assert.equal(result.count,70);
+  assert.equal(JSON.stringify(result.doses),'[50,40,30,20,15,15,10,10,5,5]');
   assert.equal(result.warnings,0);
   generated++; MobileFlow.setStep(4);
 }
 const motion = {matches:true};
 const context = {document, DOMRefs, MobileFlow, UISetup, APP_CONFIG:{defaults:{taper:{}}},
   DateUtils:{toDateInputValue: () => '2026-10-01'}, ConfigCode:{captureCurrentState:snapshot}, UIState:{},
-  AppController:{handleMobileStepNext:generate, render:()=>{}},
+  AppController:{handleMobileStepNext:generate, handleAddCustomRow:()=>{}, render:()=>{}},
   DOMRenderer:{clearResults:()=>{}, renderValidationErrors:()=>{}},
   window:{matchMedia:()=>motion, scrollY:100, scrollTo:()=>{}},
   setTimeout:callback=>setTimeout(callback,1), Event:class {constructor(type){this.type=type;}}
@@ -95,7 +105,19 @@ async function next() {button('next').click(); await settled();}
   assert.equal(get('.app-shell').inert,true);
   await next(); assert.equal(fields[0].value,'Prednisone');
   button('back').click(); await settled(); assert.equal(fields[0].value,'');
-  for(let i=0;i<9;i++) await next();
+  for(let i=0;i<5;i++) await next();
+  assert.equal(get('#tutorial-title').textContent,'Two ways to plan dose changes');
+  assert.equal(DOMRefs.useCustomOverrideInput.value,'false');
+  await next();
+  assert.deepEqual(snapshot().slice(10,13),['10','7','5']);
+  assert.equal(DOMRefs.useCustomOverrideInput.value,'false');
+  await next();
+  assert.equal(get('#tutorial-title').textContent,'Standard can also titrate up');
+  await next();
+  assert.equal(DOMRefs.useCustomOverrideInput.value,'true');
+  button('back').click(); await settled();
+  assert.equal(DOMRefs.useCustomOverrideInput.value,'false');
+  for(let i=7;i<13;i++) await next();
   assert.equal(generated,1); assert.equal(button('keep').hidden,false);
   button('exit').click();
   assert.deepEqual(snapshot(),original);
@@ -115,7 +137,7 @@ async function next() {button('next').click(); await settled();}
   get('#tutorial-button').click(); await settled();
   button('next').click(); button('pause').click();
   await sleep(10); button('pause').click(); await settled();
-  for(let i=1;i<9;i++) await next();
+  for(let i=1;i<13;i++) await next();
   button('keep').click();
   assert.equal(fields[0].value,'Prednisone');
   assert.equal(MobileFlow.currentStep,4);

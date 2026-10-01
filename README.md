@@ -9,6 +9,8 @@ This project uses:
 - `script.js`
 - `tutorial.js`
 - `password-toggle.js`
+- `print-preview.js`
+- `print-calendar.css`
 
 There is:
 
@@ -18,6 +20,12 @@ There is:
 - no build step required
 
 It is ready to deploy directly to GitHub and Cloudflare Pages as a static site.
+
+## Print Preview
+
+The Print Preview below Schedule Overview displays each month on Letter paper, with fit-to-width and percentage zoom controls. The preview and actual printing share `print-calendar.css` and the generated print markup. Include `print-preview.js` and `print-calendar.css` at the site root when deploying.
+
+Run `node analysis/print-preview-check.cjs` to check preview markup, orientation, zoom, and updates. These checks use a simulated DOM and do not verify browser layout or printer settings.
 
 ## Interactive Tutorial
 

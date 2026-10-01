@@ -791,6 +791,71 @@ body.sticky-actions-visible .sticky-action-bar {
   gap: 0.85rem;
 }
 
+.print-preview-card {
+  min-width: 0;
+}
+
+.print-preview-controls {
+  display: flex;
+  align-items: flex-end;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+}
+
+.print-preview-note {
+  color: var(--muted);
+  font-size: 0.85rem;
+  line-height: 1.5;
+  margin: 0 0 1rem;
+}
+
+.print-preview-pages {
+  display: grid;
+  gap: 1.5rem;
+  max-height: 85vh;
+  overflow: auto;
+  padding: 20px;
+  background: #e6edf1;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+}
+
+.print-preview-pages:empty {
+  display: none;
+}
+
+.print-preview-pages:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 3px;
+}
+
+.print-preview-figure {
+  width: max-content;
+  margin: 0 auto;
+}
+
+.print-preview-figure figcaption {
+  margin-bottom: 0.65rem;
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: var(--muted);
+}
+
+.print-preview-paper {
+  position: relative;
+  background: white;
+  box-shadow: 0 3px 14px rgba(20, 52, 65, 0.16);
+}
+
+.print-preview-paper iframe {
+  display: block;
+  position: absolute;
+  top: 0;
+  left: 0;
+  border: 0;
+  transform-origin: top left;
+}
+
 #tutorial-button {
   margin-left: auto;
   flex-shrink: 0;
@@ -3441,333 +3506,6 @@ body.guided-preview-active.mobile-step-3 .custom-override-panel .segment-setting
 
   #print-calendar-root {
     display: block !important;
-  }
-
-  .print-month {
-    margin: 0;
-    page-break-after: always;
-    break-after: page;
-  }
-
-  .print-month:last-child {
-    page-break-after: auto;
-    break-after: auto;
-  }
-
-  .print-page {
-    width: 7.1in;
-    min-height: 9.55in;
-    margin: 0 auto;
-    padding: 0.28in 0 0;
-    display: flex;
-    flex-direction: column;
-  }
-
-  .print-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: flex-start;
-    margin: 0 0 0.22in;
-  }
-
-  .print-header-left {
-    display: block;
-  }
-
-  .print-title-block {
-    font-family: Arial, sans-serif;
-    font-size: 17px;
-    font-weight: 700;
-    line-height: 1.02;
-    letter-spacing: 0;
-    margin-top: 0.14in;
-    margin-left: 0.02in;
-  }
-
-  .print-signature-box {
-    display: none;
-  }
-
-  .print-label-box {
-    width: 2.45in;
-    height: 1.48in;
-    border: 1px dashed #777;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-family: Arial, sans-serif;
-    font-size: 10px;
-    color: #444;
-    text-align: center;
-  }
-
-  .print-calendar-shell {
-    position: relative;
-    width: 100%;
-    padding-top: 0.18in;
-  }
-
-  .print-signoff {
-    margin-top: 0.14in;
-    padding: 0 0.04in;
-  }
-
-  .print-signature-line {
-    height: 0;
-    border-bottom: 1px solid #000;
-  }
-
-  .print-signature-label {
-    margin-top: 0.06in;
-    font-family: Arial, sans-serif;
-    font-size: 10px;
-    font-weight: 700;
-    color: #000;
-  }
-
-  .print-disclaimer {
-    margin-top: auto;
-    padding: 0.16in 0.04in 0;
-    font-family: Arial, sans-serif;
-    font-size: 8.5px;
-    line-height: 1.28;
-    color: #333;
-  }
-
-  .print-month-banner {
-    width: 2.18in;
-    margin: 0 auto -1px;
-    padding: 0.04in 0.12in;
-    border: 2px solid #000;
-    border-bottom-width: 1px;
-    font-family: Arial, sans-serif;
-    font-size: 12px;
-    font-weight: 700;
-    line-height: 1;
-    text-align: center;
-    background: #fff;
-    position: relative;
-    z-index: 2;
-  }
-
-  .print-weekday-row,
-  .print-calendar-grid {
-    display: grid;
-    grid-template-columns: repeat(7, 1fr);
-    width: 100%;
-  }
-
-  .print-weekday-row {
-    border: 2px solid #000;
-    border-bottom: 0;
-  }
-
-  .print-weekday-cell {
-    background-color: #dfdfdf;
-    border-right: 1px solid #000;
-    border-bottom: 2px solid #000;
-    font-weight: bold;
-    text-align: center;
-    height: 0.38in;
-    font-size: 8px;
-    font-family: Arial, sans-serif;
-    padding-top: 0.12in;
-  }
-
-  .print-weekday-cell:last-child {
-    border-right: 0;
-  }
-
-  .print-calendar-grid {
-    border-left: 2px solid #000;
-    border-right: 2px solid #000;
-    border-bottom: 2px solid #000;
-  }
-
-  .print-day-cell {
-    position: relative;
-    height: 0.9in;
-    border-right: 1px solid #000;
-    border-bottom: 1px solid #000;
-    border-top: 1px solid #000;
-    background: #fff;
-  }
-
-  .print-calendar-grid .print-day-cell:nth-child(7n) {
-    border-right: 0;
-  }
-
-  .print-calendar-grid .print-day-cell:nth-last-child(-n + 7) {
-    border-bottom: 0;
-  }
-
-  .print-date-tab {
-    position: absolute;
-    top: -1px;
-    left: 50%;
-    transform: translateX(-50%);
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    min-width: 0.42in;
-    min-height: 0.18in;
-    max-width: calc(100% - 0.16in);
-    padding: 0.015in 0.04in;
-    border: 2px solid #000;
-    border-top: 0;
-    background: #fff;
-    font-family: Arial, sans-serif;
-    font-size: 8px;
-    font-weight: 700;
-    line-height: 1;
-    text-align: center;
-  }
-
-  .print-day-body {
-    height: 100%;
-    padding: 0.18in 0.06in 0.06in;
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    font-family: Arial, sans-serif;
-    font-size: 8.4px;
-    line-height: 1.22;
-    text-align: center;
-    white-space: normal;
-    overflow: hidden;
-  }
-
-  .print-dose-line {
-    font-weight: 700;
-    margin-bottom: 0.03in;
-    text-align: center;
-    font-size: 8.9px;
-  }
-
-  .print-tablet-line {
-    text-align: center;
-  }
-
-  .print-day-warning {
-    margin-top: 0.03in;
-    font-size: 8px;
-    font-weight: 700;
-    text-align: center;
-  }
-
-  .print-day-cell.is-outside-month .print-day-body {
-    color: transparent;
-  }
-
-  body.print-layout-landscape .print-page {
-    width: 10.25in;
-    min-height: 7.2in;
-    padding-top: 0.18in;
-  }
-
-  body.print-layout-landscape .print-header {
-    margin-bottom: 0.18in;
-  }
-
-  body.print-layout-landscape .print-header-left {
-    display: flex;
-    flex-direction: column;
-    align-items: flex-start;
-    gap: 0.14in;
-  }
-
-  body.print-layout-landscape .print-title-block {
-    font-size: 18px;
-    margin-top: 0.04in;
-  }
-
-  body.print-layout-landscape .print-signature-box {
-    display: flex;
-    flex-direction: column;
-    justify-content: flex-end;
-    width: 2.75in;
-    min-height: 0.9in;
-    padding: 0.1in 0.12in 0.08in;
-    border: 1px solid #000;
-    background: #fff;
-  }
-
-  body.print-layout-landscape .print-signature-box-line {
-    height: 0;
-    border-bottom: 1px solid #000;
-  }
-
-  body.print-layout-landscape .print-signature-box-label {
-    margin-top: 0.05in;
-    font-family: Arial, sans-serif;
-    font-size: 9px;
-    font-weight: 700;
-    color: #000;
-  }
-
-  body.print-layout-landscape .print-label-box {
-    width: 2.45in;
-    height: 1.48in;
-    font-size: 10px;
-  }
-
-  body.print-layout-landscape .print-calendar-shell {
-    padding-top: 0.12in;
-  }
-
-  body.print-layout-landscape .print-month-banner {
-    width: 2.45in;
-    font-size: 13px;
-  }
-
-  body.print-layout-landscape .print-weekday-cell {
-    height: 0.29in;
-    font-size: 8px;
-    padding-top: 0.08in;
-  }
-
-  body.print-layout-landscape .print-day-cell {
-    height: 0.78in;
-  }
-
-  body.print-layout-landscape .print-date-tab {
-    min-height: 0.17in;
-    font-size: 8.2px;
-  }
-
-  body.print-layout-landscape .print-day-body {
-    padding: 0.15in 0.06in 0.05in;
-    font-size: 10.8px;
-    line-height: 1.16;
-  }
-
-  body.print-layout-landscape .print-dose-line {
-    font-size: 12px;
-  }
-
-  body.print-layout-landscape .print-dose-line--dense {
-    font-size: 11px;
-    margin-bottom: 0.02in;
-  }
-
-  body.print-layout-landscape .print-tablet-line--dense {
-    font-size: 9.6px;
-    line-height: 1.08;
-  }
-
-  body.print-layout-landscape .print-day-warning {
-    font-size: 9.6px;
-  }
-
-  body.print-layout-landscape .print-signoff {
-    display: none;
-  }
-
-  body.print-layout-landscape .print-disclaimer {
-    margin-top: 0.08in;
-    padding: 0 0.04in 0;
-    font-size: 7.2px;
-    line-height: 1.14;
   }
 
 }

@@ -23,15 +23,19 @@
   let saved, index = 0, token = 0, paused = false, busy = false, highlighted;
   let background = [];
   const steps = [
-    { title: "Try an advanced taper", copy: "Watch the real form fill in, one step at a time. Use Next to continue, Back to replay, or Exit to restore your inputs.", target: ".form-card" },
+    { title: "Explore Standard and Advanced Taper", copy: "Watch the real form fill in, then compare a consistent Standard Taper with a variable Advanced Multi-Taper. Use Next to continue, Back to replay, or Exit to restore your inputs.", target: ".form-card" },
     { title: "Name the medication", copy: "Enter Prednisone. This name will appear on the calendar.", target: "#drug-name", values: [["#drug-name", "Prednisone"]] },
     { title: "Choose the start date", copy: "We'll use today's date for this demonstration.", target: "#taper-start-date", values: [["#taper-start-date", () => DateUtils.toDateInputValue(new Date())]] },
     { title: "Select tablets", copy: "The medication form determines which strength and dose options are available.", page: 2, target: "#dosage-form", values: [["#dosage-form", "tablet"]] },
     { title: "Enter the available strengths", copy: "Enter strengths from largest to smallest: 50 mg in Strength A and 5 mg in Strength B.", page: 2, target: ".group-strengths", values: [["#tablet-strength-a", "50"], ["#tablet-strength-b", "5"]] },
-    { title: "Choose Advanced Multi-Taper", copy: "Advanced mode lets you define a starting period and separate dose-change segments.", page: 3, target: "#taper-mode-advanced", advanced: true },
+    { title: "Two ways to plan dose changes", copy: "Standard Taper uses the same dose change and the same duration for every step, whether tapering down or titrating up. Advanced Multi-Taper lets you vary the dose change and duration between segments. Let's explore Standard first, then Advanced.", page: 3, target: ".taper-mode-strip" },
+    { title: "Standard: a consistent change each time", copy: "This example starts at 50 mg and reduces by 10 mg every 7 days for 5 steps: 50 → 40 → 30 → 20 → 10 mg. The size of each reduction and the time at each dose stay the same.", page: 3, target: ".group-primary-taper", values: [["#starting-dose", "50"], ["#dose-change-per-step", "10"], ["#days-per-step", "7"], ["#total-steps", "5"]] },
+    { title: "Standard can also titrate up", copy: "Reduce by moves the dose down; Increase by moves it up. In either direction, Standard repeats one fixed dose change at one fixed interval. Use Advanced when the size of the changes or the time between them needs to vary.", page: 3, target: ".step-change-control .direction-toggle" },
+    { title: "Advanced: vary the changes and durations", copy: "Now switch to Advanced Multi-Taper. Each segment can have its own dose change, direction, duration, and repeats. We'll first reduce by 10 mg every 7 days, then use smaller 5 mg reductions every 14 days.", page: 3, target: "#taper-mode-advanced", advanced: true },
     { title: "Set the starting dose", copy: "For this example, enter a starting daily dose of 50 mg.", page: 3, target: "#starting-dose", values: [["#starting-dose", "50"]] },
     { title: "Set the starting period", copy: "The first row keeps the starting dose for 7 days.", page: 3, target: "#custom-segment-body tr:first-child", values: [["#custom-segment-body tr:first-child .segment-days-per-step", "7"]] },
-    { title: "Add the reductions", copy: "In the next row, reduce by 10 mg every 7 days for 5 repeats. The dose preview continues through 40, 30, 20, 10, and 0 mg.", page: 3, target: "#custom-segment-body tr:nth-child(2)", values: [["#custom-segment-body tr:nth-child(2) .segment-dose-change", "10"], ["#custom-segment-body tr:nth-child(2) .segment-days-per-step", "7"], ["#custom-segment-body tr:nth-child(2) .segment-repeats", "5"]] },
+    { title: "First segment: 10 mg reductions, 7 days each", copy: "Reduce by 10 mg every 7 days for 3 repeats: 50 → 40 → 30 → 20 mg. This segment has a consistent pattern, but the next segment can use a different one.", page: 3, target: "#custom-segment-body tr:nth-child(2)", values: [["#custom-segment-body tr:nth-child(2) .segment-dose-change", "10"], ["#custom-segment-body tr:nth-child(2) .segment-days-per-step", "7"], ["#custom-segment-body tr:nth-child(2) .segment-repeats", "3"]] },
+    { title: "Next segment: smaller changes, longer durations", copy: "Add another segment: reduce by 5 mg every 14 days for 4 repeats, continuing from 20 → 15 → 10 → 5 → 0 mg. Both the reduction size and duration change here. This flexibility is what distinguishes Advanced from Standard.", page: 3, target: "#custom-segment-body tr:nth-child(3)", addSegment: true, values: [["#custom-segment-body tr:nth-child(3) .segment-dose-change", "5"], ["#custom-segment-body tr:nth-child(3) .segment-days-per-step", "14"], ["#custom-segment-body tr:nth-child(3) .segment-repeats", "4"]] },
     { title: "Review the calendar", copy: "The calendar shows each day's dose and tablet breakdown. You can return to your original inputs or keep this example to explore Edit Inputs and Print.", target: "#results", generate: true }
   ];
 
@@ -64,6 +68,7 @@
     if (run !== token) throw new Error("cancelled");
     if (step.page) MobileFlow.setStep(step.page);
     if (step.advanced) document.getElementById("taper-mode-advanced").click();
+    if (step.addSegment) AppController.handleAddCustomRow();
     if (step.generate) {
       AppController.handleMobileStepNext();
       if (MobileFlow.currentStep !== 4) throw new Error("Example could not be generated.");
