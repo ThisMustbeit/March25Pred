@@ -1,0 +1,29 @@
+.sig-actions, .sig-search-row, .sig-entry-heading, .sig-tags { display: flex; gap: 0.65rem; flex-wrap: wrap; align-items: center; }
+.sig-search-row { align-items: end; }
+.sig-search-row label { flex: 1; min-width: 220px; }
+.sig-form, .sig-form label, .sig-search-row label { display: grid; gap: 0.5rem; }
+.sig-form { gap: 1rem; }
+.sig-form input, .sig-form textarea, #sig-search { width: 100%; padding: 0.8rem; border: 1px solid var(--border); border-radius: 10px; background: #fbfdfe; color: var(--text); }
+.sig-form textarea { resize: vertical; }
+.sig-form small, .sig-storage-note, .sig-count { color: var(--muted); line-height: 1.5; }
+.sig-storage-note { margin-top: 0; }
+.sig-tags { margin: 0.85rem 0; }
+.sig-tag { background: var(--surface-soft); border: 1px solid var(--border); border-radius: 999px; padding: 0.45rem 0.8rem; color: var(--accent-dark); cursor: pointer; }
+.sig-tag[aria-pressed="true"] { background: var(--accent); border-color: var(--accent); color: white; }
+.sig-list { display: grid; gap: 1rem; margin-top: 1rem; }
+.sig-entry { border: 1px solid var(--border); border-radius: var(--radius-sm); padding: 1.1rem; }
+.sig-entry-heading { justify-content: space-between; }
+.sig-entry h3 { margin: 0; font-size: 1.2rem; overflow-wrap: anywhere; }
+.sig-entry p { white-space: pre-wrap; overflow-wrap: anywhere; line-height: 1.6; }
+.sig-entry-notes { color: var(--muted); font-size: 0.9rem; }
+.sig-empty { padding: 2rem 1rem; text-align: center; background: var(--surface-soft); border-radius: var(--radius-sm); }
+#sig-status { margin: 0.6rem 0; color: var(--accent-dark); }
+#sig-status.is-error, #sig-form-error { color: var(--danger); }
+#sig-tool [hidden] { display: none !important; }
+#sig-editor { scroll-margin-top: 1.5rem; }
+#sig-tool :is(input, textarea, button):focus-visible { outline: 2px solid var(--accent); outline-offset: 3px; }
+@media (max-width: 600px) {
+  #sig-tool .section-heading { flex-direction: column; }
+  .sig-entry-heading { align-items: start; }
+  .sig-actions .button { padding: 0.6rem 0.85rem; }
+}

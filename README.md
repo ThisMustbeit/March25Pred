@@ -21,6 +21,12 @@ There is:
 
 It is ready to deploy directly to GitHub and Cloudflare Pages as a static site.
 
+## Sig List & Shortcuts
+
+Open `/tools/sigs/` from the Tools directory to add or edit shortcuts, meanings, notes, and comma-separated tags. Search covers all fields; tag buttons filter the list. It starts empty for a future reference list. Entries are saved in local browser storage, not synced between devices. Export/import JSON backups to transfer the list; imports skip existing shortcut names instead of replacing them. Removals have an Undo button until the page reloads or another entry is removed.
+
+Deploy the `tools/sigs/` directory and the updated `tools/index.html`. Run `node analysis/sig-list-check.cjs` for data and simulated-DOM interaction checks.
+
 ## Print Preview
 
 The Print Preview below Schedule Overview displays each month on Letter paper, with fit-to-width and percentage zoom controls. The preview and actual printing share `print-calendar.css` and the generated print markup. Include `print-preview.js` and `print-calendar.css` at the site root when deploying.

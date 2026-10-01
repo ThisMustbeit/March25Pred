@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Sig List &amp; Shortcuts | CalendRx</title>
+  <script>if (sessionStorage.getItem("calendrx_tools_dummy_access") !== "granted") document.documentElement.classList.add("tools-gate-pending");</script>
+  <link rel="icon" href="/website-icon.png" type="image/png">
+  <link rel="stylesheet" href="/style.css">
+  <link rel="stylesheet" href="/tools/sigs/sigs.css">
+  <script src="/tools/access-gate.js" defer></script>
+  <script src="/password-toggle.js" defer></script>
+  <script src="/tools/sigs/sigs.js" defer></script>
+</head>
+<body>
+  <div class="app-shell" id="sig-tool">
+    <nav class="site-nav no-print" aria-label="Primary"><div class="site-nav-inner">
+      <a href="/" class="site-nav-link">Taper Planner</a>
+      <a href="/tools/" class="site-nav-link">Other Pharmacy Tools</a>
+      <a href="/tools/sigs/" class="site-nav-link is-current" aria-current="page">Sig List &amp; Shortcuts</a>
+    </div></nav>
+    <main>
+      <section class="hero tools-hero">
+        <div class="hero-brand"><img src="/website-icon.png" alt="CalendRx logo" class="hero-logo">
+          <div><p class="section-kicker">Reference Library</p><h1>Sig List &amp; Shortcuts</h1>
+            <p class="hero-copy">Find a shortcut, read its meaning, and organize your list with tags.</p>
+          </div>
+        </div>
+        <button id="sig-add" type="button" class="button">+ Add shortcut</button>
+      </section>
+
+      <section class="card" aria-labelledby="sig-library-title">
+        <div class="section-heading"><div><p class="section-kicker">Your List</p><h2 id="sig-library-title">Search shortcuts</h2></div>
+          <div class="sig-actions"><button id="sig-export" type="button" class="button button-secondary">Export backup</button>
+            <button id="sig-import" type="button" class="button button-secondary">Import backup</button>
+            <input id="sig-import-file" type="file" accept=".json,application/json" hidden>
+          </div>
+        </div>
+        <p class="sig-storage-note">Saved in this browser on this device. Export a backup to keep a copy or move your list to another computer.</p>
+        <div class="sig-search-row">
+          <label for="sig-search"><span>Search shortcuts, meanings, notes, or tags</span><input id="sig-search" type="search" placeholder="Search your sig list…" autocomplete="off"></label>
+          <button id="sig-clear" type="button" class="button button-secondary">Clear filters</button>
+        </div>
+        <div id="sig-tags" class="sig-tags" role="group" aria-label="Filter by tag"></div>
+        <p id="sig-count" class="sig-count" aria-live="polite"></p>
+        <div id="sig-status" role="status" aria-live="polite"></div>
+        <button id="sig-undo" type="button" class="button button-secondary" hidden>Undo removal</button>
+        <div id="sig-list" class="sig-list"></div>
+      </section>
+
+      <section id="sig-editor" class="card" aria-labelledby="sig-editor-title" hidden>
+        <p class="section-kicker">Shortcut Details</p><h2 id="sig-editor-title">Add shortcut</h2>
+        <form id="sig-form" class="sig-form">
+          <label for="sig-code"><span>Shortcut</span><input id="sig-code" maxlength="80" required autocomplete="off"></label>
+          <label for="sig-meaning"><span>Meaning / expanded instructions</span><textarea id="sig-meaning" rows="3" maxlength="2000" required></textarea></label>
+          <label for="sig-entry-tags"><span>Tags (separate with commas)</span><input id="sig-entry-tags" maxlength="1000" placeholder="e.g. frequency, route, instructions" aria-describedby="sig-tags-help"><small id="sig-tags-help">Add new tags here or use a suggested tag below. Edit this field to rename or remove tags for this entry.</small></label>
+          <div id="sig-tag-suggestions" class="sig-tags" role="group" aria-label="Add an existing tag"></div>
+          <label for="sig-notes"><span>Notes (optional)</span><textarea id="sig-notes" rows="2" maxlength="2000"></textarea></label>
+          <p id="sig-form-error" role="alert"></p>
+          <div class="sig-actions"><button id="sig-save" type="submit" class="button">Save shortcut</button><button id="sig-cancel" type="button" class="button button-secondary">Cancel</button></div>
+        </form>
+      </section>
+    </main>
+  </div>
+</body>
+</html>
