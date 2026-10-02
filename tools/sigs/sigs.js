@@ -48,13 +48,18 @@
     if (existing.length + added.length > 10000) throw new Error("A list can contain up to 10,000 shortcuts.");
     return { entries: [...existing, ...added], added: added.length, skipped: incoming.length - added.length };
   }
-  if (typeof module !== "undefined") module.exports = { tags, entry, decode, matches, merge };
+  function applyCatalog(existing, applied, catalog) {
+    if (!catalog || applied.includes(catalog.id)) return {entries:existing, catalogs:applied, added:0, skipped:0};
+    const incoming = decode(JSON.stringify({version:1, entries:catalog.entries}));
+    return {...merge(existing,incoming), catalogs:[...applied,catalog.id]};
+  }
+  if (typeof module !== "undefined") module.exports = { tags, entry, decode, matches, merge, applyCatalog };
   if (typeof document === "undefined") return;
 
   function initialize() {
     if (!document.getElementById("sig-tool")) return;
     const $ = id => document.getElementById(id);
-    let entries = [], baseline = null, selectedTag = "", editing = null, removed = null, readable = true;
+    let entries = [], catalogs = [], baseline = null, selectedTag = "", editing = null, removed = null, readable = true;
     function message(text, error = false) {
       $("sig-status").textContent = text;
       $("sig-status").classList.toggle("is-error", error);
@@ -62,6 +67,12 @@
     try {
       baseline = localStorage.getItem(KEY);
       entries = baseline === null ? [] : decode(baseline);
+      const storedCatalogs = baseline === null ? [] : JSON.parse(baseline).catalogs;
+      catalogs = Array.isArray(storedCatalogs) ? storedCatalogs.filter(id => typeof id === "string") : [];
+      const seeded = applyCatalog(entries,catalogs,globalThis.CALENDRX_SIG_CATALOG);
+      entries = seeded.entries;
+      catalogs = seeded.catalogs;
+      if (seeded.skipped) message(`Added ${seeded.added} LDS shortcuts. Kept ${seeded.skipped} existing entries with matching shortcut names.`);
     } catch (error) {
       readable = false;
       message("The saved list could not be read. It has not been overwritten. Check browser storage access or recover your backup before editing.", true);
@@ -71,7 +82,7 @@
       if (!readable) return false;
       try {
         if (localStorage.getItem(KEY) !== baseline) throw new Error("This list changed in another tab. Reload this page before saving to avoid overwriting those changes.");
-        const data = JSON.stringify({version:1, entries:next});
+        const data = JSON.stringify({version:1, entries:next, catalogs});
         localStorage.setItem(KEY, data);
         baseline = data;
         entries = next;
@@ -132,7 +143,7 @@
         });
         removeButton.setAttribute("aria-label", `Remove ${item.code}`);
         actions.append(editButton,removeButton); heading.append(title,actions);
-        const meaning = document.createElement("p"); meaning.textContent = item.meaning;
+        const meaning = document.createElement("p"); meaning.dir = "auto"; meaning.textContent = item.meaning;
         article.append(heading,meaning);
         if (item.tags.length) {
           const row = document.createElement("div"); row.className = "sig-tags";
@@ -183,7 +194,7 @@
       message(`Restored ${removed.code}.`); removed = null; $("sig-undo").hidden = true; render(); $("sig-search").focus();
     });
     $("sig-export").addEventListener("click", () => {
-      const url = URL.createObjectURL(new Blob([JSON.stringify({version:1,entries},null,2)], {type:"application/json"}));
+      const url = URL.createObjectURL(new Blob([JSON.stringify({version:1,entries,catalogs},null,2)], {type:"application/json"}));
       const link = document.createElement("a"); link.href = url; link.download = `calendrx-sig-list-${new Date().toISOString().slice(0,10)}.json`;
       document.body.append(link); link.click(); link.remove(); setTimeout(() => URL.revokeObjectURL(url),1000);
       message("Backup downloaded.");

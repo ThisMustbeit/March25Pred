@@ -36,10 +36,10 @@ const source=fs.readFileSync(path.join(__dirname,'../tools/sigs/sigs.js'),'utf8'
 const KEY='calendrx_sig_library_v1';
 const storage = new Map();
 let failWrite=false;
-function load() {
+function load(catalog) {
   const ids=new Map();
   const $=id=>{if(!ids.has(id))ids.set(id,new Element());return ids.get(id);};
-  const context={document:{readyState:'complete',getElementById:$,createElement:tag=>new Element(tag),body:new Element()},
+  const context={CALENDRX_SIG_CATALOG:catalog,document:{readyState:'complete',getElementById:$,createElement:tag=>new Element(tag),body:new Element()},
     localStorage:{getItem:key=>storage.get(key)??null,setItem:(key,value)=>{if(failWrite)throw new Error('Storage full');storage.set(key,value);}},
     window:{addEventListener(){}},setTimeout,URL,Blob};
   vm.runInNewContext(source,context);
@@ -84,4 +84,35 @@ assert.equal(decode(storage.get(KEY)).length,2);
 storage.set(KEY,'broken saved data'); $=load();
 assert.equal($('sig-add').disabled,true);
 assert.equal(storage.get(KEY),'broken saved data');
+const catalog=require('../tools/sigs/lds-data.js');
+assert.equal(catalog.entries.length,568);
+assert.equal(decode(JSON.stringify({version:1,entries:catalog.entries})).length,568);
+assert.ok(catalog.entries.every(item=>item.tags.length===1 && item.tags[0]==='LDS'));
+const pageCounts=Array(14).fill(0);
+catalog.entries.forEach(item=>pageCounts[Number(item.notes.match(/page (\d+)/)[1])-1]++);
+assert.deepEqual(pageCounts,[35,42,42,42,42,42,39,41,42,42,41,42,41,35]);
+const byCode=new Map(catalog.entries.map(item=>[item.code,item]));
+assert.equal(byCode.get('BID').meaning,'TWICE A DAY');
+assert.equal(byCode.get('F7D,').meaning,'FOR 7 DAYS,');
+assert.equal(byCode.get('(UD)').meaning,'(AS DIRECTED)');
+assert.ok(byCode.get('LOCARABIC').meaning.includes('الأذن'));
+assert.ok(byCode.get('G1.5TS').notes.includes('verify'));
+assert.ok(byCode.get('INS1').notes.includes('verify'));
+const migrated=model.applyCatalog([{...sample,code:'BID'}],[],catalog);
+assert.equal(migrated.entries.length,568);
+assert.equal(migrated.entries.find(item=>item.code==='BID').meaning,sample.meaning);
+assert.equal(migrated.skipped,1);
+assert.equal(model.applyCatalog(migrated.entries,migrated.catalogs,catalog).added,0);
+storage.clear(); $=load(catalog);
+assert.equal($('sig-count').textContent,'568 of 568 shortcuts');
+$('sig-tags').children.find(button=>button.textContent==='LDS').click();
+assert.equal($('sig-count').textContent,'568 of 568 shortcuts');
+$('sig-search').value='weekly'; $('sig-search').events.input();
+assert.ok($('sig-list').children.length>0);
+$('sig-clear').click();
+$('sig-list').children[0].children[0].children[1].children[1].click();
+assert.equal(decode(storage.get(KEY)).length,567);
+$=load(catalog);
+assert.equal($('sig-count').textContent,'567 of 567 shortcuts');
 console.log('Passed: empty state, CRUD, tags, multi-word search, reload persistence, backup validation/merge, undo, write failures, stale-tab protection, and corrupt-data preservation.');
+console.log('Passed: all 568 LDS entries, 14 page counts, punctuation/Arabic, source notes, search/tag filtering, existing-entry preservation, and persistent catalog removal.');

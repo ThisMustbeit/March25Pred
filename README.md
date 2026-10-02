@@ -23,7 +23,9 @@ It is ready to deploy directly to GitHub and Cloudflare Pages as a static site.
 
 ## Sig List & Shortcuts
 
-Open `/tools/sigs/` from the Tools directory to add or edit shortcuts, meanings, notes, and comma-separated tags. Search covers all fields; tag buttons filter the list. It starts empty for a future reference list. Entries are saved in local browser storage, not synced between devices. Export/import JSON backups to transfer the list; imports skip existing shortcut names instead of replacing them. Removals have an Undo button until the page reloads or another entry is removed.
+Open `/tools/sigs/` from the Tools directory to add or edit shortcuts, meanings, notes, and comma-separated tags. Search covers all fields; tag buttons filter the list. The bundled `tools/sigs/lds-data.js` contains 568 shortcuts transcribed from all 14 pages of the supplied LDS reference, each tagged LDS with a source page note. Unusual source wording is preserved, with specific verification notes for G1.5TS and INS1. `analysis/lds-transcription.txt` contains the page-by-page transcription used to build the catalog.
+
+New browsers receive the bundled catalog automatically. Existing browser lists gain missing catalog entries without overwriting matching local shortcuts. A catalog version marker is saved with edits so removed entries stay removed on reload. Personal edits remain in local browser storage, not synced between devices. Export/import JSON backups to transfer the list; imports skip existing shortcut names instead of replacing them. Removals have an Undo button until the page reloads or another entry is removed.
 
 Deploy the `tools/sigs/` directory and the updated `tools/index.html`. Run `node analysis/sig-list-check.cjs` for data and simulated-DOM interaction checks.
 

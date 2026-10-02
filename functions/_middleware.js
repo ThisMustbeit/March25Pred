@@ -40,6 +40,7 @@ function renderLoginPage({ origin, redirectPath, errorMessage = "" }) {
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Protected Tools | CalendRx</title>
+  <meta name="description" content="Enter the Tools password to access CalendRx pharmacy utilities, including barcode generation and the sig shortcut library.">
   <link rel="icon" href="${origin}/website-icon.png" type="image/png">
   <link rel="shortcut icon" href="${origin}/website-icon.png" type="image/png">
   <link rel="apple-touch-icon" href="${origin}/website-icon.png">

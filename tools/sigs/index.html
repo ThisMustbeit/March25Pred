@@ -4,12 +4,14 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Sig List &amp; Shortcuts | CalendRx</title>
+  <meta name="description" content="Build and search your pharmacy sig shortcut library with CalendRx. Add meanings, notes, and tags, filter entries, and export or import backups of your list.">
   <script>if (sessionStorage.getItem("calendrx_tools_dummy_access") !== "granted") document.documentElement.classList.add("tools-gate-pending");</script>
   <link rel="icon" href="/website-icon.png" type="image/png">
   <link rel="stylesheet" href="/style.css">
   <link rel="stylesheet" href="/tools/sigs/sigs.css">
   <script src="/tools/access-gate.js" defer></script>
   <script src="/password-toggle.js" defer></script>
+  <script src="/tools/sigs/lds-data.js" defer></script>
   <script src="/tools/sigs/sigs.js" defer></script>
 </head>
 <body>
@@ -36,7 +38,7 @@
             <input id="sig-import-file" type="file" accept=".json,application/json" hidden>
           </div>
         </div>
-        <p class="sig-storage-note">Saved in this browser on this device. Export a backup to keep a copy or move your list to another computer.</p>
+        <p class="sig-storage-note">Includes the LDS reference list. Your additions and edits are saved in this browser on this device. Export a backup to keep a copy or move your list to another computer.</p>
         <div class="sig-search-row">
           <label for="sig-search"><span>Search shortcuts, meanings, notes, or tags</span><input id="sig-search" type="search" placeholder="Search your sig list…" autocomplete="off"></label>
           <button id="sig-clear" type="button" class="button button-secondary">Clear filters</button>
