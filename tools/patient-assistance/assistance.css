@@ -1,4 +1,4 @@
-.assistance-programs { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 1rem; }
+.assistance-programs { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(280px, 100%), 1fr)); gap: 1rem; }
 .assistance-programs article { padding: 1.1rem; border: 1px solid var(--border); border-radius: var(--radius-sm); background: var(--surface-soft); }
 .assistance-programs p, .assistance-note { color: var(--muted); line-height: 1.5; }
 .assistance-search-row { display: flex; flex-wrap: wrap; align-items: end; gap: 0.85rem; }
@@ -14,6 +14,9 @@
 .program-tag { display: inline-flex; align-items: center; padding: 0.5rem 0.85rem; min-height: 40px; border-radius: 999px; border: 1px solid; font-weight: 700; text-decoration: none; }
 .program-tag-innovicares { color: #315b25; border-color: #accc96; background: #eef6e8; }
 .program-tag-rxhelp { color: #185577; border-color: #a3c7df; background: #eaf4fb; }
+.program-tag-apoassist { color: #653b79; border-color: #cdb2dc; background: #f5edf9; }
+.program-tag-myrxcare { color: #805019; border-color: #dbc093; background: #fff5e5; }
+.program-tag-rybelsussample { color: #17635c; border-color: #9bcfc7; background: #eaf7f4; }
 .program-tag:hover { text-decoration: underline; }
 .assistance-product .program-tag { margin-top: auto; }
 .assistance-product small { color: var(--muted); margin-top: 0.8rem; line-height: 1.4; }

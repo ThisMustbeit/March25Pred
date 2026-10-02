@@ -4,7 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Patient Assistance Programs | CalendRx</title>
-  <meta name="description" content="Search brand names and ingredients in the Innovicares and RxHelp Nova Scotia reference lists, and follow links to Innovicares and RxHelp patient assistance programs.">
+  <meta name="description" content="Search drugs and ingredients from Innovicares, RxHelp, APOAssist, and MyRx Care reference lists, and visit their patient assistance program websites.">
   <script>if (sessionStorage.getItem("calendrx_tools_dummy_access") !== "granted") document.documentElement.classList.add("tools-gate-pending");</script>
   <link rel="icon" href="/website-icon.png" type="image/png">
   <link rel="stylesheet" href="/style.css">
@@ -12,6 +12,7 @@
   <script src="/tools/access-gate.js" defer></script>
   <script src="/password-toggle.js" defer></script>
   <script src="/tools/patient-assistance/rxhelp-data.js" defer></script>
+  <script src="/tools/patient-assistance/myrxcare-data.js" defer></script>
   <script src="/tools/patient-assistance/coverage-data.js" defer></script>
   <script src="/tools/patient-assistance/assistance.js" defer></script>
 </head>
@@ -37,16 +38,20 @@
             <p>Nova Scotia product list added from the October 2, 2026 guide.</p>
             <a class="button button-secondary" href="innovicares-coverage-NS-logos-2026-10-02.pdf" target="_blank" rel="noopener noreferrer">View Innovicares source PDF ↗</a></article>
           <article><a class="program-tag program-tag-rxhelp" href="https://rxhelp.ca/EN/about" target="_blank" rel="noopener noreferrer">RxHelp ↗<span class="assist-sr-only"> (opens in a new tab)</span></a>
-            <p>91 medications added from the supplied Nova Scotia list (undated).</p>
+            <p>91 medications added from the supplied Nova Scotia list. Reviewed October 2, 2026.</p>
             <a class="button button-secondary" href="rxhelp-medications-NS.pdf" target="_blank" rel="noopener noreferrer">View RxHelp source PDF ↗</a></article>
+          <article><a class="program-tag program-tag-apoassist" href="https://www.apoassist.com/en/" target="_blank" rel="noopener noreferrer">APOAssist ↗<span class="assist-sr-only"> (opens in a new tab)</span></a>
+            <p>Patient Assistance Simplified. 16 products added from the supplied APOAssist product dropdown screenshot. Reviewed October 2, 2026.</p></article>
+          <article><a class="program-tag program-tag-myrxcare" href="https://myrx.care/" target="_blank" rel="noopener noreferrer">MyRx Care ↗<span class="assist-sr-only"> (opens in a new tab)</span></a>
+            <p>54 medication names across 10 manufacturer programs added from the MyRx Care directory. Reviewed October 2, 2026.</p></article>
         </div>
       </section>
       <section class="card" aria-labelledby="assistance-search-title">
-        <div class="section-heading"><div><p class="section-kicker">Nova Scotia · October 2, 2026 list</p><h2 id="assistance-search-title">Find a drug or product</h2></div>
+        <div class="section-heading"><div><p class="section-kicker">Program reference lists</p><h2 id="assistance-search-title">Find a drug or product</h2></div>
         </div>
         <div class="assistance-search-row">
           <label for="assistance-search"><span>Brand name or ingredient</span><input id="assistance-search" type="search" placeholder="e.g. Vyvanse, semaglutide, Crestor" autocomplete="off" aria-controls="assistance-results"></label>
-          <label for="assistance-program"><span>Program</span><select id="assistance-program"><option value="all">All programs</option><option value="innovicares">Innovicares</option><option value="rxhelp">RxHelp</option></select></label>
+          <label for="assistance-program"><span>Program</span><select id="assistance-program"><option value="all">All programs</option><option value="innovicares">Innovicares</option><option value="rxhelp">RxHelp</option><option value="apoassist">APOAssist</option><option value="myrxcare">MyRx Care</option><option value="rybelsussample">rybelsussample</option></select></label>
           <button id="assistance-clear" class="button button-secondary" type="button">Clear filters</button>
         </div>
         <p class="assistance-note">These are reference lists, not a live coverage check. Ingredients are shown as listed in each source and may be abbreviated. Program availability and patient costs can change; confirm current details on the program website.</p>

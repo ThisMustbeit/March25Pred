@@ -6,7 +6,7 @@
   function search(products, query, program = "all") {
     const words = normalize(query).split(/\s+/).filter(Boolean);
     return products.filter(product => {
-      const text = normalize(`${product.brand} ${product.ingredient} ${product.aliases || ""}`);
+      const text = normalize(`${product.brand} ${product.ingredient} ${product.aliases || ""} ${product.subprogram || ""}`);
       return (program === "all" || product.program === program) && words.every(word => text.includes(word));
     }).sort((a,b) => a.brand.localeCompare(b.brand));
   }
@@ -51,10 +51,11 @@
         product.listings.forEach(listing => {
         const provider = catalog.programs[listing.program];
         const link = document.createElement("a"); link.className = `program-tag program-tag-${listing.program}`;
-        link.href = provider.url; link.target = "_blank"; link.rel = "noopener noreferrer";
-        link.textContent = `${provider.name} ↗`;
-        link.setAttribute("aria-label", `${product.brand}: visit ${provider.name} (opens in a new tab)`);
-        const source = document.createElement("small"); source.textContent = `${catalog.province} · ${provider.name} · ${provider.reference} · p. ${listing.sourcePage}`;
+        const label = listing.subprogram ? `${provider.name} · ${listing.subprogram}` : provider.name;
+        link.href = listing.url || provider.url; link.target = "_blank"; link.rel = "noopener noreferrer";
+        link.textContent = `${label} ↗`;
+        link.setAttribute("aria-label", `${product.brand}: visit ${label} (opens in a new tab)`);
+        const source = document.createElement("small"); source.textContent = `${provider.region || catalog.province} · ${provider.name} · ${provider.reference}${listing.sourcePage ? ` · p. ${listing.sourcePage}` : ""}`;
         card.append(link,source);
         });
         results.append(card);

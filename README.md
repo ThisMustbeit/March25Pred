@@ -23,7 +23,7 @@ It is ready to deploy directly to GitHub and Cloudflare Pages as a static site.
 
 ## Patient Assistance Programs
 
-The protected `/tools/patient-assistance/` page searches 163 program listings: 72 from the supplied Innovicares Nova Scotia guide dated October 2, 2026, and 91 from the supplied undated RxHelp Nova Scotia PDF. Program tags open official websites. Matching brand names are merged into 143 drug/product cards with both program tags and their own source references. Formulation suffixes remain distinct. Search checks ingredients and aliases from both lists; program filters retain all available tags on matching cards. Both original PDFs are linked; this is not a live coverage lookup.
+The protected `/tools/patient-assistance/` page searches 258 program listings: 72 from the supplied Innovicares Nova Scotia guide dated October 2, 2026, and 91 from the supplied undated RxHelp Nova Scotia PDF, and 16 from the supplied APOAssist product dropdown screenshot. APOAssist entries link to https://www.apoassist.com/en/ and use a Canada source label rather than implying Nova Scotia-specific coverage. Program tags open official websites. Matching brand names are merged into 214 drug/product cards with both program tags and their own source references. Formulation suffixes remain distinct. Search checks ingredients and aliases from both lists; program filters retain all available tags on matching cards. Both original PDFs are linked; this is not a live coverage lookup.
 
 Deploy the complete `tools/patient-assistance/` directory (including its PDF, CSS, and JavaScript files) and updated `tools/index.html`. Run `node analysis/patient-assistance-check.cjs` for data and simulated-DOM interaction checks. Brand names were read from the logos on all three PDF pages; ingredient captions were cross-checked against extracted text. Rocaltrol's Innovicares ingredient follows the logo spelling, with the caption spelling retained as a search alias. RxHelp ingredient captions are preserved as supplied (some abbreviate combination ingredients); Plaquenil also matches the correctly spelled sulfate. RxHelp's Biaxin entry spans pages 1 and 2 and is counted once. Include rxhelp-data.js when uploading.
 
@@ -219,3 +219,5 @@ If you want the shortest version:
 5. Deploy.
 
 That is enough for this project.
+
+MyRx Care: `tools/patient-assistance/myrxcare-data.js` imports 78 manufacturer-program listings (54 distinct medication names) from the public directory at https://myrx.care/, reviewed October 2, 2026. Each tag links to its manufacturer program. Directory spellings are retained, including Cladrabine with a cladribine search alias; ingredients absent from the directory are not inferred. Include this file in uploads.
