@@ -21,6 +21,12 @@ There is:
 
 It is ready to deploy directly to GitHub and Cloudflare Pages as a static site.
 
+## Patient Assistance Programs
+
+The protected `/tools/patient-assistance/` page searches 163 program listings: 72 from the supplied Innovicares Nova Scotia guide dated October 2, 2026, and 91 from the supplied undated RxHelp Nova Scotia PDF. Program tags open official websites. Products listed by both programs retain separate entries with program-specific source references. Both original PDFs are linked; this is not a live coverage lookup.
+
+Deploy the complete `tools/patient-assistance/` directory (including its PDF, CSS, and JavaScript files) and updated `tools/index.html`. Run `node analysis/patient-assistance-check.cjs` for data and simulated-DOM interaction checks. Brand names were read from the logos on all three PDF pages; ingredient captions were cross-checked against extracted text. Rocaltrol's Innovicares ingredient follows the logo spelling, with the caption spelling retained as a search alias. RxHelp ingredient captions are preserved as supplied (some abbreviate combination ingredients); Plaquenil also matches the correctly spelled sulfate. RxHelp's Biaxin entry spans pages 1 and 2 and is counted once. Include rxhelp-data.js when uploading.
+
 ## Sig List & Shortcuts
 
 Open `/tools/sigs/` from the Tools directory to add or edit shortcuts, meanings, notes, and comma-separated tags. Search covers all fields; tag buttons filter the list. The bundled `tools/sigs/lds-data.js` contains 568 shortcuts transcribed from all 14 pages of the supplied LDS reference, each tagged LDS with a source page note. Unusual source wording is preserved, with specific verification notes for G1.5TS and INS1. `analysis/lds-transcription.txt` contains the page-by-page transcription used to build the catalog.
@@ -45,11 +51,11 @@ Run the tutorial interaction and schedule checks with `node analysis/tutorial-ch
 
 ```text
 Codex/
-├─ index.html
-├─ style.css
-├─ script.js
-├─ README.md
-└─ analysis/                optional local workbook-analysis files
+â”œâ”€ index.html
+â”œâ”€ style.css
+â”œâ”€ script.js
+â”œâ”€ README.md
+â””â”€ analysis/                optional local workbook-analysis files
 ```
 
 Recommended for deployment:

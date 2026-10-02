@@ -1,0 +1,27 @@
+.assistance-programs { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 1rem; }
+.assistance-programs article { padding: 1.1rem; border: 1px solid var(--border); border-radius: var(--radius-sm); background: var(--surface-soft); }
+.assistance-programs p, .assistance-note { color: var(--muted); line-height: 1.5; }
+.assistance-search-row { display: flex; flex-wrap: wrap; align-items: end; gap: 0.85rem; }
+.assistance-search-row label { display: grid; gap: 0.45rem; }
+.assistance-search-row label:first-child { flex: 1; min-width: min(260px, 100%); }
+.assistance-search-row input, .assistance-search-row select { width: 100%; padding: 0.8rem; min-height: 48px; border: 1px solid var(--border); border-radius: 10px; color: var(--text); background: #fbfdfe; }
+.assistance-note { font-size: 0.88rem; margin: 1rem 0; }
+.assistance-count { color: var(--muted); font-weight: 600; }
+.assistance-results { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(285px, 100%), 1fr)); gap: 1rem; }
+.assistance-product { display: flex; flex-direction: column; align-items: start; padding: 1.2rem; border: 1px solid var(--border); border-radius: var(--radius-sm); background: #fbfdfe; min-width: 0; }
+.assistance-product h3 { margin: 0; font-size: 1.15rem; color: var(--accent-dark); }
+.assistance-product p { line-height: 1.5; overflow-wrap: anywhere; margin: 0.6rem 0 1rem; }
+.program-tag { display: inline-flex; align-items: center; padding: 0.5rem 0.85rem; min-height: 40px; border-radius: 999px; border: 1px solid; font-weight: 700; text-decoration: none; }
+.program-tag-innovicares { color: #315b25; border-color: #accc96; background: #eef6e8; }
+.program-tag-rxhelp { color: #185577; border-color: #a3c7df; background: #eaf4fb; }
+.program-tag:hover { text-decoration: underline; }
+.assistance-product .program-tag { margin-top: auto; }
+.assistance-product small { color: var(--muted); margin-top: 0.8rem; line-height: 1.4; }
+.assistance-empty { grid-column: 1 / -1; padding: 2rem 1rem; border-radius: var(--radius-sm); background: var(--surface-soft); text-align: center; }
+.assist-sr-only { position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); white-space: nowrap; }
+#assistance-tool :is(a,button,input,select):focus-visible { outline: 2px solid var(--accent); outline-offset: 3px; }
+@media (max-width: 600px) {
+  .assistance-programs { grid-template-columns: 1fr; }
+  #assistance-tool .section-heading { flex-direction: column; }
+  .assistance-search-row label { width: 100%; }
+}

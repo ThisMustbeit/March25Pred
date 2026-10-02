@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Patient Assistance Programs | CalendRx</title>
+  <meta name="description" content="Search brand names and ingredients in the Innovicares and RxHelp Nova Scotia reference lists, and follow links to Innovicares and RxHelp patient assistance programs.">
+  <script>if (sessionStorage.getItem("calendrx_tools_dummy_access") !== "granted") document.documentElement.classList.add("tools-gate-pending");</script>
+  <link rel="icon" href="/website-icon.png" type="image/png">
+  <link rel="stylesheet" href="/style.css">
+  <link rel="stylesheet" href="/tools/patient-assistance/assistance.css">
+  <script src="/tools/access-gate.js" defer></script>
+  <script src="/password-toggle.js" defer></script>
+  <script src="/tools/patient-assistance/rxhelp-data.js" defer></script>
+  <script src="/tools/patient-assistance/coverage-data.js" defer></script>
+  <script src="/tools/patient-assistance/assistance.js" defer></script>
+</head>
+<body>
+  <div class="app-shell" id="assistance-tool">
+    <nav class="site-nav" aria-label="Primary"><div class="site-nav-inner">
+      <a href="/" class="site-nav-link">Taper Planner</a>
+      <a href="/tools/" class="site-nav-link">Other Pharmacy Tools</a>
+      <a href="/tools/patient-assistance/" class="site-nav-link is-current" aria-current="page">Patient Assistance</a>
+    </div></nav>
+    <main>
+      <section class="hero tools-hero">
+        <div class="hero-brand"><img src="/website-icon.png" alt="CalendRx logo" class="hero-logo">
+          <div><p class="section-kicker">Program Finder</p><h1>Patient Assistance Programs</h1>
+            <p class="hero-copy">Search by drug brand or ingredient, then select a program tag to visit its website.</p>
+          </div>
+        </div>
+      </section>
+      <section class="card" aria-labelledby="programs-title">
+        <div class="section-heading"><div><p class="section-kicker">Quick Links</p><h2 id="programs-title">Program websites</h2></div></div>
+        <div class="assistance-programs">
+          <article><a class="program-tag program-tag-innovicares" href="https://www.innovicares.ca/en/" target="_blank" rel="noopener noreferrer">Innovicares ↗<span class="assist-sr-only"> (opens in a new tab)</span></a>
+            <p>Nova Scotia product list added from the October 2, 2026 guide.</p></article>
+          <article><a class="program-tag program-tag-rxhelp" href="https://rxhelp.ca/EN/about" target="_blank" rel="noopener noreferrer">RxHelp ↗<span class="assist-sr-only"> (opens in a new tab)</span></a>
+            <p>91 medications added from the supplied Nova Scotia list (undated).</p></article>
+        </div>
+      </section>
+      <section class="card" aria-labelledby="assistance-search-title">
+        <div class="section-heading"><div><p class="section-kicker">Nova Scotia · October 2, 2026 list</p><h2 id="assistance-search-title">Find a drug or product</h2></div>
+          <a class="button button-secondary" href="innovicares-coverage-NS-logos-2026-10-02.pdf" target="_blank" rel="noopener noreferrer">View source PDF ↗</a>
+        </div>
+        <p><a href="rxhelp-medications-NS.pdf" target="_blank" rel="noopener noreferrer">View RxHelp source PDF ↗</a></p>
+        <div class="assistance-search-row">
+          <label for="assistance-search"><span>Brand name or ingredient</span><input id="assistance-search" type="search" placeholder="e.g. Vyvanse, semaglutide, Crestor" autocomplete="off" aria-controls="assistance-results"></label>
+          <label for="assistance-program"><span>Program</span><select id="assistance-program"><option value="all">All programs</option><option value="innovicares">Innovicares</option><option value="rxhelp">RxHelp</option></select></label>
+          <button id="assistance-clear" class="button button-secondary" type="button">Clear filters</button>
+        </div>
+        <p class="assistance-note">These are reference lists, not a live coverage check. Ingredients are shown as listed in each source and may be abbreviated. Program availability and patient costs can change; confirm current details on the program website.</p>
+        <p id="assistance-count" class="assistance-count" role="status" aria-live="polite"></p>
+        <div id="assistance-results" class="assistance-results"></div>
+        <noscript><p>Enable JavaScript to search the list, or open the source PDF above.</p></noscript>
+      </section>
+    </main>
+  </div>
+</body>
+</html>
