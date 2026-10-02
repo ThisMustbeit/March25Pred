@@ -3,7 +3,7 @@ const fs = require('node:fs');
 const path = require('node:path');
 const vm = require('node:vm');
 const data = require('../tools/patient-assistance/coverage-data.js');
-const {search} = require('../tools/patient-assistance/assistance.js');
+const {search, groupedSearch} = require('../tools/patient-assistance/assistance.js');
 const innovicares=data.products.filter(item=>item.program==='innovicares');
 const rxhelp=data.products.filter(item=>item.program==='rxhelp');
 assert.equal(data.products.length,163);
@@ -31,6 +31,18 @@ assert.equal(search(innovicares,'quetiapine').length,2);
 assert.equal(search(innovicares,'','rxhelp').length,0);
 assert.equal(search(innovicares,'no such medicine').length,0);
 
+for (const brand of ['Crestor','Concerta']) {
+  const matches=groupedSearch(data.products,brand);
+  assert.equal(matches.length,1);
+  assert.deepEqual(matches[0].listings.map(item=>item.program),['innovicares','rxhelp']);
+}
+assert.equal(groupedSearch(data.products,'').length,143);
+assert.equal(groupedSearch(data.products,'quetiapine').length,2);
+assert.equal(groupedSearch(data.products,'Zomig').length,2);
+assert.equal(groupedSearch(data.products,'methylphenidate hydrochloride')[1].listings.length,2);
+assert.equal(groupedSearch(data.products,'Crestor','rxhelp')[0].listings.length,2);
+assert.equal(groupedSearch(data.products,'Wegovy','rxhelp').length,0);
+
 class Element {
   constructor(){this.children=[];this.events={};this.attributes={};this.value='';}
   append(...children){this.children.push(...children);}
@@ -47,9 +59,9 @@ vm.runInNewContext(source,{
   CALENDRX_ASSISTANCE:data,
   document:{readyState:'complete',getElementById:get,createElement:()=>new Element()}
 });
-assert.equal(get('assistance-results').children.length,163);
+assert.equal(get('assistance-results').children.length,143);
 get('assistance-search').value='semaglutide';get('assistance-search').events.input();
-assert.equal(get('assistance-count').textContent,'2 of 163 program listings');
+assert.equal(get('assistance-count').textContent,'2 of 143 drugs and products');
 const card=get('assistance-results').children[0];
 assert.equal(card.children[0].textContent,'Ozempic');
 assert.equal(card.children[2].href,data.programs.innovicares.url);
@@ -57,7 +69,7 @@ assert.equal(card.children[2].target,'_blank');
 assert.equal(card.children[2].rel,'noopener noreferrer');
 assert.ok(card.children[3].textContent.includes('October 2, 2026'));
 get('assistance-program').value='rxhelp';get('assistance-program').events.change();
-assert.equal(get('assistance-count').textContent,'0 of 163 program listings');
+assert.equal(get('assistance-count').textContent,'0 of 143 drugs and products');
 assert.equal(get('assistance-results').children[0].children[0].textContent,'No matching products in this list');
 get('assistance-search').value='apixaban';get('assistance-search').events.input();
 const rxCard=get('assistance-results').children[0];
@@ -68,8 +80,15 @@ assert.ok(!rxCard.children[3].textContent.includes('October 2'));
 get('assistance-search').value='';get('assistance-search').events.input();
 assert.equal(get('assistance-results').children.length,91);
 get('assistance-clear').events.click();
-assert.equal(get('assistance-results').children.length,163);
+assert.equal(get('assistance-results').children.length,143);
 assert.equal(get('assistance-search').focused,true);
+get('assistance-search').value='Crestor';get('assistance-search').events.input();
+assert.equal(get('assistance-results').children.length,1);
+const merged=get('assistance-results').children[0];
+assert.equal(merged.children[2].href,data.programs.innovicares.url);
+assert.equal(merged.children[4].href,data.programs.rxhelp.url);
+assert.ok(merged.children[3].textContent.includes('October 2, 2026'));
+assert.ok(merged.children[5].textContent.includes('undated'));
 get('assistance-search').value='<script>alert(1)</script>';get('assistance-search').events.input();
 assert.equal(get('assistance-results').children[0].children[0].textContent,'No matching products in this list');
 const html=fs.readFileSync(path.join(__dirname,'../tools/patient-assistance/index.html'),'utf8');
@@ -83,4 +102,4 @@ assert.ok(directory.includes('href="/tools/patient-assistance/"'));
 assert.ok(html.indexOf('/rxhelp-data.js') < html.indexOf('/coverage-data.js'));
 assert.ok(html.includes(data.programs.rxhelp.source));
 assert.ok(fs.existsSync(path.join(__dirname,'../tools/patient-assistance',data.programs.rxhelp.source)));
-console.log('Passed: 163 listings across both PDFs, brand/ingredient search, formulation distinctions, program filters/links, empty states, reset, program-specific source dates/PDFs, and protected directory navigation.');
+console.log('Passed: 163 listings merged into 143 drug/product cards across both PDFs, brand/ingredient search, formulation distinctions, program filters/links, empty states, reset, program-specific source dates/PDFs, and protected directory navigation.');
