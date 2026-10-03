@@ -12,6 +12,11 @@
   <link rel="stylesheet" href="print-calendar.css" media="print">
 </head>
 <body>
+  <script>
+    // Match the default guided view before any page content is painted.
+    document.body.classList.add("mobile-flow-active", "guided-preview-active", "mobile-step-1");
+    document.body.dataset.mobileStep = "1";
+  </script>
   <div id="sticky-action-bar" class="sticky-action-bar no-print" aria-hidden="true">
     <div class="sticky-action-bar-inner">
       <button id="sticky-generate-button" type="submit" form="taper-form" class="button">Generate Schedule</button>
@@ -82,8 +87,9 @@
                   <button
                     id="preview-mode-guided"
                     type="button"
-                    class="direction-toggle-button"
+                    class="direction-toggle-button is-active"
                     data-preview-mode="guided"
+                    aria-pressed="true"
                   >
                     Guided Setup
                   </button>
@@ -136,7 +142,7 @@
           <p id="mobile-step-count" class="mobile-step-count">Step 1 of 3</p>
           <h3 id="mobile-step-title" class="mobile-step-title">Medication &amp; Start</h3>
           <p id="mobile-step-description" class="mobile-step-description">
-            Enter the medication name, starting dose, and taper start date.
+            Enter the medication name and taper start date.
           </p>
         </div>
 
@@ -149,7 +155,7 @@
                 <input id="drug-name" name="drugName" type="text" maxlength="80" placeholder="Example: Prednisone, Warfarin, Vyvanse, etc." required>
               </label>
               <div id="mobile-starting-dose-home"></div>
-              <label>
+              <label class="starting-dose-field">
                 <span id="starting-dose-label">Starting Daily Dose (mg)</span>
                 <div class="input-with-unit" data-unit="mg">
                   <input id="starting-dose" name="startingDose" type="number" step="0.1" min="0" required>

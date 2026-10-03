@@ -177,6 +177,12 @@ body.sticky-actions-visible .sticky-action-bar {
   object-fit: contain;
 }
 
+/* This field moves to step 3 during setup; reserve the correct step-1 layout
+   while the main script is still downloading. */
+body.guided-preview-active.mobile-step-1 .starting-dose-field {
+  display: none;
+}
+
 .hero-copy {
   max-width: 62ch;
   color: var(--muted);
