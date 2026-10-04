@@ -1,4 +1,4 @@
-# Prednisone Taper Calendar Generator
+# CalendRx - Medication Taper Calendar Generator
 
 A plain static website for generating a prednisone taper schedule, monthly calendar view, tablet breakdown, warnings, and print-friendly output.
 

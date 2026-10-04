@@ -3,13 +3,46 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Medication Taper Calendar Generator</title>
-  <meta name="description" content="Create medication taper schedules with CalendRx. Plan standard or advanced dose changes, review tablet breakdowns, and preview and print monthly calendars.">
+  <title>CalendRx - Medication Taper Calendar Generator</title>
+  <meta name="description" content="CalendRx is a medication taper calendar generator for adjustable dose schedules, tablet quantities, and printable monthly taper calendars.">
+  <link rel="canonical" href="https://calendrx.ca/">
+  <meta property="og:site_name" content="CalendRx">
+  <meta property="og:title" content="CalendRx - Medication Taper Calendar Generator">
+  <meta property="og:description" content="Create adjustable medication dose schedules, review tablet quantities, and print monthly taper calendars with CalendRx.">
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="https://calendrx.ca/">
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@graph": [
+      {
+        "@type": "WebSite",
+        "@id": "https://calendrx.ca/#website",
+        "name": "CalendRx",
+        "url": "https://calendrx.ca/",
+        "inLanguage": "en"
+      },
+      {
+        "@type": "WebApplication",
+        "@id": "https://calendrx.ca/#application",
+        "name": "CalendRx",
+        "url": "https://calendrx.ca/",
+        "applicationCategory": "HealthApplication",
+        "operatingSystem": "Web",
+        "description": "CalendRx is a medication taper calendar generator for adjustable dose schedules, tablet quantities, and printable monthly taper calendars.",
+        "isPartOf": {"@id": "https://calendrx.ca/#website"}
+      }
+    ]
+  }
+  </script>
   <link rel="icon" href="./website-icon.png" type="image/png">
   <link rel="shortcut icon" href="./website-icon.png" type="image/png">
   <link rel="apple-touch-icon" href="./website-icon.png">
   <link rel="stylesheet" href="style.css">
   <link rel="stylesheet" href="print-calendar.css" media="print">
+  <script src="script.js" defer></script>
+  <script src="print-preview.js" defer></script>
+  <script src="tutorial.js" defer></script>
 </head>
 <body>
   <script>
@@ -43,10 +76,10 @@
       <div class="hero-brand">
         <img src="website-icon.png" alt="Medication taper calendar logo" class="hero-logo">
         <div class="hero-brand-copy">
-        <h1>Medication Taper Calendar Generator | CalendRx</h1>
+        <h1>CalendRx - Medication Taper Calendar Generator</h1>
         <p class="hero-copy">
-          Build a day-by-day medication taper schedule, see strength breakdowns, review exact-dose warnings,
-          and print a clean monthly calendar.
+          CalendRx creates day-by-day medication taper schedules with standard or advanced dose changes.
+          Adjust start dates, review strength breakdowns and tablet quantities, and preview and print monthly calendars.
         </p>
         </div>
       </div>
@@ -591,8 +624,5 @@
     </tr>
   </template>
 
-  <script src="script.js"></script>
-  <script src="print-preview.js"></script>
-  <script src="tutorial.js"></script>
 </body>
 </html>
