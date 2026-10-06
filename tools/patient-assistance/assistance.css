@@ -17,6 +17,8 @@
 .program-tag-apoassist { color: #653b79; border-color: #cdb2dc; background: #f5edf9; }
 .program-tag-myrxcare { color: #805019; border-color: #dbc093; background: #fff5e5; }
 .program-tag-rybelsussample { color: #17635c; border-color: #9bcfc7; background: #eaf7f4; }
+.program-tag-myzepbound { color: #743955; border-color: #d8a9bf; background: #fbeef4; }
+.program-tag-mymounjaro { color: #58477f; border-color: #bdb0d9; background: #f2eef9; }
 .program-tag:hover { text-decoration: underline; }
 .assistance-product .program-tag { margin-top: auto; }
 .assistance-product small { color: var(--muted); margin-top: 0.8rem; line-height: 1.4; }

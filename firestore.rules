@@ -1,0 +1,45 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    function signedIn() { return request.auth != null; }
+    function owner() {
+      // Keep aligned with the owner UID used in firebase-config.js.
+      return signedIn() && request.auth.uid == 'ukzzYYtIU3cyfoqP5BFgDhxjOCJ3';
+    }
+    function own(uid) { return signedIn() && request.auth.uid == uid; }
+    function validSig() {
+      let d = request.resource.data;
+      return d.keys().hasAll(['code','meaning','notes','tags','deleted','revision','updatedAt'])
+        && d.keys().hasOnly(['code','meaning','notes','tags','deleted','revision','updatedAt'])
+        && d.code is string && d.code.size() > 0 && d.code.size() <= 80
+        && d.meaning is string && d.meaning.size() > 0 && d.meaning.size() <= 2000
+        && d.notes is string && d.notes.size() <= 2000
+        && d.tags is list && d.tags.size() <= 20
+        && d.deleted is bool && d.revision is int && d.revision > 0
+        && d.updatedAt == request.time;
+    }
+    match /sharedSigs/{id} {
+      allow read: if true;
+      allow create: if owner() && validSig() && request.resource.data.revision == 1;
+      allow update: if owner() && validSig() && request.resource.data.revision == resource.data.revision + 1;
+      // Deletions are tombstones so bundled entries do not return.
+      allow delete: if false;
+    }
+    match /users/{uid}/sigs/{id} {
+      allow read: if own(uid);
+      allow create: if own(uid) && validSig() && request.resource.data.revision == 1;
+      allow update: if own(uid) && validSig() && request.resource.data.revision == resource.data.revision + 1;
+      allow delete: if false;
+    }
+    match /users/{uid}/favorites/{id} {
+      allow read, delete: if own(uid);
+      allow create, update: if own(uid)
+        && request.resource.data.keys().hasOnly(['source','entryId'])
+        && request.resource.data.source in ['shared','personal']
+        && request.resource.data.entryId is string
+        && request.resource.data.entryId.size() <= 100
+        && id == request.resource.data.source + '_' + request.resource.data.entryId;
+    }
+    match /{document=**} { allow read, write: if false; }
+  }
+}

@@ -27,3 +27,11 @@
   .sig-entry-heading { align-items: start; }
   .sig-actions .button { padding: 0.6rem 0.85rem; }
 }
+
+#sig-auth-form { max-width: 36rem; margin-bottom: 1rem; }
+#sig-tool select { padding: .65rem; border: 1px solid var(--border); border-radius: 10px; background: white; color: var(--text); }
+#sig-auth-form .sig-show-password { display: flex; align-items: center; gap: .5rem; }
+#sig-auth-form .sig-show-password input { width: auto; }
+#sig-tool button:disabled { opacity: .55; cursor: not-allowed; }
+#sig-sync-state, #sig-account-state { color: var(--muted); }
+#sig-auth-status { overflow-wrap: anywhere; }

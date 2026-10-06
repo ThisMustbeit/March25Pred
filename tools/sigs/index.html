@@ -11,11 +11,14 @@
   <link rel="stylesheet" href="/tools/sigs/sigs.css">
   <script src="/tools/access-gate.js" defer></script>
   <script src="/password-toggle.js" defer></script>
-  <script src="/tools/sigs/lds-data.js" defer></script>
+  <script src="/tools/sigs/ls-data.js" defer></script>
+  <script src="/tools/sigs/cs-data.js" defer></script>
   <script src="/tools/sigs/sigs.js" defer></script>
+  <script src="/tools/sigs/cloud-model.js" defer></script>
+  <script src="/tools/sigs/cloud-loader.js" defer></script>
 </head>
 <body>
-  <div class="app-shell" id="sig-tool">
+  <div class="app-shell" id="sig-tool" data-cloud="true">
     <nav class="site-nav no-print" aria-label="Primary"><div class="site-nav-inner">
       <a href="/" class="site-nav-link">Taper Planner</a>
       <a href="/tools/" class="site-nav-link">Other Pharmacy Tools</a>
@@ -28,17 +31,39 @@
             <p class="hero-copy">Find a shortcut, read its meaning, and organize your list with tags.</p>
           </div>
         </div>
-        <button id="sig-add" type="button" class="button">+ Add shortcut</button>
+        <button id="sig-add" type="button" class="button" disabled>+ Add shortcut</button>
+      </section>
+
+      <section class="card" aria-labelledby="sig-account-title">
+        <h2 id="sig-account-title">Your account</h2>
+        <p id="sig-account-state" role="status">Connecting to sign-in…</p>
+        <form id="sig-auth-form" class="sig-form" hidden>
+          <label for="sig-email">Email<input id="sig-email" type="email" autocomplete="username" required></label>
+          <label for="sig-password">Password<input id="sig-password" type="password" autocomplete="current-password" required></label>
+          <label class="sig-show-password"><input id="sig-show-password" type="checkbox"> Show password</label>
+          <div class="sig-actions">
+            <button type="submit" class="button">Sign in</button>
+            <button id="sig-register" type="button" class="button button-secondary">Create account</button>
+            <button id="sig-reset-password" type="button" class="button button-secondary">Reset password</button>
+          </div>
+        </form>
+        <div class="sig-actions">
+          <button id="sig-signout" type="button" class="button button-secondary" hidden>Sign out</button>
+          <button id="sig-import-local" type="button" class="button button-secondary" disabled>Import browser-saved list into my account</button>
+        </div>
+        <p id="sig-auth-status" role="status"></p>
       </section>
 
       <section class="card" aria-labelledby="sig-library-title">
         <div class="section-heading"><div><p class="section-kicker">Your List</p><h2 id="sig-library-title">Search shortcuts</h2></div>
           <div class="sig-actions"><button id="sig-export" type="button" class="button button-secondary">Export backup</button>
-            <button id="sig-import" type="button" class="button button-secondary">Import backup</button>
+            <button id="sig-import" type="button" class="button button-secondary" disabled>Import personal backup</button>
             <input id="sig-import-file" type="file" accept=".json,application/json" hidden>
           </div>
         </div>
-        <p class="sig-storage-note">Includes the LDS reference list. Your additions and edits are saved in this browser on this device. Export a backup to keep a copy or move your list to another computer.</p>
+        <p class="sig-storage-note">Everyone can read the shared LS and CS lists. Sign in to save personal shortcuts, tags and favourites across devices. Only the owner can change the shared list. Copy a shared shortcut to your personal list to customize it.</p>
+        <label for="sig-view">Show <select id="sig-view"><option value="all">All shortcuts</option><option value="shared">Shared library</option><option value="personal">My personal shortcuts</option><option value="favorites">My favourites</option></select></label>
+        <p id="sig-sync-state" role="status">Loading the shared library…</p>
         <div class="sig-search-row">
           <label for="sig-search"><span>Search shortcuts, meanings, notes, or tags</span><input id="sig-search" type="search" placeholder="Search your sig list…" autocomplete="off"></label>
           <button id="sig-clear" type="button" class="button button-secondary">Clear filters</button>
@@ -53,6 +78,7 @@
       <section id="sig-editor" class="card" aria-labelledby="sig-editor-title" hidden>
         <p class="section-kicker">Shortcut Details</p><h2 id="sig-editor-title">Add shortcut</h2>
         <form id="sig-form" class="sig-form">
+          <label for="sig-scope">Save to<select id="sig-scope"><option value="personal">My personal list</option><option value="shared" id="sig-shared-option" hidden>Shared library (everyone)</option></select></label>
           <label for="sig-code"><span>Shortcut</span><input id="sig-code" maxlength="80" required autocomplete="off"></label>
           <label for="sig-meaning"><span>Meaning / expanded instructions</span><textarea id="sig-meaning" rows="3" maxlength="2000" required></textarea></label>
           <label for="sig-entry-tags"><span>Tags (separate with commas)</span><input id="sig-entry-tags" maxlength="1000" placeholder="e.g. frequency, route, instructions" aria-describedby="sig-tags-help"><small id="sig-tags-help">Add new tags here or use a suggested tag below. Edit this field to rename or remove tags for this entry.</small></label>

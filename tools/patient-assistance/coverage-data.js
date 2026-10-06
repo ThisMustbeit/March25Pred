@@ -108,11 +108,17 @@
       rxhelp: {name:"RxHelp", source:"rxhelp-medications-NS.pdf", reference:"Reviewed October 2, 2026", url:"https://rxhelp.ca/EN/about"},
       apoassist: {name:"APOAssist", region:"Canada", reference:"Reviewed October 2, 2026", url:"https://www.apoassist.com/en/"},
       myrxcare: {name:"MyRx Care", region:"Canada", reference:"Reviewed October 2, 2026", url:"https://myrx.care/"},
-      rybelsussample: {name:"rybelsussample", region:"Canada", reference:"User-supplied link · Added October 2, 2026", url:"https://rybelsussample.ca/"}
+      rybelsussample: {name:"rybelsussample", region:"Canada", reference:"User-supplied link · Added October 2, 2026", url:"https://rybelsussample.ca/"},
+      myzepbound: {name:"myzepbound", region:"Canada", reference:"Reviewed October 3, 2026", url:"https://myzepbound.ca/en"},
+      mymounjaro: {name:"mymounjaro", region:"Canada", reference:"Reviewed October 3, 2026", url:"https://mymounjaro.ca/en"}
     },
     products: pages.flatMap((rows, index) => rows.map(([brand, ingredient, aliases = ""]) => ({
       brand, ingredient, aliases, program:"innovicares", sourcePage:index + 1
-    }))).concat(rxhelp, apoassist, myrxcare, [{brand:"Rybelsus", ingredient:"semaglutide tablets", aliases:"oral semaglutide", program:"rybelsussample"}])
+    }))).concat(rxhelp, apoassist, myrxcare, [
+      {brand:"Rybelsus", ingredient:"semaglutide tablets", aliases:"oral semaglutide", program:"rybelsussample"},
+      {brand:"Zepbound", ingredient:"tirzepatide injection", aliases:"KwikPen", program:"myzepbound"},
+      {brand:"Mounjaro KwikPen", ingredient:"tirzepatide injection", aliases:"Mounjaro", program:"mymounjaro"}
+    ])
   };
   if (typeof module !== "undefined") module.exports = catalog;
   else globalThis.CALENDRX_ASSISTANCE = catalog;

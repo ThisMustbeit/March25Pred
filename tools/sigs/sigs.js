@@ -33,7 +33,7 @@
     if (parsed?.version !== 1 || !Array.isArray(parsed.entries)) throw new Error("Choose a valid Sig List backup (version 1).");
     if (parsed.entries.length > 10000) throw new Error("A list can contain up to 10,000 shortcuts.");
     const entries = parsed.entries.map(entry);
-    const keys = new Set(entries.map(item => normalize(item.code)));
+    const keys = new Set(entries.map(identity));
     if (keys.size !== entries.length) throw new Error("The backup contains duplicate shortcuts.");
     return entries;
   }
@@ -48,16 +48,42 @@
     if (existing.length + added.length > 10000) throw new Error("A list can contain up to 10,000 shortcuts.");
     return { entries: [...existing, ...added], added: added.length, skipped: incoming.length - added.length };
   }
+  const identity = item => JSON.stringify([normalize(item.code), item.meaning]);
+  function migrateNames(entries) {
+    return entries.map(item => ({...item,
+      tags: tags(item.tags.map(tag => normalize(tag) === "lds" ? "LS" : tag)),
+      notes: item.notes.replace(/Sig list LDS\.pdf/g, "Sig list LS.pdf")
+    }));
+  }
+  function mergeVariants(existing, incoming) {
+    const entries = existing.map(item => ({...item}));
+    const positions = new Map(entries.map((item,index) => [identity(item),index]));
+    let added = 0;
+    for (const item of incoming) {
+      const index = positions.get(identity(item));
+      if (index === undefined) {
+        positions.set(identity(item), entries.length); entries.push(item); added++;
+      } else {
+        const current = entries[index];
+        entries[index] = {...current, tags:tags([...current.tags,...item.tags]),
+          notes: [...new Set([current.notes,item.notes].filter(Boolean))].join("\n")};
+      }
+    }
+    if (entries.length > 10000) throw new Error("A list can contain up to 10,000 shortcuts.");
+    return {entries, added, skipped:incoming.length-added};
+  }
   function applyCatalog(existing, applied, catalog) {
     if (!catalog || applied.includes(catalog.id)) return {entries:existing, catalogs:applied, added:0, skipped:0};
     const incoming = decode(JSON.stringify({version:1, entries:catalog.entries}));
-    return {...merge(existing,incoming), catalogs:[...applied,catalog.id]};
+    return {...(catalog.variants ? mergeVariants(existing,incoming) : merge(existing,incoming)), catalogs:[...applied,catalog.id]};
   }
-  if (typeof module !== "undefined") module.exports = { tags, entry, decode, matches, merge, applyCatalog };
+  if (typeof module !== "undefined") module.exports = { tags, entry, decode, matches, merge, applyCatalog, migrateNames, mergeVariants };
+  globalThis.CalendRxSigModel = {tags, entry, decode, matches, merge, applyCatalog, migrateNames, mergeVariants};
   if (typeof document === "undefined") return;
 
   function initialize() {
     if (!document.getElementById("sig-tool")) return;
+    if (document.getElementById("sig-tool").dataset?.cloud === "true") return;
     const $ = id => document.getElementById(id);
     let entries = [], catalogs = [], baseline = null, selectedTag = "", editing = null, removed = null, readable = true;
     function message(text, error = false) {
@@ -66,13 +92,16 @@
     }
     try {
       baseline = localStorage.getItem(KEY);
-      entries = baseline === null ? [] : decode(baseline);
+      entries = migrateNames(baseline === null ? [] : decode(baseline));
       const storedCatalogs = baseline === null ? [] : JSON.parse(baseline).catalogs;
       catalogs = Array.isArray(storedCatalogs) ? storedCatalogs.filter(id => typeof id === "string") : [];
       const seeded = applyCatalog(entries,catalogs,globalThis.CALENDRX_SIG_CATALOG);
       entries = seeded.entries;
       catalogs = seeded.catalogs;
-      if (seeded.skipped) message(`Added ${seeded.added} LDS shortcuts. Kept ${seeded.skipped} existing entries with matching shortcut names.`);
+      const cs = applyCatalog(entries,catalogs,globalThis.CALENDRX_CS_CATALOG);
+      entries = cs.entries;
+      catalogs = cs.catalogs;
+      if (seeded.skipped) message(`Added ${seeded.added} LS shortcuts. Kept ${seeded.skipped} existing entries with matching shortcut names.`);
     } catch (error) {
       readable = false;
       message("The saved list could not be read. It has not been overwritten. Check browser storage access or recover your backup before editing.", true);
@@ -92,6 +121,9 @@
         return false;
       }
     }
+    // Persist catalog imports and the LDS-to-LS rename without requiring an edit.
+    if (readable && (baseline !== null || catalogs.length) &&
+        baseline !== JSON.stringify({version:1, entries, catalogs})) save(entries);
     function makeButton(text, action, className = "button button-secondary") {
       const button = document.createElement("button");
       button.type = "button"; button.className = className; button.textContent = text;
@@ -137,7 +169,7 @@
         const removeButton = makeButton("Remove", () => {
           if (!save(entries.filter(value => value !== item))) return;
           removed = item; $("sig-undo").hidden = false;
-          if (editing === normalize(item.code)) close();
+          if (editing === item) close();
           render(); message(`Removed ${item.code}. You can undo this removal.`);
           $("sig-undo").focus();
         });
@@ -156,7 +188,7 @@
       });
     }
     function open(item = null) {
-      editing = item ? normalize(item.code) : null;
+      editing = item;
       $("sig-form").reset(); $("sig-form-error").textContent = "";
       $("sig-editor-title").textContent = item ? "Edit shortcut & tags" : "Add shortcut";
       $("sig-code").value = item?.code || ""; $("sig-meaning").value = item?.meaning || "";
@@ -175,9 +207,9 @@
       event.preventDefault();
       try {
         const item = entry({code:$("sig-code").value, meaning:$("sig-meaning").value, tags:$("sig-entry-tags").value, notes:$("sig-notes").value});
-        if (entries.some(value => normalize(value.code) === normalize(item.code) && normalize(value.code) !== editing)) throw new Error("That shortcut already exists. Edit its existing entry instead.");
+        if (entries.some(value => identity(value) === identity(item) && value !== editing)) throw new Error("That shortcut and meaning already exists. Edit its existing entry instead.");
         if (!editing && entries.length >= 10000) throw new Error("A list can contain up to 10,000 shortcuts.");
-        const next = editing ? entries.map(value => normalize(value.code) === editing ? item : value) : [...entries,item];
+        const next = editing ? entries.map(value => value === editing ? item : value) : [...entries,item];
         if (!save(next)) { $("sig-form-error").textContent = $("sig-status").textContent; return; }
         $("sig-search").value = ""; selectedTag = "";
         close(); render(); message(`Saved ${item.code}.`);
@@ -189,7 +221,7 @@
     $("sig-undo").addEventListener("click", () => {
       if (!removed) return;
       if (entries.length >= 10000) {message("Remove another entry before restoring this shortcut; the list is full.", true); return;}
-      if (entries.some(item => normalize(item.code) === normalize(removed.code))) {message("A shortcut with that name now exists. Rename it before undoing the removal.", true); return;}
+      if (entries.some(item => identity(item) === identity(removed))) {message("A shortcut with that name and meaning now exists. Rename it before undoing the removal.", true); return;}
       if (!save([...entries,removed])) return;
       message(`Restored ${removed.code}.`); removed = null; $("sig-undo").hidden = true; render(); $("sig-search").focus();
     });
@@ -204,10 +236,10 @@
       const file = event.target.files[0]; if (!file) return;
       try {
         if (file.size > 5 * 1024 * 1024) throw new Error("Choose a backup smaller than 5 MB.");
-        const incoming = decode(await file.text());
-        const result = merge(entries,incoming);
+        const incoming = migrateNames(decode(await file.text()));
+        const result = mergeVariants(entries,incoming);
         if (!save(result.entries)) return;
-        close(); render(); message(`Imported ${result.added} shortcuts. Skipped ${result.skipped} existing shortcuts; existing entries were kept.`);
+        close(); render(); message(`Imported ${result.added} shortcuts. Combined tags and source notes for ${result.skipped} matching entries; different meanings were kept separately.`);
       } catch (error) {message(`Import failed. ${error.message}`,true);}
       finally {event.target.value = "";}
     });
