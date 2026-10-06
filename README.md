@@ -19,7 +19,7 @@ There is:
 - no package manager required
 - no build step required
 
-It is ready to deploy directly to GitHub and Cloudflare Pages as a static site.
+It is ready to deploy directly to GitHub and Cloudflare Pages as a static site!
 
 ## Patient Assistance Programs
 
