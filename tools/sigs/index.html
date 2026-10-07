@@ -23,6 +23,7 @@
       <a href="/" class="site-nav-link">Taper Planner</a>
       <a href="/tools/" class="site-nav-link">Other Pharmacy Tools</a>
       <a href="/tools/sigs/" class="site-nav-link is-current" aria-current="page">Sig List &amp; Shortcuts</a>
+      <a href="/tools/notepad/" class="site-nav-link">My Notepad</a>
     </div></nav>
     <main>
       <section class="hero tools-hero">
@@ -81,7 +82,7 @@
           <label for="sig-scope">Save to<select id="sig-scope"><option value="personal">My personal list</option><option value="shared" id="sig-shared-option" hidden>Shared library (everyone)</option></select></label>
           <label for="sig-code"><span>Shortcut</span><input id="sig-code" maxlength="80" required autocomplete="off"></label>
           <label for="sig-meaning"><span>Meaning / expanded instructions</span><textarea id="sig-meaning" rows="3" maxlength="2000" required></textarea></label>
-          <label for="sig-entry-tags"><span>Tags (separate with commas)</span><input id="sig-entry-tags" maxlength="1000" placeholder="e.g. frequency, route, instructions" aria-describedby="sig-tags-help"><small id="sig-tags-help">Add new tags here or use a suggested tag below. Edit this field to rename or remove tags for this entry.</small></label>
+          <label for="sig-entry-tags"><span>Tags (separate with commas)</span><input id="sig-entry-tags" maxlength="1000" placeholder="e.g. LS, counselling, antibiotics" aria-describedby="sig-tags-help"><small id="sig-tags-help">A sig can have up to 20 tags. Type a new tag to create it, separate multiple tags with commas, or choose suggestions below. Saving a shared sig updates its tags for everyone.</small></label>
           <div id="sig-tag-suggestions" class="sig-tags" role="group" aria-label="Add an existing tag"></div>
           <label for="sig-notes"><span>Notes (optional)</span><textarea id="sig-notes" rows="2" maxlength="2000"></textarea></label>
           <p id="sig-form-error" role="alert"></p>

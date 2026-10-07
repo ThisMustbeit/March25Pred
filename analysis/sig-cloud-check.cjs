@@ -36,7 +36,7 @@ class Element {
   const login=uid=>{auth.currentUser={uid,email:uid+'@example.test'};authCallback(auth.currentUser);};
   const actions=()=> $('sig-list').children.flatMap(card=>card.children.filter(el=>el.className==='sig-actions').flatMap(el=>el.children));
   const clickText=text=>{const found=actions().find(el=>el.textContent===text);assert.ok(found,`Button ${text}`);found.click();};
-  const submit=async(code,meaning)=>{$('sig-code').value=code;$('sig-meaning').value=meaning;$('sig-entry-tags').value='Mine';$('sig-notes').value='';$('sig-form').events.submit({preventDefault(){}});await tick();};
+  const submit=async(code,meaning,tags='Mine')=>{$('sig-code').value=code;$('sig-meaning').value=meaning;$('sig-entry-tags').value=tags;$('sig-notes').value='';$('sig-form').events.submit({preventDefault(){}});await tick();};
   assert.equal($('sig-add').disabled,true);assert.equal(actions().length,0);
   login('member');assert.equal($('sig-shared-option').hidden,true);
   assert.ok(!actions().some(el=>el.textContent==='Edit'),'Members cannot edit shared entries');
@@ -53,8 +53,9 @@ class Element {
   await $('sig-signout').onclick();assert.equal($('sig-list').children.length,1);assert.match($('sig-list').children[0].textContent,/Sign in/);
   login('other');assert.ok(!$('sig-list').children.some(card=>card.children.some(el=>el.textContent==='Private meaning')));
   login('owner');$('sig-view').value='shared';$('sig-view').onchange();assert.equal($('sig-shared-option').hidden,false);
-  clickText('Edit');await submit('TEST','Updated shared meaning');
+  clickText('Edit tags');await submit('TEST','Updated shared meaning','LS, CS, New tag');
   const sharedPath=[...docs.keys()].find(p=>p.startsWith('sharedSigs/'));assert.ok(sharedPath);assert.equal(docs.get(sharedPath).meaning,'Updated shared meaning');
+  assert.deepEqual(docs.get(sharedPath).tags,['LS','CS','New tag']);
   clickText('Remove');await tick();assert.equal(docs.get(sharedPath).deleted,true);assert.equal($('sig-count').textContent,'0 shortcuts');
   const original=JSON.stringify({version:1,entries:[row,{code:'CUSTOM',meaning:'Local addition',notes:'',tags:['LS']}]});storage.set('calendrx_sig_library_v1',original);
   await $('sig-import-local').onclick();assert.equal(storage.get('calendrx_sig_library_v1'),original);

@@ -75,6 +75,8 @@ function render() {
         const remove=button('Remove',()=>removeRow(row));
         edit.disabled=remove.disabled=busy || !(row.scope==='shared'?sharedReady:personalReady);
         actions.append(edit,remove);
+        const editTags=button('Edit tags',()=>{openEditor(row);$('sig-entry-tags').focus();});
+        editTags.disabled=edit.disabled; actions.append(editTags);
       }
       if (isOwner() && row.scope==='personal') {
         const publish=button('Copy to shared library',()=>openEditor(row,true,'shared'));

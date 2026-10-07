@@ -19,7 +19,7 @@ There is:
 - no package manager required
 - no build step required
 
-It is ready to deploy directly to GitHub and Cloudflare Pages as a static site!
+It is ready to deploy directly to GitHub and Cloudflare Pages as a static site.
 
 ## Patient Assistance Programs
 
@@ -225,3 +225,5 @@ MyRx Care: `tools/patient-assistance/myrxcare-data.js` imports 78 manufacturer-p
 ## Firebase accounts for sigs
 
 The sig library now uses Firebase browser modules without an npm build. See [FIREBASE_SETUP.md](FIREBASE_SETUP.md) for console configuration, owner permissions, uploading updated files, browser-list migration and verification. The tools password gate remains separate from account sign-in.
+
+The **My Notepad** tool provides private notebooks for signed-in users and an owner-edited shared notebook. Include `tools/notepad/` in uploads and publish the updated Firestore rules. Notebook setup and usage are documented in `FIREBASE_SETUP.md`.

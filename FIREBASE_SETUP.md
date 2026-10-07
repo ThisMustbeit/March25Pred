@@ -43,3 +43,17 @@ node --check tools/sigs/cloud.js
 The cloud test uses simulated Firebase services to check UI permissions, data paths, account isolation, favourites, save conflicts, shared removal and import retries. It does not replace a deployed-rules or real-project test.
 
 After deployment, verify with the owner account and a separate ordinary account: the owner can edit Shared, the ordinary account can only copy it, personal entries remain account-specific, and saved entries/favourites reappear on a second session. If you see permission errors, check that the published rules and owner UID match. If sign-in says the provider is disabled, enable Email/Password in Authentication.
+
+## Notepad (added October 7, 2026)
+
+Upload the entire `tools/notepad/` folder plus the updated `tools/index.html` and sig files. **Republish the updated root `firestore.rules`**: the previous rules do not include notebook access. No collections need to be created manually.
+
+Every signed-in account gets its own private notebook at `users/{UID}/notebookPages/{pageId}`. Even the owner account cannot read other users' private pages through these client rules. The shared notebook at `sharedNotebookPages/{pageId}` is readable by signed-in users and writable only by the configured owner UID. It uses the same sign-in session as the sig tool.
+
+Features: named sections, multiple pages, title/content search, pinned pages, autosave after a one-second pause, manual Save, Markdown export, and trash/restore. Creating a section creates its first page. Change a page's Section field to move it or create a new section name. Sections are derived from their pages. Trashed pages remain in Firebase until restored; there is no permanent-delete control.
+
+Notebook saves require connectivity and use revision checks to prevent overwriting concurrent edits. Failed saves leave the draft on the page. Switching notebooks/pages or signing out first attempts to save; a failed save stops navigation. The browser warns before leaving an unsaved draft. Drafts are not persisted to localStorage. Export includes the current unsaved draft for recovery; other pages come from the loaded notebook. Account changes clear private page content. Markdown export contains plain text, not a runnable HTML preview.
+
+For sigs, the owner can click **Edit tags** on a shared entry. Type comma-separated names to create multiple tags (up to 20 per sig), then save. Personal entries support the same tags. No full sig migration was performed: bundled LS/CS entries remain the starting library, with Firebase overrides for shared edits and Firebase collections for personal entries.
+
+Run `node analysis/notepad-check.cjs` for simulated notebook integration checks. These cover private isolation, shared owner/member UI, sections, autosave, failed-save recovery, conflicts, export, trash/restore and account switching. Actual Firebase rule enforcement and deployment still need live verification after publishing the rules and uploading files.
