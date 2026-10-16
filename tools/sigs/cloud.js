@@ -11,7 +11,7 @@ const auth = getAuth(app);
 const db = getFirestore(app);
 // Session-only authentication avoids leaving an account signed in on shared pharmacy computers.
 await setPersistence(auth, browserSessionPersistence);
-const base = await Promise.all(model.mergeVariants(CALENDRX_SIG_CATALOG.entries, CALENDRX_CS_CATALOG.entries).entries.map(async row => ({...row, id:await cloud.stableId(row.code,row.meaning), scope:'shared',revision:0})));
+const base = await Promise.all(model.mergeVariants(CALENDRX_SIG_CATALOG.entries, CALENDRX_CS_CATALOG.entries).entries.map(model.entry).map(async row => ({...row, id:await cloud.stableId(row.code,row.meaning), scope:'shared',revision:0})));
 let user = null, shared = [], personal = [], favorites = new Set(), subscriptions = [];
 let generation = 0, sharedReady = false, personalReady = false, favoritesReady = false;
 let selectedTag = '', editing = null, busy = false;

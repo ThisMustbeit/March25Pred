@@ -13,6 +13,7 @@
   <script src="/password-toggle.js" defer></script>
   <script src="/tools/patient-assistance/rxhelp-data.js" defer></script>
   <script src="/tools/patient-assistance/myrxcare-data.js" defer></script>
+  <script src="/tools/patient-assistance/originals-data.js" defer></script>
   <script src="/tools/patient-assistance/coverage-data.js" defer></script>
   <script src="/tools/patient-assistance/assistance.js" defer></script>
 </head>
@@ -34,6 +35,8 @@
       <section class="card" aria-labelledby="programs-title">
         <div class="section-heading"><div><p class="section-kicker">Quick Links</p><h2 id="programs-title">Program websites</h2></div></div>
         <div class="assistance-programs">
+          <article><a class="program-tag program-tag-viatrisoriginals" href="https://www.viatrisoriginals.ca/en-ca" target="_blank" rel="noopener noreferrer">Viatris Originals ↗<span class="assist-sr-only"> (opens in a new tab)</span></a><p>26 brand/formulation entries from the official payment-assistance list. Reviewed October 15, 2026.</p></article>
+          <article><a class="program-tag program-tag-pfizeroriginals" href="https://www.pfizeroriginals.ca/" target="_blank" rel="noopener noreferrer">Pfizer Originals ↗<span class="assist-sr-only"> (opens in a new tab)</span></a><p>9 brand/formulation entries from the official program website. Provincial eligibility varies. Reviewed October 15, 2026.</p></article>
           <article><a class="program-tag program-tag-innovicares" href="https://www.innovicares.ca/en/" target="_blank" rel="noopener noreferrer">Innovicares ↗<span class="assist-sr-only"> (opens in a new tab)</span></a>
             <p>Nova Scotia product list added from the October 2, 2026 guide.</p>
             <a class="button button-secondary" href="innovicares-coverage-NS-logos-2026-10-02.pdf" target="_blank" rel="noopener noreferrer">View Innovicares source PDF ↗</a></article>
@@ -51,10 +54,10 @@
         </div>
         <div class="assistance-search-row">
           <label for="assistance-search"><span>Brand name or ingredient</span><input id="assistance-search" type="search" placeholder="e.g. Vyvanse, semaglutide, Crestor" autocomplete="off" aria-controls="assistance-results"></label>
-          <label for="assistance-program"><span>Program</span><select id="assistance-program"><option value="all">All programs</option><option value="innovicares">Innovicares</option><option value="rxhelp">RxHelp</option><option value="apoassist">APOAssist</option><option value="myrxcare">MyRx Care</option><option value="rybelsussample">rybelsussample</option><option value="myzepbound">myzepbound</option><option value="mymounjaro">mymounjaro</option></select></label>
+          <label for="assistance-program"><span>Program</span><select id="assistance-program"><option value="all">All programs</option><option value="viatrisoriginals">Viatris Originals</option><option value="pfizeroriginals">Pfizer Originals</option><option value="innovicares">Innovicares</option><option value="rxhelp">RxHelp</option><option value="apoassist">APOAssist</option><option value="myrxcare">MyRx Care</option><option value="rybelsussample">rybelsussample</option><option value="myzepbound">myzepbound</option><option value="mymounjaro">mymounjaro</option></select></label>
           <button id="assistance-clear" class="button button-secondary" type="button">Clear filters</button>
         </div>
-        <p class="assistance-note">These are reference lists, not a live coverage check. Ingredients are shown as listed in each source and may be abbreviated. Program availability and patient costs can change; confirm current details on the program website.</p>
+        <p class="assistance-note">Viatris Originals and Pfizer Originals appear first as primary links for matching drugs; RxHelp remains available. These are reference lists, not a live coverage check. Ingredients are shown as listed in each source and may be abbreviated. Program availability and patient costs can change; confirm current details on the program website.</p>
         <p id="assistance-count" class="assistance-count" role="status" aria-live="polite"></p>
         <div id="assistance-results" class="assistance-results"></div>
         <noscript><p>Enable JavaScript to search the list, or open the source PDF above.</p></noscript>

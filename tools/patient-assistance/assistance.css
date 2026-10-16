@@ -14,6 +14,8 @@
 .program-tag { display: inline-flex; align-items: center; padding: 0.5rem 0.85rem; min-height: 40px; border-radius: 999px; border: 1px solid; font-weight: 700; text-decoration: none; }
 .program-tag-innovicares { color: #315b25; border-color: #accc96; background: #eef6e8; }
 .program-tag-rxhelp { color: #185577; border-color: #a3c7df; background: #eaf4fb; }
+.program-tag-viatrisoriginals { color: #493476; border-color: #bfb0dc; background: #f2eef9; }
+.program-tag-pfizeroriginals { color: #154e8a; border-color: #a5c6ec; background: #edf5ff; }
 .program-tag-apoassist { color: #653b79; border-color: #cdb2dc; background: #f5edf9; }
 .program-tag-myrxcare { color: #805019; border-color: #dbc093; background: #fff5e5; }
 .program-tag-rybelsussample { color: #17635c; border-color: #9bcfc7; background: #eaf7f4; }

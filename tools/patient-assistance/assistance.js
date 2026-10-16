@@ -19,7 +19,7 @@
       if (!groups.has(key)) groups.set(key, {...product, listings: []});
       groups.get(key).listings.push(product);
     });
-    return [...groups.values()].sort((a,b) => a.brand.localeCompare(b.brand));
+    return [...groups.values()].map(group => ({...group, listings:group.listings.sort((a,b) => Number(Boolean(b.primary))-Number(Boolean(a.primary)))})).sort((a,b) => a.brand.localeCompare(b.brand));
   }
   if (typeof module !== "undefined") module.exports = {normalize, search, groupedSearch};
   if (typeof document === "undefined") return;
@@ -53,10 +53,11 @@
         const link = document.createElement("a"); link.className = `program-tag program-tag-${listing.program}`;
         const label = listing.subprogram ? `${provider.name} · ${listing.subprogram}` : provider.name;
         link.href = listing.url || provider.url; link.target = "_blank"; link.rel = "noopener noreferrer";
-        link.textContent = `${label} ↗`;
+        link.textContent = `${label}${listing.primary && product.listings.length > 1 ? ' · Primary' : ''} ↗`;
         link.setAttribute("aria-label", `${product.brand}: visit ${label} (opens in a new tab)`);
         const source = document.createElement("small"); source.textContent = `${provider.region || catalog.province} · ${provider.name} · ${provider.reference}${listing.sourcePage ? ` · p. ${listing.sourcePage}` : ""}`;
         card.append(link,source);
+        if (listing.note) { const note=document.createElement("small"); note.textContent=listing.note; card.append(note); }
         });
         results.append(card);
       });

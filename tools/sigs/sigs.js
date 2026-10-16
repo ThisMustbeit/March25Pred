@@ -25,6 +25,7 @@
       if (result[key].length > limit) throw new Error(`${key} exceeds ${limit} characters.`);
     }
     if (!result.code || !result.meaning) throw new Error("Enter both a shortcut and its meaning.");
+    result.notes = result.notes.replace(/Source: CO Sigs\.pdf, page \d+\. Transcribed as printed\.[ \t]*(?:\r?\n)?/g, "").trim();
     result.tags = tags(raw.tags || []);
     return result;
   }

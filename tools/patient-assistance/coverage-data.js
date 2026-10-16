@@ -81,6 +81,10 @@
   ];
   const rxhelp = typeof module !== "undefined" ? require("./rxhelp-data.js") : (globalThis.CALENDRX_RXHELP || []);
   const myrxcare = typeof module !== "undefined" ? require("./myrxcare-data.js") : (globalThis.CALENDRX_MYRXCARE || []);
+  const originals = (typeof module !== "undefined" ? require("./originals-data.js") : (globalThis.CALENDRX_ORIGINALS || [])).map(row => ({...row,
+    // Retain ingredient descriptions from the existing RxHelp source for exact brand/form matches.
+    ingredient: row.ingredient || rxhelp.find(existing => existing.brand === row.brand)?.ingredient || ""
+  }));
   // Product labels transcribed from the supplied APOAssist dropdown screenshot.
   const apoassist = [
     ["Apo-Abiraterone Tabs", "abiraterone"],
@@ -104,6 +108,8 @@
     province: "Nova Scotia", date: "2026-10-02", dateLabel: "October 2, 2026",
     source: "innovicares-coverage-NS-logos-2026-10-02.pdf",
     programs: {
+      viatrisoriginals: {name:"Viatris Originals", region:"Canada · provincial eligibility varies", reference:"Official website reviewed October 15, 2026", url:"https://www.viatrisoriginals.ca/en-ca"},
+      pfizeroriginals: {name:"Pfizer Originals", region:"Canada · provincial eligibility varies", reference:"Official website reviewed October 15, 2026", url:"https://www.pfizeroriginals.ca/"},
       innovicares: {name:"Innovicares", source:"innovicares-coverage-NS-logos-2026-10-02.pdf", reference:"October 2, 2026 guide", url:"https://www.innovicares.ca/en/"},
       rxhelp: {name:"RxHelp", source:"rxhelp-medications-NS.pdf", reference:"Reviewed October 2, 2026", url:"https://rxhelp.ca/EN/about"},
       apoassist: {name:"APOAssist", region:"Canada", reference:"Reviewed October 2, 2026", url:"https://www.apoassist.com/en/"},
@@ -114,7 +120,7 @@
     },
     products: pages.flatMap((rows, index) => rows.map(([brand, ingredient, aliases = ""]) => ({
       brand, ingredient, aliases, program:"innovicares", sourcePage:index + 1
-    }))).concat(rxhelp, apoassist, myrxcare, [
+    }))).concat(rxhelp, apoassist, myrxcare, originals, [
       {brand:"Rybelsus", ingredient:"semaglutide tablets", aliases:"oral semaglutide", program:"rybelsussample"},
       {brand:"Zepbound", ingredient:"tirzepatide injection", aliases:"KwikPen", program:"myzepbound"},
       {brand:"Mounjaro KwikPen", ingredient:"tirzepatide injection", aliases:"Mounjaro", program:"mymounjaro"}
