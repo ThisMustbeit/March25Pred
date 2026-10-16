@@ -142,13 +142,19 @@ get('assistance-clear').events.click();
 get('assistance-search').value='<script>alert(1)</script>';get('assistance-search').events.input();
 assert.equal(get('assistance-results').children[0].children[0].textContent,'No matching products in this list');
 const html=fs.readFileSync(path.join(__dirname,'../tools/patient-assistance/index.html'),'utf8');
-assert.ok(html.includes('/tools/access-gate.js'));
-assert.ok(html.includes('/password-toggle.js'));
+assert.ok(!html.includes('/tools/access-gate.js'));
+assert.ok(!html.includes('tools-gate-pending'));
 assert.ok(html.includes('name="description"'));
 assert.ok(html.includes(data.source));
 assert.ok(fs.existsSync(path.join(__dirname,'../tools/patient-assistance',data.source)));
 const directory=fs.readFileSync(path.join(__dirname,'../tools/index.html'),'utf8');
 assert.ok(directory.includes('href="/tools/patient-assistance/"'));
+assert.ok(!directory.includes('/tools/access-gate.js'));
+for (const tool of ['barcodes','notepad','sigs']) {
+  const protectedPage=fs.readFileSync(path.join(__dirname,`../tools/${tool}/index.html`),'utf8');
+  assert.ok(protectedPage.includes('/tools/access-gate.js'));
+  assert.ok(protectedPage.includes('tools-gate-pending'));
+}
 assert.ok(html.indexOf('/rxhelp-data.js') < html.indexOf('/coverage-data.js'));
 assert.ok(html.includes(data.programs.rxhelp.source));
 assert.ok(fs.existsSync(path.join(__dirname,'../tools/patient-assistance',data.programs.rxhelp.source)));
