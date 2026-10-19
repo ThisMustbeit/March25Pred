@@ -60,7 +60,10 @@ function renderToolsGate() {
   });
 }
 
-if (sessionStorage.getItem(TOOLS_GATE_KEY) === "granted") {
+// Only the three internal tools require this gate. Public pages remain accessible
+// even if an older cached HTML page still includes this script.
+const requiresToolsGate = /^\/tools\/(?:barcodes|notepad|sigs)(?:\/|$)/.test(window.location.pathname);
+if (!requiresToolsGate || sessionStorage.getItem(TOOLS_GATE_KEY) === "granted") {
   clearToolsGatePendingState();
 } else {
   window.addEventListener("DOMContentLoaded", () => {
