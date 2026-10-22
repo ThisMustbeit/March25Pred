@@ -1722,6 +1722,7 @@ const DOMBuilders = {
     if (cell.scheduleRow?.warning) classes.push("warning");
 
     const hasVisibleDose = cell.scheduleRow && !NumberUtils.isNearZero(cell.scheduleRow.doseMg);
+    if (hasVisibleDose) classes.push("has-dose");
     const totalLine = hasVisibleDose ? cell.scheduleRow.instructionParts.totalLine : "";
     const tabletLines = hasVisibleDose ? cell.scheduleRow.instructionParts.tabletLines.join("\n") : "";
     const warning = hasVisibleDose ? cell.scheduleRow.instructionParts.warningLine : "";

@@ -38,6 +38,9 @@
   <link rel="icon" href="./website-icon.png" type="image/png">
   <link rel="shortcut icon" href="./website-icon.png" type="image/png">
   <link rel="apple-touch-icon" href="./website-icon.png">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible+Next:wght@400;500;600;700;800&display=swap">
   <link rel="stylesheet" href="style.css">
   <link rel="stylesheet" href="print-calendar.css" media="print">
   <script src="script.js" defer></script>
@@ -67,6 +70,7 @@
   <div class="app-shell">
     <nav class="site-nav no-print" aria-label="Primary">
       <div class="site-nav-inner">
+        <a href="/" class="site-brand" aria-label="CalendRx home"><img src="website-icon.png" alt="" width="30" height="30"><span>CalendRx</span></a>
         <a href="/" class="site-nav-link is-current" aria-current="page">Taper Planner</a>
         <a href="/tools/" class="site-nav-link">Other Pharmacy Tools</a>
       </div>
@@ -74,9 +78,8 @@
 
     <header class="hero">
       <div class="hero-brand">
-        <img src="website-icon.png" alt="Medication taper calendar logo" class="hero-logo">
         <div class="hero-brand-copy">
-        <h1>CalendRx - Medication Taper Calendar Generator</h1>
+        <h1>Medication taper calendar generator</h1>
         <p class="hero-copy">
           CalendRx creates day-by-day medication taper schedules with standard or advanced dose changes.
           Adjust start dates, review strength breakdowns and tablet quantities, and preview and print monthly calendars.
@@ -542,7 +545,7 @@
           </p>
         </div>
       </section>
-      <section class="card no-print" aria-labelledby="public-tools-title">
+      <section class="card explore-card no-print" aria-labelledby="public-tools-title">
         <p class="section-kicker">Explore CalendRx</p>
         <h2 id="public-tools-title">Medication calendars and pharmacy calculators</h2>
         <div class="tools-grid">

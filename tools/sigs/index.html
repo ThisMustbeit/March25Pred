@@ -7,6 +7,9 @@
   <meta name="description" content="Build and search your pharmacy sig shortcut library with CalendRx. Add meanings, notes, and tags, filter entries, and export or import backups of your list.">
   <script>if (sessionStorage.getItem("calendrx_tools_dummy_access") !== "granted") document.documentElement.classList.add("tools-gate-pending");</script>
   <link rel="icon" href="/website-icon.png" type="image/png">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible+Next:wght@400;500;600;700;800&display=swap">
   <link rel="stylesheet" href="/style.css">
   <link rel="stylesheet" href="/tools/sigs/sigs.css">
   <script src="/tools/access-gate.js" defer></script>
@@ -20,6 +23,7 @@
 <body>
   <div class="app-shell" id="sig-tool" data-cloud="true">
     <nav class="site-nav no-print" aria-label="Primary"><div class="site-nav-inner">
+      <a href="/" class="site-brand" aria-label="CalendRx home"><img src="/website-icon.png" alt="" width="30" height="30"><span>CalendRx</span></a>
       <a href="/" class="site-nav-link">Taper Planner</a>
       <a href="/tools/" class="site-nav-link">Other Pharmacy Tools</a>
       <a href="/tools/sigs/" class="site-nav-link is-current" aria-current="page">Sig List &amp; Shortcuts</a>

@@ -44,6 +44,7 @@ function renderLoginPage({ origin, redirectPath, errorMessage = "" }) {
   <link rel="icon" href="${origin}/website-icon.png" type="image/png">
   <link rel="shortcut icon" href="${origin}/website-icon.png" type="image/png">
   <link rel="apple-touch-icon" href="${origin}/website-icon.png">
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible+Next:wght@400;500;600;700;800&display=swap">
   <link rel="stylesheet" href="${origin}/style.css">
   <script src="${origin}/password-toggle.js" defer></script>
 </head>

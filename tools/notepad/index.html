@@ -6,12 +6,15 @@
   <meta name="description" content="A private notebook with sections, searchable pages and cloud saving for your CalendRx account.">
   <script>if(sessionStorage.getItem('calendrx_tools_dummy_access')!=='granted')document.documentElement.classList.add('tools-gate-pending');</script>
   <link rel="icon" href="/website-icon.png" type="image/png">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible+Next:wght@400;500;600;700;800&display=swap">
   <link rel="stylesheet" href="/style.css"><link rel="stylesheet" href="/tools/notepad/notepad.css">
   <script src="/tools/access-gate.js" defer></script><script src="/password-toggle.js" defer></script>
   <script src="/tools/notepad/loader.js" defer></script>
 </head>
 <body><div class="app-shell" id="notepad">
-  <nav class="site-nav" aria-label="Primary"><div class="site-nav-inner"><a class="site-nav-link" href="/">Taper Planner</a><a class="site-nav-link" href="/tools/">Other Pharmacy Tools</a><a class="site-nav-link" href="/tools/sigs/">Sig List</a><a class="site-nav-link is-current" href="/tools/notepad/" aria-current="page">My Notepad</a></div></nav>
+  <nav class="site-nav" aria-label="Primary"><div class="site-nav-inner"><a href="/" class="site-brand" aria-label="CalendRx home"><img src="/website-icon.png" alt="" width="30" height="30"><span>CalendRx</span></a><a class="site-nav-link" href="/">Taper Planner</a><a class="site-nav-link" href="/tools/">Other Pharmacy Tools</a><a class="site-nav-link" href="/tools/sigs/">Sig List</a><a class="site-nav-link is-current" href="/tools/notepad/" aria-current="page">My Notepad</a></div></nav>
   <main>
     <section class="hero"><p class="section-kicker">Personal workspace</p><h1>My Notepad</h1><p class="hero-copy">Keep reference notes in sections, pin useful pages, and find them with search. Your private notebook belongs to your account. The shared notebook contains references maintained by the owner.</p></section>
     <section class="card">
