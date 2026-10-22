@@ -1109,16 +1109,16 @@ body.guided-preview-active .mobile-results-actions {
 }
 
 body.guided-preview-active.mobile-step-1 #results,
-body.guided-preview-active.mobile-step-2 #results,
-body.guided-preview-active.mobile-step-3 #results {
+body.guided-preview-active.mobile-step-3 #results,
+body.guided-preview-active.mobile-step-2 #results {
   display: none;
 }
 
-body.guided-preview-active.mobile-step-4 .form-card {
+body.guided-preview-active.mobile-step-5 .form-card {
   display: none;
 }
 
-body.guided-preview-active.mobile-step-4 .mobile-results-actions {
+body.guided-preview-active.mobile-step-5 .mobile-results-actions {
   display: grid;
 }
 
@@ -1441,17 +1441,17 @@ body.guided-preview-active.mobile-step-4 .mobile-results-actions {
 }
 
 body.guided-preview-active.mobile-step-1 .taper-mode-strip,
-body.guided-preview-active.mobile-step-2 .taper-mode-strip,
+body.guided-preview-active.mobile-step-3 .taper-mode-strip,
 body.guided-preview-active.mobile-step-1 .group-primary-taper,
 body.guided-preview-active.mobile-step-1 .group-strengths,
 body.guided-preview-active.mobile-step-1 .custom-override-panel,
 body.guided-preview-active.mobile-step-1 .group-config-code,
-body.guided-preview-active.mobile-step-2 .group-med-start,
-body.guided-preview-active.mobile-step-2 .group-primary-taper,
-body.guided-preview-active.mobile-step-2 .custom-override-panel,
-body.guided-preview-active.mobile-step-2 .group-config-code,
 body.guided-preview-active.mobile-step-3 .group-med-start,
-body.guided-preview-active.mobile-step-3 .group-strengths {
+body.guided-preview-active.mobile-step-3 .group-primary-taper,
+body.guided-preview-active.mobile-step-3 .custom-override-panel,
+body.guided-preview-active.mobile-step-3 .group-config-code,
+body.guided-preview-active.mobile-step-2 .group-med-start,
+body.guided-preview-active.mobile-step-2 .group-strengths {
   display: none !important;
 }
 
@@ -1465,7 +1465,7 @@ body.guided-preview-active .form-grid {
   margin: 0 auto;
 }
 
-body.guided-preview-active.mobile-step-3 .form-grid.is-advanced-mode {
+body.guided-preview-active.mobile-step-2 .form-grid.is-advanced-mode {
   max-width: 1260px;
 }
 
@@ -1473,96 +1473,96 @@ body.guided-preview-active .group {
   min-width: 0;
 }
 
-body.guided-preview-active.mobile-step-3 .form-card {
+body.guided-preview-active.mobile-step-2 .form-card {
   padding-bottom: 1.5rem;
 }
 
-body.guided-preview-active.mobile-step-3 .section-heading {
+body.guided-preview-active.mobile-step-2 .section-heading {
   display: none;
 }
 
-body.guided-preview-active.mobile-step-3 .taper-mode-strip {
+body.guided-preview-active.mobile-step-2 .taper-mode-strip {
   display: flex;
   width: 100%;
   margin-bottom: 0.75rem;
   padding-top: 0;
 }
 
-body.guided-preview-active.mobile-step-3 .taper-mode-control,
-body.guided-preview-active.mobile-step-3 .preview-mode-control {
+body.guided-preview-active.mobile-step-2 .taper-mode-control,
+body.guided-preview-active.mobile-step-2 .preview-mode-control {
   width: 100%;
   min-width: 0;
 }
 
-body.guided-preview-active.mobile-step-3 .direction-toggle,
-body.guided-preview-active.mobile-step-3 .step-change-control .direction-toggle {
+body.guided-preview-active.mobile-step-2 .direction-toggle,
+body.guided-preview-active.mobile-step-2 .step-change-control .direction-toggle {
   width: 100%;
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
 }
 
-body.guided-preview-active.mobile-step-3 .direction-toggle-button {
+body.guided-preview-active.mobile-step-2 .direction-toggle-button {
   min-width: 0;
   white-space: normal;
   text-align: center;
 }
 
-body.guided-preview-active.mobile-step-3 .step-change-control,
-body.guided-preview-active.mobile-step-3 .paired-field-grid {
+body.guided-preview-active.mobile-step-2 .step-change-control,
+body.guided-preview-active.mobile-step-2 .paired-field-grid {
   grid-template-columns: 1fr;
 }
 
-body.guided-preview-active.mobile-step-3 .paired-field-action,
-body.guided-preview-active.mobile-step-3 .paired-field-action .inline-action-button,
-body.guided-preview-active.mobile-step-3 .group-primary-taper input,
-body.guided-preview-active.mobile-step-3 .group-primary-taper select,
-body.guided-preview-active.mobile-step-3 #custom-override-panel input {
+body.guided-preview-active.mobile-step-2 .paired-field-action,
+body.guided-preview-active.mobile-step-2 .paired-field-action .inline-action-button,
+body.guided-preview-active.mobile-step-2 .group-primary-taper input,
+body.guided-preview-active.mobile-step-2 .group-primary-taper select,
+body.guided-preview-active.mobile-step-2 #custom-override-panel input {
   width: 100%;
   max-width: 100%;
 }
 
-body.guided-preview-active.mobile-step-3 .paired-field-action {
+body.guided-preview-active.mobile-step-2 .paired-field-action {
   justify-content: stretch;
 }
 
-body.guided-preview-active.mobile-step-3 .custom-override-panel .table-scroll {
+body.guided-preview-active.mobile-step-2 .custom-override-panel .table-scroll {
   overflow: visible;
 }
 
-body.guided-preview-active.mobile-step-3 .advanced-taper-workspace {
+body.guided-preview-active.mobile-step-2 .advanced-taper-workspace {
   grid-template-columns: minmax(0, 1.35fr) minmax(420px, 1fr);
   gap: 1.35rem;
 }
 
-body.guided-preview-active.mobile-step-3 .advanced-calendar-preview {
+body.guided-preview-active.mobile-step-2 .advanced-calendar-preview {
   position: sticky;
   top: 5.35rem;
   align-self: start;
 }
 
-body.guided-preview-active.mobile-step-3 .custom-override-panel .input-table,
-body.guided-preview-active.mobile-step-3 .custom-override-panel .input-table tr,
-body.guided-preview-active.mobile-step-3 .custom-override-panel .input-table td {
+body.guided-preview-active.mobile-step-2 .custom-override-panel .input-table,
+body.guided-preview-active.mobile-step-2 .custom-override-panel .input-table tr,
+body.guided-preview-active.mobile-step-2 .custom-override-panel .input-table td {
   display: block;
   width: 100%;
 }
 
-body.guided-preview-active.mobile-step-3 .custom-override-panel .input-table {
+body.guided-preview-active.mobile-step-2 .custom-override-panel .input-table {
   min-width: 0;
   border-collapse: separate;
 }
 
-body.guided-preview-active.mobile-step-3 .custom-override-panel .input-table thead {
+body.guided-preview-active.mobile-step-2 .custom-override-panel .input-table thead {
   display: none;
 }
 
-body.guided-preview-active.mobile-step-3 .custom-override-panel .input-table tbody {
+body.guided-preview-active.mobile-step-2 .custom-override-panel .input-table tbody {
   display: grid;
   gap: 1rem;
   position: relative;
 }
 
-body.guided-preview-active.mobile-step-3 .custom-override-panel .input-table tr.custom-segment-row {
+body.guided-preview-active.mobile-step-2 .custom-override-panel .input-table tr.custom-segment-row {
   display: grid;
   gap: 0.78rem;
   padding: 1rem 1rem 1.05rem;
@@ -1573,7 +1573,7 @@ body.guided-preview-active.mobile-step-3 .custom-override-panel .input-table tr.
   position: relative;
 }
 
-body.guided-preview-active.mobile-step-3 .custom-override-panel .input-table tr.custom-segment-row::before {
+body.guided-preview-active.mobile-step-2 .custom-override-panel .input-table tr.custom-segment-row::before {
   content: "";
   position: absolute;
   left: -1.15rem;
@@ -1583,7 +1583,7 @@ body.guided-preview-active.mobile-step-3 .custom-override-panel .input-table tr.
   background: linear-gradient(180deg, rgba(198, 213, 223, 0.95) 0%, rgba(198, 213, 223, 0.35) 100%);
 }
 
-body.guided-preview-active.mobile-step-3 .custom-override-panel .input-table tr.custom-segment-row::after {
+body.guided-preview-active.mobile-step-2 .custom-override-panel .input-table tr.custom-segment-row::after {
   content: "";
   position: absolute;
   left: -1.5rem;
@@ -1596,18 +1596,18 @@ body.guided-preview-active.mobile-step-3 .custom-override-panel .input-table tr.
   box-shadow: 0 0 0 4px rgba(38, 113, 173, 0.08);
 }
 
-body.guided-preview-active.mobile-step-3 .custom-override-panel .input-table tr.custom-segment-row.is-first-segment::after {
+body.guided-preview-active.mobile-step-2 .custom-override-panel .input-table tr.custom-segment-row.is-first-segment::after {
   background: var(--accent);
 }
 
-body.guided-preview-active.mobile-step-3 .custom-override-panel .input-table td {
+body.guided-preview-active.mobile-step-2 .custom-override-panel .input-table td {
   border-bottom: 0;
   padding: 0;
   margin: 0;
   min-width: 0;
 }
 
-body.guided-preview-active.mobile-step-3 .custom-override-panel .input-table td::before {
+body.guided-preview-active.mobile-step-2 .custom-override-panel .input-table td::before {
   display: block;
   margin-bottom: 0.3rem;
   font-size: 0.72rem;
@@ -1617,102 +1617,102 @@ body.guided-preview-active.mobile-step-3 .custom-override-panel .input-table td:
   color: var(--muted);
 }
 
-body.guided-preview-active.mobile-step-3 .custom-override-panel .input-table td:nth-child(1)::before {
+body.guided-preview-active.mobile-step-2 .custom-override-panel .input-table td:nth-child(1)::before {
   display: none;
 }
 
-body.guided-preview-active.mobile-step-3 .custom-override-panel .input-table td:nth-child(1) {
+body.guided-preview-active.mobile-step-2 .custom-override-panel .input-table td:nth-child(1) {
   margin-bottom: 0.1rem;
 }
 
-body.guided-preview-active.mobile-step-3 .custom-override-panel .segment-card-head {
+body.guided-preview-active.mobile-step-2 .custom-override-panel .segment-card-head {
   align-items: center;
 }
 
-body.guided-preview-active.mobile-step-3 .custom-override-panel .segment-badge {
+body.guided-preview-active.mobile-step-2 .custom-override-panel .segment-badge {
   align-self: flex-start;
 }
 
-body.guided-preview-active.mobile-step-3 .custom-override-panel .segment-head-copy {
+body.guided-preview-active.mobile-step-2 .custom-override-panel .segment-head-copy {
   flex: 1 1 auto;
 }
 
-body.guided-preview-active.mobile-step-3 .custom-override-panel .segment-label {
+body.guided-preview-active.mobile-step-2 .custom-override-panel .segment-label {
   padding: 0;
   border: 0;
   background: transparent;
   font-size: 1.02rem;
 }
 
-body.guided-preview-active.mobile-step-3 .custom-override-panel .segment-date-range {
+body.guided-preview-active.mobile-step-2 .custom-override-panel .segment-date-range {
   margin-top: 0;
   font-size: 0.9rem;
 }
 
-body.guided-preview-active.mobile-step-3 .custom-override-panel .segment-sequence {
+body.guided-preview-active.mobile-step-2 .custom-override-panel .segment-sequence {
   font-size: 1.36rem;
   line-height: 1.2;
 }
 
-body.guided-preview-active.mobile-step-3 .custom-override-panel .segment-sequence-note {
+body.guided-preview-active.mobile-step-2 .custom-override-panel .segment-sequence-note {
   font-size: 0.92rem;
   padding-bottom: 0.15rem;
   border-bottom: 1px solid rgba(198, 213, 223, 0.72);
 }
 
-body.guided-preview-active.mobile-step-3 .custom-override-panel .segment-guidance {
+body.guided-preview-active.mobile-step-2 .custom-override-panel .segment-guidance {
   margin-top: 0.5rem;
 }
 
-body.guided-preview-active.mobile-step-3 .custom-override-panel .input-table tr.custom-segment-row.is-first-segment td:nth-child(2),
-body.guided-preview-active.mobile-step-3 .custom-override-panel .input-table tr.custom-segment-row.is-first-segment td:nth-child(3),
-body.guided-preview-active.mobile-step-3 .custom-override-panel .input-table tr.custom-segment-row.is-first-segment td:nth-child(5),
-body.guided-preview-active.mobile-step-3 .custom-override-panel .input-table tr.custom-segment-row.is-first-segment td:nth-child(6) {
+body.guided-preview-active.mobile-step-2 .custom-override-panel .input-table tr.custom-segment-row.is-first-segment td:nth-child(2),
+body.guided-preview-active.mobile-step-2 .custom-override-panel .input-table tr.custom-segment-row.is-first-segment td:nth-child(3),
+body.guided-preview-active.mobile-step-2 .custom-override-panel .input-table tr.custom-segment-row.is-first-segment td:nth-child(5),
+body.guided-preview-active.mobile-step-2 .custom-override-panel .input-table tr.custom-segment-row.is-first-segment td:nth-child(6) {
   display: none;
 }
 
-body.guided-preview-active.mobile-step-3 .custom-override-panel .input-table tr.custom-segment-row.is-first-segment td:nth-child(7)::before {
+body.guided-preview-active.mobile-step-2 .custom-override-panel .input-table tr.custom-segment-row.is-first-segment td:nth-child(7)::before {
   content: "Options";
 }
 
-body.guided-preview-active.mobile-step-3 .custom-override-panel .input-table tr.custom-segment-row:not(.is-first-segment) td:nth-child(4)::before {
+body.guided-preview-active.mobile-step-2 .custom-override-panel .input-table tr.custom-segment-row:not(.is-first-segment) td:nth-child(4)::before {
   content: "Days Per Step";
 }
 
-body.guided-preview-active.mobile-step-3 .custom-override-panel .input-table tr.custom-segment-row.is-first-segment .segment-sequence {
+body.guided-preview-active.mobile-step-2 .custom-override-panel .input-table tr.custom-segment-row.is-first-segment .segment-sequence {
   font-size: 1.6rem;
 }
 
-body.guided-preview-active.mobile-step-3 .custom-override-panel .input-table tr.custom-segment-row.is-first-segment .segment-sequence-note {
+body.guided-preview-active.mobile-step-2 .custom-override-panel .input-table tr.custom-segment-row.is-first-segment .segment-sequence-note {
   border-bottom: 0;
   padding-bottom: 0;
 }
 
-body.guided-preview-active.mobile-step-3 .custom-override-panel .input-table td:nth-child(2)::before {
+body.guided-preview-active.mobile-step-2 .custom-override-panel .input-table td:nth-child(2)::before {
   content: "Start Dose";
 }
 
-body.guided-preview-active.mobile-step-3 .custom-override-panel .input-table td:nth-child(3)::before {
+body.guided-preview-active.mobile-step-2 .custom-override-panel .input-table td:nth-child(3)::before {
   content: "Dose Change";
 }
 
-body.guided-preview-active.mobile-step-3 .custom-override-panel .input-table td:nth-child(4)::before {
+body.guided-preview-active.mobile-step-2 .custom-override-panel .input-table td:nth-child(4)::before {
   content: "What is the duration of the starting / initial dosage?";
 }
 
-body.guided-preview-active.mobile-step-3 .custom-override-panel .input-table td:nth-child(5)::before {
+body.guided-preview-active.mobile-step-2 .custom-override-panel .input-table td:nth-child(5)::before {
   content: "Repeats";
 }
 
-body.guided-preview-active.mobile-step-3 .custom-override-panel .input-table td:nth-child(6)::before {
+body.guided-preview-active.mobile-step-2 .custom-override-panel .input-table td:nth-child(6)::before {
   content: "End Dose";
 }
 
-body.guided-preview-active.mobile-step-3 .custom-override-panel .input-table td:nth-child(7)::before {
+body.guided-preview-active.mobile-step-2 .custom-override-panel .input-table td:nth-child(7)::before {
   content: "Row Actions";
 }
 
-body.guided-preview-active.mobile-step-3 .custom-override-panel .row-action-stack {
+body.guided-preview-active.mobile-step-2 .custom-override-panel .row-action-stack {
   display: grid;
   grid-template-columns: repeat(2, 2.5rem);
   justify-content: flex-start;
@@ -1720,7 +1720,7 @@ body.guided-preview-active.mobile-step-3 .custom-override-panel .row-action-stac
   min-height: 0;
 }
 
-body.guided-preview-active.mobile-step-3 .custom-override-panel .segment-settings-popover {
+body.guided-preview-active.mobile-step-2 .custom-override-panel .segment-settings-popover {
   position: static;
   top: auto;
   right: auto;
@@ -2767,7 +2767,7 @@ body.guided-preview-active.mobile-step-3 .custom-override-panel .segment-setting
     flex: 1 1 100%;
   }
 
-  body.mobile-flow-active.mobile-step-3 {
+  body.mobile-flow-active.mobile-step-2 {
     overflow-x: hidden;
   }
 
@@ -2791,36 +2791,36 @@ body.guided-preview-active.mobile-step-3 .custom-override-panel .segment-setting
   }
 
   body.mobile-flow-active.mobile-step-1 #results,
-  body.mobile-flow-active.mobile-step-2 #results,
-  body.mobile-flow-active.mobile-step-3 #results {
+  body.mobile-flow-active.mobile-step-3 #results,
+  body.mobile-flow-active.mobile-step-2 #results {
     display: none;
   }
 
-  body.mobile-flow-active.mobile-step-4 .form-card {
+  body.mobile-flow-active.mobile-step-5 .form-card {
     display: none;
   }
 
-  body.mobile-flow-active.mobile-step-4 .mobile-results-actions {
+  body.mobile-flow-active.mobile-step-5 .mobile-results-actions {
     display: grid;
   }
 
   body.mobile-flow-active.mobile-step-1 .taper-mode-strip,
-  body.mobile-flow-active.mobile-step-2 .taper-mode-strip,
+  body.mobile-flow-active.mobile-step-3 .taper-mode-strip,
   body.mobile-flow-active.mobile-step-1 .group-primary-taper,
   body.mobile-flow-active.mobile-step-1 .group-strengths,
   body.mobile-flow-active.mobile-step-1 .custom-override-panel,
   body.mobile-flow-active.mobile-step-1 .group-config-code,
-  body.mobile-flow-active.mobile-step-2 .taper-mode-strip,
-  body.mobile-flow-active.mobile-step-2 .group-med-start,
-  body.mobile-flow-active.mobile-step-2 .group-primary-taper,
-  body.mobile-flow-active.mobile-step-2 .custom-override-panel,
-  body.mobile-flow-active.mobile-step-2 .group-config-code,
+  body.mobile-flow-active.mobile-step-3 .taper-mode-strip,
   body.mobile-flow-active.mobile-step-3 .group-med-start,
-  body.mobile-flow-active.mobile-step-3 .group-strengths {
+  body.mobile-flow-active.mobile-step-3 .group-primary-taper,
+  body.mobile-flow-active.mobile-step-3 .custom-override-panel,
+  body.mobile-flow-active.mobile-step-3 .group-config-code,
+  body.mobile-flow-active.mobile-step-2 .group-med-start,
+  body.mobile-flow-active.mobile-step-2 .group-strengths {
     display: none !important;
   }
 
-  body.mobile-flow-active.mobile-step-3 .taper-mode-strip {
+  body.mobile-flow-active.mobile-step-2 .taper-mode-strip {
     display: flex;
     width: 100%;
     margin-bottom: 0.75rem;
@@ -2839,18 +2839,18 @@ body.guided-preview-active.mobile-step-3 .custom-override-panel .segment-setting
     min-width: 0;
   }
 
-  body.mobile-flow-active.mobile-step-3 .form-card {
+  body.mobile-flow-active.mobile-step-2 .form-card {
     gap: 1rem;
     padding: 1rem;
     max-width: 100%;
     overflow-x: hidden;
   }
 
-  body.mobile-flow-active.mobile-step-3 .section-heading {
+  body.mobile-flow-active.mobile-step-2 .section-heading {
     display: none;
   }
 
-  body.mobile-flow-active.mobile-step-3 .mobile-stepper {
+  body.mobile-flow-active.mobile-step-2 .mobile-stepper {
     padding: 0.85rem 0.9rem;
     margin-top: 0;
   }
@@ -2859,23 +2859,23 @@ body.guided-preview-active.mobile-step-3 .custom-override-panel .segment-setting
     padding-top: 0;
   }
 
-  body.mobile-flow-active.mobile-step-3 .taper-mode-control {
+  body.mobile-flow-active.mobile-step-2 .taper-mode-control {
     width: 100%;
     gap: 0.4rem;
     min-width: 0;
   }
 
-  body.mobile-flow-active.mobile-step-3 .taper-mode-label {
+  body.mobile-flow-active.mobile-step-2 .taper-mode-label {
     font-size: 0.88rem;
   }
 
-  body.mobile-flow-active.mobile-step-3 .direction-toggle {
+  body.mobile-flow-active.mobile-step-2 .direction-toggle {
     width: 100%;
     padding: 0.2rem;
     min-width: 0;
   }
 
-  body.mobile-flow-active.mobile-step-3 .direction-toggle-button {
+  body.mobile-flow-active.mobile-step-2 .direction-toggle-button {
     min-width: 0;
     padding: 0.6rem 0.5rem;
     font-size: 0.92rem;
@@ -2884,118 +2884,118 @@ body.guided-preview-active.mobile-step-3 .custom-override-panel .segment-setting
     width: 100%;
   }
 
-  body.mobile-flow-active.mobile-step-3 .group-primary-taper,
-  body.mobile-flow-active.mobile-step-3 #custom-override-panel .group {
+  body.mobile-flow-active.mobile-step-2 .group-primary-taper,
+  body.mobile-flow-active.mobile-step-2 #custom-override-panel .group {
     padding: 1rem;
     width: 100%;
     max-width: 100%;
     overflow-x: hidden;
   }
 
-  body.mobile-flow-active.mobile-step-3 .form-card {
+  body.mobile-flow-active.mobile-step-2 .form-card {
     padding-bottom: 1.5rem;
   }
 
-  body.mobile-flow-active.mobile-step-3 .group-primary-taper label,
-  body.mobile-flow-active.mobile-step-3 #custom-override-panel .help-text {
+  body.mobile-flow-active.mobile-step-2 .group-primary-taper label,
+  body.mobile-flow-active.mobile-step-2 #custom-override-panel .help-text {
     margin-bottom: 0.8rem;
   }
 
-  body.mobile-flow-active.mobile-step-3 .group-primary-taper legend,
-  body.mobile-flow-active.mobile-step-3 #custom-override-panel .group legend {
+  body.mobile-flow-active.mobile-step-2 .group-primary-taper legend,
+  body.mobile-flow-active.mobile-step-2 #custom-override-panel .group legend {
     font-size: 1rem;
   }
 
-  body.mobile-flow-active.mobile-step-3 .step-change-control {
+  body.mobile-flow-active.mobile-step-2 .step-change-control {
     grid-template-columns: 1fr;
     gap: 0.5rem;
     align-items: stretch;
   }
 
-  body.mobile-flow-active.mobile-step-3 .step-change-control .direction-toggle,
-  body.mobile-flow-active.mobile-step-3 .taper-mode-strip .direction-toggle,
-  body.mobile-flow-active.mobile-step-3 .paired-field-grid,
-  body.mobile-flow-active.mobile-step-3 .paired-field-action,
-  body.mobile-flow-active.mobile-step-3 .paired-field-action .inline-action-button {
+  body.mobile-flow-active.mobile-step-2 .step-change-control .direction-toggle,
+  body.mobile-flow-active.mobile-step-2 .taper-mode-strip .direction-toggle,
+  body.mobile-flow-active.mobile-step-2 .paired-field-grid,
+  body.mobile-flow-active.mobile-step-2 .paired-field-action,
+  body.mobile-flow-active.mobile-step-2 .paired-field-action .inline-action-button {
     width: 100%;
   }
 
-  body.mobile-flow-active.mobile-step-3 .step-change-control .direction-toggle,
-  body.mobile-flow-active.mobile-step-3 .taper-mode-strip .direction-toggle {
+  body.mobile-flow-active.mobile-step-2 .step-change-control .direction-toggle,
+  body.mobile-flow-active.mobile-step-2 .taper-mode-strip .direction-toggle {
     display: grid;
     grid-template-columns: 1fr;
     gap: 0.25rem;
   }
 
-  body.mobile-flow-active.mobile-step-3 .step-change-control .direction-toggle-button {
+  body.mobile-flow-active.mobile-step-2 .step-change-control .direction-toggle-button {
     padding: 0.55rem 0.4rem;
     font-size: 0.88rem;
     line-height: 1.2;
   }
 
-  body.mobile-flow-active.mobile-step-3 .paired-field-grid {
+  body.mobile-flow-active.mobile-step-2 .paired-field-grid {
     grid-template-columns: 1fr;
     gap: 0.6rem;
     margin-bottom: 0;
   }
 
-  body.mobile-flow-active.mobile-step-3 .group-primary-taper input,
-  body.mobile-flow-active.mobile-step-3 .group-primary-taper select,
-  body.mobile-flow-active.mobile-step-3 #custom-override-panel input {
+  body.mobile-flow-active.mobile-step-2 .group-primary-taper input,
+  body.mobile-flow-active.mobile-step-2 .group-primary-taper select,
+  body.mobile-flow-active.mobile-step-2 #custom-override-panel input {
     min-width: 0;
     max-width: 100%;
     width: 100%;
   }
 
-  body.mobile-flow-active.mobile-step-3 .input-with-unit {
+  body.mobile-flow-active.mobile-step-2 .input-with-unit {
     width: 100%;
   }
 
-  body.mobile-flow-active.mobile-step-3 .paired-field-action {
+  body.mobile-flow-active.mobile-step-2 .paired-field-action {
     justify-content: stretch;
   }
 
-  body.mobile-flow-active.mobile-step-3 .inline-action-button {
+  body.mobile-flow-active.mobile-step-2 .inline-action-button {
     padding: 0.7rem 0.85rem;
     font-size: 0.94rem;
   }
 
-  body.mobile-flow-active.mobile-step-3 .custom-override-panel .table-scroll {
+  body.mobile-flow-active.mobile-step-2 .custom-override-panel .table-scroll {
     margin: 0;
     padding: 0;
     overflow: visible;
   }
 
-  body.mobile-flow-active.mobile-step-3 .advanced-calendar-preview {
+  body.mobile-flow-active.mobile-step-2 .advanced-calendar-preview {
     display: none !important;
   }
 
-  body.mobile-flow-active.mobile-step-3 .custom-override-panel .input-table,
-  body.mobile-flow-active.mobile-step-3 .custom-override-panel .input-table tr,
-  body.mobile-flow-active.mobile-step-3 .custom-override-panel .input-table td {
+  body.mobile-flow-active.mobile-step-2 .custom-override-panel .input-table,
+  body.mobile-flow-active.mobile-step-2 .custom-override-panel .input-table tr,
+  body.mobile-flow-active.mobile-step-2 .custom-override-panel .input-table td {
     display: block;
     width: 100%;
   }
 
-  body.mobile-flow-active.mobile-step-3 .custom-override-panel .input-table {
+  body.mobile-flow-active.mobile-step-2 .custom-override-panel .input-table {
     min-width: 0;
     border-collapse: separate;
   }
 
-  body.mobile-flow-active.mobile-step-3 .custom-override-panel .input-table tbody {
+  body.mobile-flow-active.mobile-step-2 .custom-override-panel .input-table tbody {
     display: grid;
     gap: 1rem;
   }
 
-  body.mobile-flow-active.mobile-step-3 .custom-override-panel .input-table thead {
+  body.mobile-flow-active.mobile-step-2 .custom-override-panel .input-table thead {
     display: none;
   }
 
-  body.mobile-flow-active.mobile-step-3 .custom-override-panel .input-table tfoot {
+  body.mobile-flow-active.mobile-step-2 .custom-override-panel .input-table tfoot {
     display: table-footer-group;
   }
 
-  body.mobile-flow-active.mobile-step-3 .custom-override-panel .input-table tr.custom-segment-row {
+  body.mobile-flow-active.mobile-step-2 .custom-override-panel .input-table tr.custom-segment-row {
     display: grid;
     gap: 0.78rem;
     padding: 1rem 1rem 1.05rem;
@@ -3007,7 +3007,7 @@ body.guided-preview-active.mobile-step-3 .custom-override-panel .segment-setting
     position: relative;
   }
 
-  body.mobile-flow-active.mobile-step-3 .custom-override-panel .input-table tr.custom-segment-row::before {
+  body.mobile-flow-active.mobile-step-2 .custom-override-panel .input-table tr.custom-segment-row::before {
     content: "";
     position: absolute;
     left: -1.05rem;
@@ -3017,7 +3017,7 @@ body.guided-preview-active.mobile-step-3 .custom-override-panel .segment-setting
     background: linear-gradient(180deg, rgba(198, 213, 223, 0.95) 0%, rgba(198, 213, 223, 0.35) 100%);
   }
 
-  body.mobile-flow-active.mobile-step-3 .custom-override-panel .input-table tr.custom-segment-row::after {
+  body.mobile-flow-active.mobile-step-2 .custom-override-panel .input-table tr.custom-segment-row::after {
     content: "";
     position: absolute;
     left: -1.38rem;
@@ -3030,18 +3030,18 @@ body.guided-preview-active.mobile-step-3 .custom-override-panel .segment-setting
     box-shadow: 0 0 0 4px rgba(38, 113, 173, 0.08);
   }
 
-  body.mobile-flow-active.mobile-step-3 .custom-override-panel .input-table tr.custom-segment-row.is-first-segment::after {
+  body.mobile-flow-active.mobile-step-2 .custom-override-panel .input-table tr.custom-segment-row.is-first-segment::after {
     background: var(--accent);
   }
 
-  body.mobile-flow-active.mobile-step-3 .custom-override-panel .input-table td {
+  body.mobile-flow-active.mobile-step-2 .custom-override-panel .input-table td {
     border-bottom: 0;
     padding: 0;
     margin: 0;
     min-width: 0;
   }
 
-  body.mobile-flow-active.mobile-step-3 .custom-override-panel .input-table td::before {
+  body.mobile-flow-active.mobile-step-2 .custom-override-panel .input-table td::before {
     display: block;
     margin-bottom: 0.3rem;
     font-size: 0.72rem;
@@ -3051,109 +3051,109 @@ body.guided-preview-active.mobile-step-3 .custom-override-panel .segment-setting
     color: var(--muted);
   }
 
-  body.mobile-flow-active.mobile-step-3 .custom-override-panel .input-table td:nth-child(1)::before {
+  body.mobile-flow-active.mobile-step-2 .custom-override-panel .input-table td:nth-child(1)::before {
     display: none;
   }
 
-  body.mobile-flow-active.mobile-step-3 .custom-override-panel .input-table td:nth-child(2)::before {
+  body.mobile-flow-active.mobile-step-2 .custom-override-panel .input-table td:nth-child(2)::before {
     content: "Start Dose";
   }
 
-  body.mobile-flow-active.mobile-step-3 .custom-override-panel .input-table td:nth-child(3)::before {
+  body.mobile-flow-active.mobile-step-2 .custom-override-panel .input-table td:nth-child(3)::before {
     content: "Dose Change";
   }
 
-  body.mobile-flow-active.mobile-step-3 .custom-override-panel .input-table td:nth-child(4)::before {
+  body.mobile-flow-active.mobile-step-2 .custom-override-panel .input-table td:nth-child(4)::before {
     content: "What is the duration of the starting / initial dosage?";
   }
 
-  body.mobile-flow-active.mobile-step-3 .custom-override-panel .input-table td:nth-child(5)::before {
+  body.mobile-flow-active.mobile-step-2 .custom-override-panel .input-table td:nth-child(5)::before {
     content: "Repeats";
   }
 
-  body.mobile-flow-active.mobile-step-3 .custom-override-panel .input-table td:nth-child(6)::before {
+  body.mobile-flow-active.mobile-step-2 .custom-override-panel .input-table td:nth-child(6)::before {
     content: "End Dose";
   }
 
-  body.mobile-flow-active.mobile-step-3 .custom-override-panel .input-table td:nth-child(7)::before {
+  body.mobile-flow-active.mobile-step-2 .custom-override-panel .input-table td:nth-child(7)::before {
     content: "Row Actions";
   }
 
-  body.mobile-flow-active.mobile-step-3 .custom-override-panel .input-table td:nth-child(1) {
+  body.mobile-flow-active.mobile-step-2 .custom-override-panel .input-table td:nth-child(1) {
     font-size: 1rem;
     font-weight: 700;
     color: var(--accent-dark);
     padding-bottom: 0.1rem;
   }
 
-  body.mobile-flow-active.mobile-step-3 .custom-override-panel .segment-card-head {
+  body.mobile-flow-active.mobile-step-2 .custom-override-panel .segment-card-head {
     align-items: center;
   }
 
-  body.mobile-flow-active.mobile-step-3 .custom-override-panel .segment-badge {
+  body.mobile-flow-active.mobile-step-2 .custom-override-panel .segment-badge {
     align-self: flex-start;
   }
 
-  body.mobile-flow-active.mobile-step-3 .custom-override-panel .segment-label {
+  body.mobile-flow-active.mobile-step-2 .custom-override-panel .segment-label {
     padding: 0;
     border: 0;
     background: transparent;
     font-size: 1rem;
   }
 
-  body.mobile-flow-active.mobile-step-3 .custom-override-panel .segment-date-range {
+  body.mobile-flow-active.mobile-step-2 .custom-override-panel .segment-date-range {
     margin-top: 0;
     font-size: 0.88rem;
   }
 
-  body.mobile-flow-active.mobile-step-3 .custom-override-panel .segment-sequence {
+  body.mobile-flow-active.mobile-step-2 .custom-override-panel .segment-sequence {
     font-size: 1.18rem;
     line-height: 1.2;
   }
 
-  body.mobile-flow-active.mobile-step-3 .custom-override-panel .segment-sequence-note {
+  body.mobile-flow-active.mobile-step-2 .custom-override-panel .segment-sequence-note {
     font-size: 0.9rem;
     padding-bottom: 0.15rem;
     border-bottom: 1px solid rgba(198, 213, 223, 0.72);
   }
 
-  body.mobile-flow-active.mobile-step-3 .custom-override-panel .segment-guidance {
+  body.mobile-flow-active.mobile-step-2 .custom-override-panel .segment-guidance {
     display: block;
     margin-top: 0.5rem;
   }
 
-  body.mobile-flow-active.mobile-step-3 .custom-override-panel .input-table tr.custom-segment-row.is-first-segment td:nth-child(2),
-  body.mobile-flow-active.mobile-step-3 .custom-override-panel .input-table tr.custom-segment-row.is-first-segment td:nth-child(3),
-  body.mobile-flow-active.mobile-step-3 .custom-override-panel .input-table tr.custom-segment-row.is-first-segment td:nth-child(5),
-  body.mobile-flow-active.mobile-step-3 .custom-override-panel .input-table tr.custom-segment-row.is-first-segment td:nth-child(6) {
+  body.mobile-flow-active.mobile-step-2 .custom-override-panel .input-table tr.custom-segment-row.is-first-segment td:nth-child(2),
+  body.mobile-flow-active.mobile-step-2 .custom-override-panel .input-table tr.custom-segment-row.is-first-segment td:nth-child(3),
+  body.mobile-flow-active.mobile-step-2 .custom-override-panel .input-table tr.custom-segment-row.is-first-segment td:nth-child(5),
+  body.mobile-flow-active.mobile-step-2 .custom-override-panel .input-table tr.custom-segment-row.is-first-segment td:nth-child(6) {
     display: none;
   }
 
-  body.mobile-flow-active.mobile-step-3 .custom-override-panel .input-table tr.custom-segment-row.is-first-segment td:nth-child(7)::before {
+  body.mobile-flow-active.mobile-step-2 .custom-override-panel .input-table tr.custom-segment-row.is-first-segment td:nth-child(7)::before {
     content: "Options";
   }
 
-  body.mobile-flow-active.mobile-step-3 .custom-override-panel .input-table tr.custom-segment-row:not(.is-first-segment) td:nth-child(4)::before {
+  body.mobile-flow-active.mobile-step-2 .custom-override-panel .input-table tr.custom-segment-row:not(.is-first-segment) td:nth-child(4)::before {
     content: "Days Per Step";
   }
 
-  body.mobile-flow-active.mobile-step-3 .custom-override-panel .input-table tr.custom-segment-row.is-first-segment .segment-sequence {
+  body.mobile-flow-active.mobile-step-2 .custom-override-panel .input-table tr.custom-segment-row.is-first-segment .segment-sequence {
     font-size: 1.28rem;
   }
 
-  body.mobile-flow-active.mobile-step-3 .custom-override-panel .input-table tr.custom-segment-row.is-first-segment .segment-sequence-note {
+  body.mobile-flow-active.mobile-step-2 .custom-override-panel .input-table tr.custom-segment-row.is-first-segment .segment-sequence-note {
     border-bottom: 0;
     padding-bottom: 0;
   }
 
-  body.mobile-flow-active.mobile-step-3 .custom-override-panel .input-table td:nth-child(2),
-  body.mobile-flow-active.mobile-step-3 .custom-override-panel .input-table td:nth-child(6) {
+  body.mobile-flow-active.mobile-step-2 .custom-override-panel .input-table td:nth-child(2),
+  body.mobile-flow-active.mobile-step-2 .custom-override-panel .input-table td:nth-child(6) {
     color: var(--accent-dark);
     font-weight: 600;
   }
 
-  body.mobile-flow-active.mobile-step-3 .custom-override-panel .input-table td:nth-child(2) .helper-dose,
-  body.mobile-flow-active.mobile-step-3 .custom-override-panel .input-table td:nth-child(6) .helper-dose {
+  body.mobile-flow-active.mobile-step-2 .custom-override-panel .input-table td:nth-child(2) .helper-dose,
+  body.mobile-flow-active.mobile-step-2 .custom-override-panel .input-table td:nth-child(6) .helper-dose {
     display: inline-flex;
     align-items: center;
     min-height: 2.8rem;
@@ -3163,12 +3163,12 @@ body.guided-preview-active.mobile-step-3 .custom-override-panel .segment-setting
     background: #ffffff;
   }
 
-  body.mobile-flow-active.mobile-step-3 .custom-override-panel .input-table .row-action-cell {
+  body.mobile-flow-active.mobile-step-2 .custom-override-panel .input-table .row-action-cell {
     width: 100%;
     text-align: left;
   }
 
-  body.mobile-flow-active.mobile-step-3 .custom-override-panel .row-action-stack {
+  body.mobile-flow-active.mobile-step-2 .custom-override-panel .row-action-stack {
     display: grid;
     grid-template-columns: repeat(2, 2.5rem);
     justify-content: flex-start;
@@ -3176,15 +3176,15 @@ body.guided-preview-active.mobile-step-3 .custom-override-panel .segment-setting
     min-height: 0;
   }
 
-  body.mobile-flow-active.mobile-step-3 .custom-override-panel .dose-helper,
-  body.mobile-flow-active.mobile-step-3 .custom-override-panel .segment-dose-static,
-  body.mobile-flow-active.mobile-step-3 .custom-override-panel .segment-repeats-static {
+  body.mobile-flow-active.mobile-step-2 .custom-override-panel .dose-helper,
+  body.mobile-flow-active.mobile-step-2 .custom-override-panel .segment-dose-static,
+  body.mobile-flow-active.mobile-step-2 .custom-override-panel .segment-repeats-static {
     min-width: 0;
     white-space: normal;
   }
 
-  body.mobile-flow-active.mobile-step-3 .custom-override-panel .segment-dose-static,
-  body.mobile-flow-active.mobile-step-3 .custom-override-panel .segment-repeats-static {
+  body.mobile-flow-active.mobile-step-2 .custom-override-panel .segment-dose-static,
+  body.mobile-flow-active.mobile-step-2 .custom-override-panel .segment-repeats-static {
     min-height: 2.8rem;
     padding: 0 0.85rem;
     border: 1px solid rgba(170, 192, 203, 0.5);
@@ -3192,13 +3192,13 @@ body.guided-preview-active.mobile-step-3 .custom-override-panel .segment-setting
     background: #ffffff;
   }
 
-  body.mobile-flow-active.mobile-step-3 .custom-override-panel .segment-settings-button,
-  body.mobile-flow-active.mobile-step-3 .custom-override-panel .row-delete-button {
+  body.mobile-flow-active.mobile-step-2 .custom-override-panel .segment-settings-button,
+  body.mobile-flow-active.mobile-step-2 .custom-override-panel .row-delete-button {
     width: 2.5rem;
     height: 2.5rem;
   }
 
-  body.mobile-flow-active.mobile-step-3 .custom-override-panel .segment-settings-popover {
+  body.mobile-flow-active.mobile-step-2 .custom-override-panel .segment-settings-popover {
     position: static;
     top: auto;
     right: auto;
@@ -3515,3 +3515,22 @@ body.guided-preview-active.mobile-step-3 .custom-override-panel .segment-setting
   }
 
 }
+
+/* Four setup steps, followed by results. */
+.guided-review { display:none; }
+body.guided-preview-active.mobile-step-4 #results { display:none !important; }
+body.guided-preview-active.mobile-step-4 .form-grid > :not(.guided-review),
+body.guided-preview-active.mobile-step-4 .taper-mode-strip { display:none !important; }
+body.guided-preview-active.mobile-step-4 .guided-review { display:block; }
+body.guided-preview-active.mobile-step-2 .segment-settings-button,
+body.guided-preview-active.mobile-step-2 .segment-settings-popover { display:none !important; }
+.review-actions { display:flex; flex-wrap:wrap; gap:.6rem; margin-bottom:1rem; }
+.review-segment { border:1px solid var(--border); border-radius:12px; padding:1rem; margin:1rem 0; }
+.review-strengths { display:flex; flex-wrap:wrap; gap:1rem; }
+.review-strengths label { display:flex; align-items:center; gap:.4rem; }
+.review-strengths input { width:auto; }
+
+body.dose-only-calendar .schedule-table :is(th,td):nth-child(5),
+body.dose-only-calendar .schedule-table :is(th,td):nth-child(6),
+body.dose-only-calendar .schedule-table :is(th,td):nth-child(7),
+body.dose-only-calendar .schedule-table :is(th,td):nth-child(8) { display:none; }

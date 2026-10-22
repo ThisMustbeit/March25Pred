@@ -172,7 +172,7 @@
         </div>
 
         <div class="mobile-stepper no-print" aria-live="polite">
-          <p id="mobile-step-count" class="mobile-step-count">Step 1 of 3</p>
+          <p id="mobile-step-count" class="mobile-step-count">Step 1 of 4</p>
           <h3 id="mobile-step-title" class="mobile-step-title">Medication &amp; Start</h3>
           <p id="mobile-step-description" class="mobile-step-description">
             Enter the medication name and taper start date.
@@ -181,11 +181,42 @@
 
         <form id="taper-form" novalidate>
           <div class="form-grid">
+            <section id="guided-review" class="guided-review no-print" aria-label="Overview and review"></section>
             <fieldset class="group group-med-start">
               <legend>Medication &amp; Start</legend>
               <label>
                 <span>Medication Name</span>
                 <input id="drug-name" name="drugName" type="text" maxlength="80" placeholder="Example: Prednisone, Warfarin, Vyvanse, etc." required>
+              </label>
+              <label>
+                <span>Medication Form</span>
+                <select id="dosage-form" name="dosageForm">
+                  <option value="tablet">Tablets</option>
+                  <option value="capsule">Capsules</option>
+                  <option value="solution">Solution</option>
+                </select>
+              </label>
+              <label id="solution-unit-row" hidden>
+                <span>Solution Unit</span>
+                <div class="direction-toggle" role="group" aria-label="Solution unit">
+                  <button
+                    id="solution-unit-ml"
+                    type="button"
+                    class="direction-toggle-button is-active"
+                    data-solution-unit="ml"
+                  >
+                    mL
+                  </button>
+                  <button
+                    id="solution-unit-drop"
+                    type="button"
+                    class="direction-toggle-button"
+                    data-solution-unit="drop"
+                  >
+                    Eye drops
+                  </button>
+                </div>
+                <input id="solution-unit" name="solutionUnit" type="hidden" value="ml">
               </label>
               <div id="mobile-starting-dose-home"></div>
               <label class="starting-dose-field">
@@ -265,41 +296,13 @@
             </fieldset>
 
             <fieldset class="group group-strengths">
-              <legend>Medication Strengths</legend>
-              <label>
-                <span>Medication Form</span>
-                <select id="dosage-form" name="dosageForm">
-                  <option value="tablet">Tablets</option>
-                  <option value="capsule">Capsules</option>
-                  <option value="solution">Solution</option>
-                </select>
-              </label>
-              <label id="solution-unit-row" hidden>
-                <span>Solution Unit</span>
-                <div class="direction-toggle" role="group" aria-label="Solution unit">
-                  <button
-                    id="solution-unit-ml"
-                    type="button"
-                    class="direction-toggle-button is-active"
-                    data-solution-unit="ml"
-                  >
-                    mL
-                  </button>
-                  <button
-                    id="solution-unit-drop"
-                    type="button"
-                    class="direction-toggle-button"
-                    data-solution-unit="drop"
-                  >
-                    Eye drops
-                  </button>
-                </div>
-                <input id="solution-unit" name="solutionUnit" type="hidden" value="ml">
-              </label>
+              <legend>Medication Strengths (optional)</legend>
+              <p class="help-text">Enter strengths to show tablet quantities. Leave all strengths blank for doses only. Skipping clears any entered strengths.</p>
+              <button id="skip-strengths" type="button" class="button button-secondary">Skip strengths — doses only</button>
               <label>
                 <span id="strength-label-a">Tablet Strength A (mg)</span>
                 <div class="input-with-unit" data-unit="mg">
-                  <input id="tablet-strength-a" name="tabletStrengthA" type="number" step="0.1" min="0.1" required>
+                  <input id="tablet-strength-a" name="tabletStrengthA" type="number" step="0.1" min="0.1">
                   <span class="input-unit" aria-hidden="true">mg</span>
                 </div>
               </label>

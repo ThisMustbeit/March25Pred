@@ -80,7 +80,7 @@ function generate() {
   assert.equal(result.count,70);
   assert.equal(JSON.stringify(result.doses),'[50,40,30,20,15,15,10,10,5,5]');
   assert.equal(result.warnings,0);
-  generated++; MobileFlow.setStep(4);
+  generated++; MobileFlow.setStep(5);
 }
 const motion = {matches:true};
 const context = {document, DOMRefs, MobileFlow, UISetup, APP_CONFIG:{defaults:{taper:{}}},
@@ -105,7 +105,7 @@ async function next() {button('next').click(); await settled();}
   assert.equal(get('.app-shell').inert,true);
   await next(); assert.equal(fields[0].value,'Prednisone');
   button('back').click(); await settled(); assert.equal(fields[0].value,'');
-  for(let i=0;i<5;i++) await next();
+  for(let i=0;i<4;i++) await next();
   assert.equal(get('#tutorial-title').textContent,'Two ways to plan dose changes');
   assert.equal(DOMRefs.useCustomOverrideInput.value,'false');
   await next();
@@ -117,7 +117,7 @@ async function next() {button('next').click(); await settled();}
   assert.equal(DOMRefs.useCustomOverrideInput.value,'true');
   button('back').click(); await settled();
   assert.equal(DOMRefs.useCustomOverrideInput.value,'false');
-  for(let i=7;i<13;i++) await next();
+  for(let i=0;i<20 && button('keep').hidden;i++) await next();
   assert.equal(generated,1); assert.equal(button('keep').hidden,false);
   button('exit').click();
   assert.deepEqual(snapshot(),original);
@@ -137,10 +137,10 @@ async function next() {button('next').click(); await settled();}
   get('#tutorial-button').click(); await settled();
   button('next').click(); button('pause').click();
   await sleep(10); button('pause').click(); await settled();
-  for(let i=1;i<13;i++) await next();
+  for(let i=0;i<20 && button('keep').hidden;i++) await next();
   button('keep').click();
   assert.equal(fields[0].value,'Prednisone');
-  assert.equal(MobileFlow.currentStep,4);
+  assert.equal(MobileFlow.currentStep,5);
   assert.equal(document.panel.hidden,true);
   console.log('Passed: all tutorial steps, real schedule generation, Back replay, Pause/Resume, cancellation, restore, and Keep example.');
 })().catch(error=>{console.error(error);process.exitCode=1;});

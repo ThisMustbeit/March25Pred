@@ -784,7 +784,7 @@ const Strengths = {
 };
 
 const Validation = {
-  validateInputs(inputs) {
+  validateInputs(inputs, {skipStrengths=false} = {}) {
     const errors = [];
     const isSolution = inputs.dosageForm === "solution";
 
@@ -826,7 +826,7 @@ const Validation = {
     } else if (inputs.minDoseClamp > inputs.maxDoseClamp) {
       errors.push("Minimum dose clamp cannot be greater than maximum dose clamp.");
     }
-    if (!isSolution) {
+    if (!isSolution && !skipStrengths && !inputs.doseOnly) {
       if (inputs.tabletStrengthA == null || inputs.tabletStrengthA <= 0) {
         errors.push("Strength A is required and must be greater than 0.");
       }
@@ -1015,10 +1015,10 @@ const ScheduleLogic = {
     const doseMg = Templates.doseForDay(dayIndex, inputs);
     const stepIndex = Templates.standardStepIndex(dayIndex, inputs.daysPerStep);
     const strengthsForDay = ScheduleLogic.strengthsForDay(dayIndex, inputs);
-    const allocation = Strengths.allocateDose(doseMg, strengthsForDay, {
+    const allocation = inputs.doseOnly ? {allocations:[],finalRemainder:0} : Strengths.allocateDose(doseMg, strengthsForDay, {
       allowPartialTablets: inputs.allowPartialTablets,
     });
-    const warning = inputs.dosageForm === "solution" ? "" : ScheduleLogic.getExactnessWarning(doseMg, allocation);
+    const warning = inputs.doseOnly || inputs.dosageForm === "solution" ? "" : ScheduleLogic.getExactnessWarning(doseMg, allocation);
     const instructionParts = ScheduleLogic.buildInstructionParts(
       doseMg,
       allocation,
@@ -1040,6 +1040,7 @@ const ScheduleLogic = {
       stepIndex,
       doseMg,
       dosageForm: inputs.dosageForm,
+      doseOnly: Boolean(inputs.doseOnly),
       strengths: strengthsForDay,
       allocations: allocation.allocations,
       warning,
@@ -1166,7 +1167,7 @@ const ViewModelFactory = {
   buildTabletSummaryItems(inputs, summary) {
     const tabletItems = [];
 
-    if (inputs.dosageForm === "solution") {
+    if (inputs.doseOnly || inputs.dosageForm === "solution") {
       return tabletItems;
     }
 
@@ -1215,15 +1216,15 @@ const ViewModelFactory = {
       ],
       secondary: [
         ...ViewModelFactory.buildTabletSummaryItems(inputs, summary),
-        { label: "Total Dispensed", value: Formatters.dose(summary.totalMgDispensed), level: "secondary" },
+        { label: inputs.doseOnly ? "Total Scheduled Dose" : "Total Dispensed", value: Formatters.dose(summary.totalMgDispensed), level: "secondary" },
         {
           label: "Warning Count",
           value: String(summary.warningDays),
           level: "secondary",
           tone: summary.warningDays > 0 ? "warning" : "success",
         },
-        { label: "Schedule Type", value: mode, level: "secondary", badge: true, tone: "neutral" },
-      ],
+        { label: "Schedule Type", value: inputs.doseOnly ? mode + " · Dose only" : mode, level: "secondary", badge: true, tone: "neutral" },
+      ].filter(item => !inputs.doseOnly || item.label !== "Warning Count"),
     };
   },
 
@@ -1330,26 +1331,11 @@ const DOMRefs = {
 const MobileFlow = {
   currentStep: 1,
   steps: [
-    {
-      title: "Medication & Start",
-      description: "Enter the medication name and taper start date.",
-      nextLabel: "Next: Strengths",
-    },
-    {
-      title: "Medication Strengths",
-      description: "Choose the medication form and the strengths available for planning.",
-      nextLabel: "Next: Taper Setup",
-    },
-    {
-      title: "Taper Setup",
-      description: "Choose the taper mode and complete the taper settings before generating the calendar.",
-      nextLabel: "Generate Calendar",
-    },
-    {
-      title: "Calendar & Print",
-      description: "Review the generated schedule, switch views, and print the taper calendar.",
-      nextLabel: "Generate Calendar",
-    },
+    {title:"Medication & Start", description:"Enter the medication name, form and start date.", nextLabel:"Next: Taper Setup"},
+    {title:"Taper Setup", description:"Set the starting dose, dose changes and durations.", nextLabel:"Next: Strengths"},
+    {title:"Medication Strengths", description:"Optionally enter strengths for tablet quantities, or skip for a dose-only calendar.", nextLabel:"Next: Overview & Review"},
+    {title:"Overview & Review", description:"Review your plan and choose the strengths used for each advanced segment.", nextLabel:"Generate Calendar"},
+    {title:"Calendar & Print", description:"Review and print the generated calendar.", nextLabel:"Generate Calendar"},
   ],
 
   isActive() {
@@ -1404,8 +1390,9 @@ const MobileFlow = {
       return errors;
     }
 
-    if (MobileFlow.currentStep === 2) {
+    if (MobileFlow.currentStep === 3) {
       const inputs = InputFactory.readNumericInputs();
+      if ([inputs.tabletStrengthA,inputs.tabletStrengthB,inputs.tabletStrengthC].every(value=>value==null)) return [];
       const dosageForm = MedicationTerms.normalizeDosageForm(DOMRefs.form.dosageForm.value);
       const strengths = Strengths.create({
         ...inputs,
@@ -1431,11 +1418,67 @@ const MobileFlow = {
       return errors;
     }
 
-    if (MobileFlow.currentStep === 3) {
+    if (MobileFlow.currentStep === 2) {
+      return InputFactory.create({skipStrengths:true}).errors;
+    }
+    if (MobileFlow.currentStep === 4) {
       return InputFactory.create().errors;
     }
 
     return [];
+  },
+};
+
+const GuidedReview = {
+  render() {
+    const root = document.getElementById("guided-review");
+    if (!root) return;
+    root.replaceChildren();
+    const add = (tag, text, parent=root) => { const el=document.createElement(tag); el.textContent=text; parent.appendChild(el); return el; };
+    add("h3", "Overview & Review");
+    const actions=add("div", ""); actions.className="review-actions";
+    [[1,"Edit medication & start"],[2,"Edit taper"],[3,"Edit strengths"]].forEach(([step,label])=>{
+      const button=add("button",label,actions);button.type="button";button.className="button button-secondary";
+      button.addEventListener("click",()=>{UIState.validationRequested=false;UIState.mobileValidationRequested=false;DOMRenderer.renderValidationErrors([]);MobileFlow.setStep(step);});
+    });
+    const {inputs,errors}=InputFactory.create();
+    add("p", DOMRefs.form.drugName.value + " · " + DOMRefs.form.dosageForm.selectedOptions[0].textContent + " · Start: " + DOMRefs.form.taperStartDate.value);
+    add("p", "Starting daily dose: " + DOMRefs.form.startingDose.value + (inputs.dosageForm === "solution" ? " " + inputs.solutionUnit : " mg"));
+    if(errors.length){ add("p",errors.join(" "));return; }
+    add("p", inputs.doseOnly ? "Dose-only calendar: strengths skipped; tablet quantities and allocation checks are not included." : inputs.dosageForm === "solution" ? "Liquid amounts use the selected solution unit." : "Available strengths: " + inputs.strengths.map(strength=>Formatters.dose(strength.value)).join(", "));
+    if(inputs.useCustomOverride){
+      UISetup.syncCustomSegmentDoseHelpers();
+      [...DOMRefs.customSegmentBody.querySelectorAll("tr")].forEach((row,index)=>{
+        const fields=UISetup.getCustomRowFields(row), segment=inputs.customSegments[index];
+        if(!segment)return;
+        const card=add("section","");card.className="review-segment";
+        add("h4", index===0?"Starting period":"Segment "+index, card);
+        add("p",fields.segmentSequenceEl.textContent,card);
+        add("p",segment.daysPerStep+" days per dose · "+segment.repeats+" repeat(s) · "+fields.segmentDateRangeEl.textContent,card);
+        if(!inputs.doseOnly && inputs.dosageForm!=="solution"){
+          const group=add("fieldset","",card);group.className="review-strengths";add("legend","Strengths to use",group);
+          fields.strengthOptions.forEach(option=>{
+            const original=option.querySelector(".segment-strength-toggle");if(original.disabled)return;
+            const label=add("label","",group);const checkbox=document.createElement("input");checkbox.type="checkbox";checkbox.checked=original.checked;
+            checkbox.setAttribute("aria-label", "Segment "+index+": "+option.querySelector(".segment-strength-option-label").textContent);
+            label.appendChild(checkbox);add("span",option.querySelector(".segment-strength-option-label").textContent,label);
+            checkbox.addEventListener("change",()=>{original.checked=checkbox.checked;original.dataset.userSet="true";GuidedReview.updateTotals(root);});
+          });
+        }
+      });
+    } else {
+      add("p", "Standard taper: " + Math.abs(inputs.doseChangePerStep) + (inputs.dosageForm==="solution"?" "+inputs.solutionUnit:" mg") + (inputs.doseChangePerStep>0?" increase":" reduction") + " every " + inputs.daysPerStep + " day(s), for " + inputs.totalSteps + " step(s).");
+      if (!inputs.doseOnly) add("p", "The standard taper uses the available strengths throughout. Use Advanced Multi-Taper for different strength choices by segment.");
+    }
+    const totals=add("p","");totals.id="review-totals";totals.setAttribute("role","status");
+    GuidedReview.updateTotals(root);
+  },
+  updateTotals(root) {
+    const target=root.querySelector("#review-totals");if(!target)return;
+    const {inputs,errors}=InputFactory.create();if(errors.length){target.textContent=errors.join(" ");return;}
+    const rows=ScheduleLogic.generateScheduleRows(inputs);
+    const warnings=rows.filter(row=>row.warning).length;
+    target.textContent=rows.length+" scheduled days"+(rows.length?" · Final scheduled dose: "+rows[rows.length-1].doseMg+(inputs.dosageForm==="solution"?" "+inputs.solutionUnit:" mg"):"")+(inputs.doseOnly?" · Dose only (no tablet quantities).":" · "+warnings+" day(s) with allocation warnings.");
   },
 };
 
@@ -1573,7 +1616,7 @@ const InputFactory = {
     });
   },
 
-  create() {
+  create({skipStrengths=false} = {}) {
     const errors = [];
     const baseInputs = {
       ...InputFactory.readDateInputs(),
@@ -1621,11 +1664,12 @@ const InputFactory = {
     const strengths = Strengths.create(baseInputs);
     const inputs = {
       ...baseInputs,
+      doseOnly: baseInputs.dosageForm !== "solution" && [baseInputs.tabletStrengthA,baseInputs.tabletStrengthB,baseInputs.tabletStrengthC].every(value=>value==null),
       customSegments,
       strengths,
     };
 
-    errors.push(...Validation.validateInputs(inputs));
+    errors.push(...Validation.validateInputs(inputs, {skipStrengths}));
     return { inputs, errors };
   },
 
@@ -1804,10 +1848,10 @@ const DOMBuilders = {
                 ${
                   hasVisibleDose
                     ? `<p><strong>Total dose:</strong> ${Html.escape(Formatters.dose(row.doseMg))}</p>
-                <p><strong>Strength breakdown:</strong><br>${Html.escape(row.compactTabletSummary).replace(
+                ${row.doseOnly ? "" : `<p><strong>Strength breakdown:</strong><br>${Html.escape(row.compactTabletSummary).replace(
                   /\n/g,
                   "<br>"
-                )}</p>
+                )}</p>`}
                 ${row.warning ? `<p><strong>Warning:</strong> ${Html.escape(row.warning)}</p>` : ""}`
                     : ""
                 }
@@ -1828,7 +1872,7 @@ const DOMBuilders = {
           : "";
 
         const counts = Object.fromEntries(row.allocations.map((item) => [item.key, item.count]));
-        const isSolution = row.dosageForm === "solution";
+        const isSolution = row.doseOnly || row.dosageForm === "solution";
 
         return `
           <tr class="${row.warning ? "row-warning" : ""}">
@@ -2090,6 +2134,9 @@ const DOMRenderer = {
     document.body.classList.toggle("mobile-step-3", isActive && MobileFlow.currentStep === 3);
     document.body.classList.toggle("mobile-step-4", isActive && MobileFlow.currentStep === 4);
 
+    document.body.classList.toggle("mobile-step-5", isActive && MobileFlow.currentStep === 5);
+    if (isActive && MobileFlow.currentStep === 4) GuidedReview.render();
+
     const setupStepCount = MobileFlow.steps.length - 1;
     const isSetupStep = MobileFlow.currentStep <= setupStepCount;
     DOMRefs.mobileStepCount.hidden = !isSetupStep;
@@ -2105,8 +2152,8 @@ const DOMRenderer = {
 
     if (DOMRefs.mobileStepNextButton) {
       DOMRefs.mobileStepNextButton.textContent =
-        MobileFlow.currentStep === 3 ? "Generate & View Calendar" : currentStep.nextLabel;
-      DOMRefs.mobileStepNextButton.hidden = MobileFlow.currentStep === 4;
+        MobileFlow.currentStep === 4 ? "Generate & View Calendar" : currentStep.nextLabel;
+      DOMRefs.mobileStepNextButton.hidden = MobileFlow.currentStep === 5;
     }
   },
 
@@ -2200,7 +2247,7 @@ const UISetup = {
       DOMRefs.previewModeInput.value = normalized;
     }
 
-    if (normalized === "guided" && MobileFlow.currentStep === 4 && DOMRefs.results?.classList.contains("is-hidden")) {
+    if (normalized === "guided" && MobileFlow.currentStep === 5 && DOMRefs.results?.classList.contains("is-hidden")) {
       MobileFlow.currentStep = 1;
     }
 
@@ -2904,6 +2951,7 @@ const AppController = {
       UISetup.setPreviewMode("guided");
       MobileFlow.syncForViewport();
       DOMRefs.form.addEventListener("submit", AppController.handleGenerate);
+      document.getElementById("skip-strengths")?.addEventListener("click", AppController.handleSkipStrengths);
       DOMRefs.form.addEventListener("reset", AppController.handleReset);
       DOMRefs.previewModeButtons.forEach((button) =>
         button.addEventListener("click", AppController.handlePreviewModeClick)
@@ -2971,7 +3019,7 @@ const AppController = {
 
   handleGenerate(event) {
     event.preventDefault();
-    if (MobileFlow.isActive() && MobileFlow.currentStep < 3) {
+    if (MobileFlow.isActive() && MobileFlow.currentStep < 4) {
       AppController.handleMobileStepNext();
       return;
     }
@@ -2982,7 +3030,7 @@ const AppController = {
     if (success && MobileFlow.isActive()) {
       UIState.validationRequested = false;
       UIState.mobileValidationRequested = false;
-      MobileFlow.setStep(4);
+      MobileFlow.setStep(5);
     }
   },
 
@@ -3073,7 +3121,7 @@ const AppController = {
     UIState.mobileValidationRequested = false;
     DOMRenderer.renderValidationErrors([]);
 
-    if (MobileFlow.currentStep < 3) {
+    if (MobileFlow.currentStep < 4) {
       MobileFlow.goToNextStep();
       return;
     }
@@ -3082,11 +3130,19 @@ const AppController = {
     DOMRefs.form.requestSubmit();
   },
 
+  handleSkipStrengths() {
+    ["tabletStrengthA","tabletStrengthB","tabletStrengthC"].forEach(key=>{DOMRefs.form[key].value="";});
+    UISetup.syncCustomSegmentStrengthSelectors();
+    UIState.validationRequested=false;UIState.mobileValidationRequested=false;
+    AppController.render();
+    if(MobileFlow.isActive())MobileFlow.setStep(4);
+  },
+
   handleMobileEditInputs() {
     UIState.validationRequested = false;
     UIState.mobileValidationRequested = false;
     DOMRenderer.renderValidationErrors([]);
-    MobileFlow.setStep(3);
+    MobileFlow.setStep(4);
   },
 
   handleConfigCodeKeydown(event) {
@@ -3212,6 +3268,7 @@ const AppController = {
 
   render() {
     const { inputs, errors } = InputFactory.create();
+    document.body.classList.toggle("dose-only-calendar", Boolean(inputs.doseOnly));
 
     if (errors.length > 0) {
       DOMRenderer.renderValidationErrors(errors);
