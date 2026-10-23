@@ -74,7 +74,37 @@
         <p id="sig-count" class="sig-count" aria-live="polite"></p>
         <div id="sig-status" role="status" aria-live="polite"></div>
         <button id="sig-undo" type="button" class="button button-secondary" hidden>Undo removal</button>
+        <div id="sig-select-bar" class="sig-select-bar" hidden>
+          <button id="sig-select-toggle" type="button" class="button button-secondary" aria-pressed="false">Select</button>
+          <button id="sig-select-all" type="button" class="button button-secondary" hidden>Select all shown</button>
+          <button id="sig-select-none" type="button" class="link-button" hidden>Clear selection</button>
+          <span id="sig-select-hint" class="sig-select-hint" hidden>Tip: Shift-click to select a range.</span>
+        </div>
         <div id="sig-list" class="sig-list"></div>
+        <div id="sig-bulk" class="sig-bulk" role="region" aria-label="Selected shortcuts" hidden>
+          <div id="sig-bulk-panel" class="sig-bulk-panel" hidden>
+            <p id="sig-bulk-panel-title" class="sig-bulk-panel-title"></p>
+            <label id="sig-bulk-tag-field" for="sig-bulk-tag-input"><span>Tags (separate with commas)</span><input id="sig-bulk-tag-input" maxlength="1000" autocomplete="off" placeholder="e.g. antibiotics, counselling"></label>
+            <div id="sig-bulk-tag-options" class="sig-tags" role="group" aria-label="Tags"></div>
+            <p id="sig-bulk-panel-error" class="sig-bulk-error" role="alert"></p>
+            <div class="sig-actions">
+              <button id="sig-bulk-apply" type="button" class="button">Apply</button>
+              <button id="sig-bulk-cancel" type="button" class="button button-secondary">Cancel</button>
+            </div>
+          </div>
+          <div class="sig-bulk-main">
+            <strong id="sig-bulk-count" aria-live="polite">0 selected</strong>
+            <div class="sig-bulk-actions">
+              <button id="sig-bulk-add-tags" type="button" class="button">Add tags</button>
+              <button id="sig-bulk-remove-tags" type="button" class="button button-secondary">Remove tags</button>
+              <button id="sig-bulk-favourite" type="button" class="button button-secondary">Favourite</button>
+              <button id="sig-bulk-unfavourite" type="button" class="button button-secondary">Unfavourite</button>
+              <button id="sig-bulk-copy" type="button" class="button button-secondary">Copy to my list</button>
+              <button id="sig-bulk-delete" type="button" class="button button-secondary sig-danger">Delete</button>
+              <button id="sig-bulk-clear" type="button" class="link-button">Clear</button>
+            </div>
+          </div>
+        </div>
       </section>
 
       <section id="sig-editor" class="card" aria-labelledby="sig-editor-title" hidden>

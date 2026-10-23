@@ -15,6 +15,8 @@ const base = await Promise.all(model.mergeVariants(CALENDRX_SIG_CATALOG.entries,
 let user = null, shared = [], personal = [], favorites = new Set(), subscriptions = [];
 let generation = 0, sharedReady = false, personalReady = false, favoritesReady = false;
 let selectedTag = '', editing = null, busy = false;
+// Bulk selection state.
+let selectMode = false, selected = new Set(), lastIndex = -1, shown = [], bulkMode = null, bulkRemove = new Set(), undoRows = null;
 const status = (text, error = false) => { $('sig-status').textContent = text; $('sig-status').classList.toggle('is-error',error); };
 const isOwner = () => user?.uid === ownerUid;
 const rows = () => [...cloud.combine(base,shared), ...personal.filter(row=>!row.deleted)];
@@ -54,10 +56,28 @@ function render() {
     b.setAttribute('aria-pressed',String(tag===selectedTag)); tagBox.append(b);
   }
   const filtered = scoped.filter(row=>model.matches(row,$('sig-search').value,selectedTag)).sort((a,b)=>a.code.localeCompare(b.code));
+  shown = filtered;
+  const existing = new Set(all.map(cloud.key));
+  for (const k of [...selected]) if (!existing.has(k)) selected.delete(k);
   $('sig-count').textContent = `${filtered.length} shortcuts`;
   const list = $('sig-list'); list.replaceChildren();
-  for (const row of filtered) {
+  filtered.forEach((row, index) => {
     const card=document.createElement('article'); card.className='sig-entry';
+    if (selectMode) {
+      const k = cloud.key(row), isOn = selected.has(k);
+      card.className = 'sig-entry is-selectable' + (isOn ? ' is-selected' : '');
+      const box = document.createElement('input'); box.type = 'checkbox'; box.className = 'sig-check'; box.checked = isOn;
+      box.setAttribute('aria-label', `Select ${row.code}`);
+      box.addEventListener('click', event => { event?.stopPropagation?.(); toggleSelect(index, event?.shiftKey); });
+      card.append(box);
+      card.addEventListener('click', event => {
+        if (event?.target?.closest?.('button, input, a, select, textarea')) return;
+        if (!event?.shiftKey && globalThis.getSelection?.()?.toString()) return; // let people copy text
+        toggleSelect(index, event?.shiftKey);
+      });
+      // Shift-click selects a range, not text.
+      card.addEventListener('mousedown', event => { if (event?.shiftKey) event.preventDefault(); });
+    }
     for (const [tag,text,cls] of [['h3',row.code,''],['p',row.meaning,''],['p',`${row.scope==='shared'?'Shared':'Personal'} · ${row.tags.join(', ')}`,'sig-entry-notes'],['p',row.notes,'sig-entry-notes']]) {
       if (!text) continue;
       const el=document.createElement(tag); el.textContent=text; el.className=cls; card.append(el);
@@ -83,14 +103,227 @@ function render() {
         publish.disabled=busy || !sharedReady; actions.append(publish);
       }
     }
-    card.append(actions); list.append(card);
-  }
+    if (!selectMode) card.append(actions);
+    list.append(card);
+  });
   if (!filtered.length) {
     const empty=document.createElement('p'); empty.className='sig-empty';
     empty.textContent=!user && ['personal','favorites'].includes(view)?'Sign in to see your personal shortcuts and favourites.':'No shortcuts match these filters.';
     list.append(empty);
   }
+  renderBulk();
 }
+
+// ---------- Bulk selection ----------
+const keyOf = row => cloud.key(row);
+const selectedRows = () => rows().filter(row => selected.has(keyOf(row)));
+const canWrite = row => cloud.canEdit(user, ownerUid, row.scope) && (row.scope === 'shared' ? sharedReady : personalReady);
+const plural = (n, word) => `${n} ${word}${n === 1 ? '' : 's'}`;
+function toggleSelect(index, range) {
+  const row = shown[index]; if (!row || busy) return;
+  const turnOn = !selected.has(keyOf(row));
+  const [from, to] = range && lastIndex >= 0 ? [Math.min(lastIndex, index), Math.max(lastIndex, index)] : [index, index];
+  for (let i = from; i <= to; i++) { const k = keyOf(shown[i]); if (turnOn) selected.add(k); else selected.delete(k); }
+  lastIndex = index;
+  render();
+}
+function setSelectMode(on) {
+  selectMode = on; lastIndex = -1;
+  if (!on) { selected.clear(); closeBulkPanel(); }
+  render();
+}
+function closeBulkPanel() { bulkMode = null; bulkRemove = new Set(); $('sig-bulk-panel').hidden = true; $('sig-bulk-panel-error').textContent = ''; }
+function renderBulk() {
+  $('sig-select-bar').hidden = !user;
+  $('sig-select-toggle').textContent = selectMode ? 'Done selecting' : 'Select';
+  $('sig-select-toggle').setAttribute('aria-pressed', String(selectMode));
+  $('sig-select-toggle').disabled = busy;
+  $('sig-select-all').hidden = !selectMode;
+  $('sig-select-all').textContent = `Select all ${shown.length} shown`;
+  $('sig-select-all').disabled = busy || !shown.length;
+  $('sig-select-none').hidden = !selectMode || !selected.size;
+  $('sig-select-hint').hidden = !selectMode;
+  const picked = selectedRows(), editable = picked.filter(canWrite);
+  $('sig-bulk').hidden = !(user && selectMode && picked.length);
+  $('sig-bulk-count').textContent = `${picked.length} selected`;
+  $('sig-bulk-add-tags').disabled = $('sig-bulk-remove-tags').disabled = $('sig-bulk-delete').disabled = busy || !editable.length;
+  $('sig-bulk-favourite').disabled = $('sig-bulk-unfavourite').disabled = busy || !favoritesReady;
+  $('sig-bulk-copy').hidden = !picked.some(row => row.scope === 'shared');
+  $('sig-bulk-copy').disabled = busy || !personalReady;
+  $('sig-bulk-clear').disabled = busy;
+  if (bulkMode === 'remove') renderRemoveOptions();
+}
+function skippedNote(picked, editable) {
+  const skipped = picked.length - editable.length;
+  return skipped ? ` Skipped ${plural(skipped, 'shared shortcut')} you can't edit; copy ${skipped === 1 ? 'it' : 'them'} to your list first.` : '';
+}
+function openBulkPanel(mode) {
+  if (busy) return;
+  const editable = selectedRows().filter(canWrite);
+  bulkMode = mode; bulkRemove = new Set();
+  $('sig-bulk-panel').hidden = false; $('sig-bulk-panel-error').textContent = '';
+  $('sig-bulk-tag-field').hidden = mode !== 'add';
+  const options = $('sig-bulk-tag-options'); options.replaceChildren();
+  if (mode === 'add') {
+    $('sig-bulk-panel-title').textContent = `Add tags to ${plural(editable.length, 'shortcut')}. Existing tags are kept.`;
+    $('sig-bulk-tag-input').value = '';
+    for (const tag of [...new Set(rows().flatMap(row => row.tags))].sort((a, b) => a.localeCompare(b))) {
+      options.append(button(tag, () => {
+        try { $('sig-bulk-tag-input').value = model.tags([...model.tags($('sig-bulk-tag-input').value), tag]).join(', '); }
+        catch (error) { $('sig-bulk-panel-error').textContent = fail(error); }
+      }, 'sig-tag'));
+    }
+    $('sig-bulk-tag-input').focus?.();
+  } else {
+    renderRemoveOptions();
+  }
+}
+function renderRemoveOptions() {
+  const editable = selectedRows().filter(canWrite);
+  const counts = new Map();
+  for (const row of editable) for (const tag of row.tags) counts.set(tag, (counts.get(tag) || 0) + 1);
+  $('sig-bulk-panel-title').textContent = counts.size
+    ? `Choose tags to remove from ${plural(editable.length, 'shortcut')}.`
+    : 'The selected shortcuts have no tags to remove.';
+  const options = $('sig-bulk-tag-options'); options.replaceChildren();
+  for (const [tag, count] of [...counts].sort((a, b) => a[0].localeCompare(b[0]))) {
+    const b = button(`${tag} (${count})`, () => { bulkRemove.has(tag) ? bulkRemove.delete(tag) : bulkRemove.add(tag); renderRemoveOptions(); }, 'sig-tag');
+    b.setAttribute('aria-pressed', String(bulkRemove.has(tag))); options.append(b);
+  }
+}
+function confirmShared(changes, verb) {
+  const sharedCount = changes.filter(change => change.row.scope === 'shared').length;
+  return !sharedCount || confirm(`This ${verb} ${plural(sharedCount, 'shortcut')} in the shared library for everyone. Continue?`);
+}
+// Saves many entries with the same revision checks as single edits, in batches.
+async function bulkSave(changes) {
+  const uid = user?.uid, saved = []; let conflicts = 0;
+  for (const scope of ['personal', 'shared']) {
+    const group = changes.filter(change => change.row.scope === scope);
+    for (let start = 0; start < group.length; start += 100) {
+      const chunk = group.slice(start, start + 100), written = [];
+      let chunkConflicts = 0;
+      await runTransaction(db, async tx => {
+        written.length = 0; chunkConflicts = 0;
+        if (auth.currentUser?.uid !== uid) throw new Error('Your account changed. Sign in again.');
+        const refs = chunk.map(change => refFor(scope, change.row.id, uid));
+        const snapshots = [];
+        for (const ref of refs) snapshots.push(await tx.get(ref));
+        chunk.forEach((change, i) => {
+          const current = snapshots[i].exists() ? snapshots[i].data().revision : 0;
+          if (current !== change.row.revision) { chunkConflicts++; return; }
+          tx.set(refs[i], {...model.entry(change.next), deleted: Boolean(change.deleted), revision: current + 1, updatedAt: serverTimestamp()});
+          written.push({...change.row, ...model.entry(change.next), revision: current + 1});
+        });
+      });
+      saved.push(...written); conflicts += chunkConflicts;
+      if (group.length > 100) status(`Saving… ${saved.length} of ${changes.length}`);
+    }
+  }
+  return {saved, conflicts};
+}
+const conflictNote = n => n ? ` ${plural(n, 'shortcut')} changed in another session and ${n === 1 ? 'was' : 'were'} skipped.` : '';
+function applyBulkTags() {
+  const picked = selectedRows(), editable = picked.filter(canWrite);
+  let changes = [], tooMany = 0;
+  try {
+    if (bulkMode === 'add') {
+      const adding = model.tags($('sig-bulk-tag-input').value);
+      if (!adding.length) { $('sig-bulk-panel-error').textContent = 'Type at least one tag.'; return; }
+      for (const row of editable) {
+        let next;
+        try { next = model.tags([...row.tags, ...adding]); } catch { tooMany++; continue; }
+        if (next.length !== row.tags.length) changes.push({row, next: {...row, tags: next}});
+      }
+    } else {
+      if (!bulkRemove.size) { $('sig-bulk-panel-error').textContent = 'Choose at least one tag to remove.'; return; }
+      for (const row of editable) {
+        const next = row.tags.filter(tag => !bulkRemove.has(tag));
+        if (next.length !== row.tags.length) changes.push({row, next: {...row, tags: next}});
+      }
+    }
+  } catch (error) { $('sig-bulk-panel-error').textContent = fail(error); return; }
+  const verb = bulkMode === 'add' ? 'adds tags to' : 'removes tags from';
+  if (!changes.length) {
+    $('sig-bulk-panel-error').textContent = tooMany ? `No changes: ${plural(tooMany, 'shortcut')} would go over 20 tags.` : 'No changes needed: the selected shortcuts already match.';
+    return;
+  }
+  if (!confirmShared(changes, verb)) return;
+  const mode = bulkMode;
+  action(async () => {
+    const {saved, conflicts} = await bulkSave(changes);
+    closeBulkPanel();
+    const unchanged = editable.length - changes.length - tooMany;
+    return `${mode === 'add' ? 'Added tags to' : 'Removed tags from'} ${plural(saved.length, 'shortcut')}.` +
+      (unchanged > 0 ? ` ${unchanged} already matched.` : '') +
+      (tooMany ? ` ${plural(tooMany, 'shortcut')} would go over 20 tags and ${tooMany === 1 ? 'was' : 'were'} skipped.` : '') +
+      conflictNote(conflicts) + skippedNote(picked, editable);
+  });
+}
+function bulkDelete() {
+  if (busy) return;
+  const picked = selectedRows(), editable = picked.filter(canWrite);
+  if (!editable.length) return;
+  const sharedCount = editable.filter(row => row.scope === 'shared').length;
+  const question = `Delete ${plural(editable.length, 'shortcut')}?` + (sharedCount ? ` ${sharedCount} ${sharedCount === 1 ? 'is' : 'are'} in the shared library and will be removed for everyone.` : '');
+  if (!confirm(question)) return;
+  action(async () => {
+    const {saved, conflicts} = await bulkSave(editable.map(row => ({row, next: row, deleted: true})));
+    undoRows = saved;
+    $('sig-undo').textContent = `Undo delete (${saved.length})`;
+    $('sig-undo').hidden = !saved.length;
+    return `Deleted ${plural(saved.length, 'shortcut')}.` + conflictNote(conflicts) + skippedNote(picked, editable);
+  });
+}
+function bulkFavourite(on) {
+  const uid = user?.uid, picked = selectedRows(); if (!uid || !picked.length) return;
+  action(async () => {
+    let changed = 0;
+    for (let start = 0; start < picked.length; start += 200) {
+      const chunk = picked.slice(start, start + 200);
+      let count = 0;
+      await runTransaction(db, async tx => {
+        count = 0;
+        if (auth.currentUser?.uid !== uid) throw new Error('Your account changed. Sign in again.');
+        const refs = chunk.map(row => doc(db, 'users', uid, 'favorites', keyOf(row)));
+        const snapshots = [];
+        for (const ref of refs) snapshots.push(await tx.get(ref));
+        chunk.forEach((row, i) => {
+          if (on && !snapshots[i].exists()) { tx.set(refs[i], {source: row.scope, entryId: row.id}); count++; }
+          if (!on && snapshots[i].exists()) { tx.delete(refs[i]); count++; }
+        });
+      });
+      changed += count;
+    }
+    return on ? `Added ${plural(changed, 'shortcut')} to favourites.` : `Removed ${plural(changed, 'shortcut')} from favourites.`;
+  });
+}
+function bulkCopy() {
+  const sharedRows = selectedRows().filter(row => row.scope === 'shared');
+  if (!sharedRows.length) return;
+  action(async () => await importRows(sharedRows.map(row => model.entry(row))));
+}
+$('sig-select-toggle').onclick = () => setSelectMode(!selectMode);
+$('sig-select-all').onclick = () => { shown.forEach(row => selected.add(keyOf(row))); render(); };
+$('sig-select-none').onclick = () => { selected.clear(); closeBulkPanel(); render(); };
+$('sig-bulk-clear').onclick = () => { selected.clear(); closeBulkPanel(); render(); };
+$('sig-bulk-add-tags').onclick = () => openBulkPanel('add');
+$('sig-bulk-remove-tags').onclick = () => openBulkPanel('remove');
+$('sig-bulk-cancel').onclick = () => closeBulkPanel();
+$('sig-bulk-apply').onclick = () => applyBulkTags();
+$('sig-bulk-tag-input').addEventListener('keydown', event => { if (event?.key === 'Enter') { event.preventDefault(); applyBulkTags(); } });
+$('sig-bulk-delete').onclick = () => bulkDelete();
+$('sig-bulk-favourite').onclick = () => bulkFavourite(true);
+$('sig-bulk-unfavourite').onclick = () => bulkFavourite(false);
+$('sig-bulk-copy').onclick = () => bulkCopy();
+$('sig-undo').onclick = () => {
+  const restore = undoRows; if (!restore?.length) return;
+  undoRows = null; $('sig-undo').hidden = true;
+  action(async () => {
+    const {saved, conflicts} = await bulkSave(restore.map(row => ({row, next: row, deleted: false})));
+    return `Restored ${plural(saved.length, 'shortcut')}.` + conflictNote(conflicts);
+  });
+};
 function closeEditor() { editing=null; $('sig-editor').hidden=true; $('sig-form').reset(); $('sig-form-error').textContent=''; }
 function openEditor(row=null, copy=false, scope='personal') {
   if (busy || !user) return;
@@ -228,6 +461,7 @@ onAuthStateChanged(auth,next=>{
   generation++; const session=generation;
   subscriptions.forEach(stop=>stop());subscriptions=[];
   user=next;personal=[];favorites=new Set();personalReady=favoritesReady=false;closeEditor();status('');
+  selectMode=false;selected.clear();undoRows=null;$('sig-undo').hidden=true;closeBulkPanel();
   $('sig-auth-form').hidden=Boolean(user);$('sig-signout').hidden=!user;
   $('sig-account-state').textContent=user?`Signed in as ${user.email}${isOwner()?' · Owner':''}. Personal data syncs to this account. Sign-in lasts for this browser session.`:'Browse the shared list or sign in to save your own shortcuts and favourites.';
   if(user) {
