@@ -1,3 +1,6 @@
+/* Site font: change the family name here and in --font-stack below. */
+@import url("https://fonts.googleapis.com/css2?family=Figtree:wght@400;500;600;700;800&display=swap");
+
 :root {
   --bg: #f3f6f8;
   --surface: #ffffff;
@@ -3543,16 +3546,17 @@ body.dose-only-calendar .schedule-table :is(th,td):nth-child(8) { display:none; 
    above are untouched; this layer only restyles.
    ===================================================================== */
 :root {
-  --bg: #f2f4f1;
+  --bg: #f1f5f7;
   --surface: #ffffff;
-  --surface-soft: #f6f8f5;
-  --border: #dbe0da;
-  --border-strong: #b7bfb7;
-  --text: #17201d;
-  --muted: #5a6560;
-  --accent: #1e5b47;
-  --accent-dark: #143f31;
-  --accent-tint: #e5eee9;
+  --surface-soft: #f5f8fa;
+  --border: #d6e0e5;
+  --border-strong: #afbfc7;
+  --text: #13232b;
+  --muted: #55666e;
+  --accent: #167590;
+  --brand: #219ebc;
+  --accent-dark: #0f5a71;
+  --accent-tint: #e3f2f7;
   --warning-bg: #fbf1de;
   --warning-border: #d9a548;
   --warning-ink: #87520a;
@@ -3560,8 +3564,8 @@ body.dose-only-calendar .schedule-table :is(th,td):nth-child(8) { display:none; 
   --shadow: none;
   --radius: 10px;
   --radius-sm: 6px;
-  --font-stack: "Atkinson Hyperlegible Next", "Atkinson Hyperlegible", "Segoe UI", system-ui, sans-serif;
-  --focus: 0 0 0 3px rgba(30, 91, 71, 0.28);
+  --font-stack: "Figtree", "Segoe UI", system-ui, sans-serif;
+  --focus: 0 0 0 3px rgba(33, 158, 188, 0.35);
 }
 
 body {
@@ -3640,7 +3644,7 @@ main { gap: 1.25rem; }
 .site-nav-link.is-current {
   background: transparent;
   color: var(--accent);
-  border-bottom-color: var(--accent);
+  border-bottom-color: var(--brand);
 }
 
 /* ---------- Page header ---------- */
@@ -3801,7 +3805,7 @@ main { gap: 1.25rem; }
 .toggle-group label:has(input:checked) {
   background: var(--surface);
   color: var(--text);
-  box-shadow: 0 0 0 1px var(--border-strong), 0 1px 2px rgba(23, 32, 29, 0.08);
+  box-shadow: 0 0 0 1px var(--border-strong), 0 1px 2px rgba(19, 35, 43, 0.08);
 }
 
 .toggle-group input { accent-color: var(--accent); }
@@ -3882,7 +3886,7 @@ main { gap: 1.25rem; }
   box-shadow: var(--focus);
 }
 
-.group input:disabled { background: var(--surface-soft); color: #8b948f; }
+.group input:disabled { background: var(--surface-soft); color: #8a979d; }
 
 .group input[type="checkbox"],
 .checkbox-row input,
@@ -4033,12 +4037,12 @@ body.guided-preview-active .group legend { display: none; }
 
 /* ---------- Print preview ---------- */
 .print-preview-pages {
-  background: #e7eae6;
+  background: #e2e9ed;
   border: 0;
   border-radius: var(--radius-sm);
 }
 
-.print-preview-paper { box-shadow: 0 1px 3px rgba(23, 32, 29, 0.18), 0 8px 24px rgba(23, 32, 29, 0.08); }
+.print-preview-paper { box-shadow: 0 1px 3px rgba(19, 35, 43, 0.18), 0 8px 24px rgba(19, 35, 43, 0.08); }
 
 /* ---------- Calendar: the wall calendar ---------- */
 .calendar-months { gap: 2.5rem; }
@@ -4066,9 +4070,9 @@ body.guided-preview-active .group legend { display: none; }
 .month-weekdays {
   gap: 0;
   margin: 0;
-  border: 1px solid var(--text);
+  border: 1px solid var(--accent-dark);
   border-bottom: 0;
-  background: var(--text);
+  background: var(--accent-dark);
 }
 
 .month-weekdays div {
@@ -4099,15 +4103,15 @@ body.guided-preview-active .group legend { display: none; }
 }
 
 .calendar-cell.outside-month {
-  background: repeating-linear-gradient(135deg, #f6f7f5 0 6px, #f1f3f0 6px 12px);
-  color: #a3aaa6;
+  background: repeating-linear-gradient(135deg, #f5f8fa 0 6px, #eef3f6 6px 12px);
+  color: #9fadb4;
 }
 
 .calendar-cell.outside-month .calendar-dose,
 .calendar-cell.outside-month .calendar-combo,
 .calendar-cell.outside-month .calendar-warning { visibility: hidden; }
 
-.calendar-cell.has-dose:not(.outside-month) { background: #fbfcfa; }
+.calendar-cell.has-dose:not(.outside-month) { background: #f8fcfd; }
 
 .calendar-cell.has-dose:not(.outside-month)::after {
   content: "";
@@ -4115,7 +4119,7 @@ body.guided-preview-active .group legend { display: none; }
   order: -1;
   height: 3px;
   margin: -0.55rem -0.65rem 0.25rem;
-  background: var(--accent);
+  background: var(--brand);
 }
 
 .calendar-cell.warning:not(.outside-month) {
@@ -4204,7 +4208,7 @@ body.guided-preview-active .group legend { display: none; }
 .segment-settings-popover {
   border-color: var(--border-strong);
   border-radius: 8px;
-  box-shadow: 0 10px 30px rgba(23, 32, 29, 0.14);
+  box-shadow: 0 10px 30px rgba(19, 35, 43, 0.14);
 }
 
 .advanced-preview-shell {
@@ -4272,9 +4276,9 @@ body.mobile-flow-active.mobile-step-2 .custom-override-panel .input-table td::be
 
 .tutorial-panel {
   border: 1px solid var(--border-strong);
-  border-top: 4px solid var(--accent);
+  border-top: 4px solid var(--brand);
   border-radius: var(--radius);
-  box-shadow: 0 16px 48px rgba(23, 32, 29, 0.22);
+  box-shadow: 0 16px 48px rgba(19, 35, 43, 0.22);
 }
 
 .tutorial-highlight { outline: 3px solid var(--accent) !important; outline-offset: 4px; }
@@ -4486,3 +4490,157 @@ body.guided-preview-active .form-card > .section-heading {
 body.guided-preview-active .form-card > .section-heading { max-width: none; }
 body.guided-preview-active .mobile-flow-footer { justify-content: start; }
 body.guided-preview-active.mobile-step-2 .custom-override-panel .input-table .row-action-cell { text-align: left; }
+
+/* Starting dose question shown inside the Baseline card (advanced taper, guided). */
+.starting-dose-field.is-in-baseline { margin: 1rem 0 0.25rem; }
+.starting-dose-field.is-in-baseline > span { color: var(--text); }
+tr.is-first-segment:has(.starting-dose-field.is-in-baseline) .segment-sequence,
+tr.is-first-segment:has(.starting-dose-field.is-in-baseline) .segment-sequence-note { display: none; }
+
+/* Taper type: simple by default, multi-phase behind a link (Oct 23, 2026). */
+.taper-mode-strip { display: none !important; }
+
+.taper-switch {
+  margin: 1.5rem 0 0;
+  padding-top: 1rem;
+  border-top: 1px dashed var(--border);
+  color: var(--muted);
+  font-size: 0.93rem;
+}
+
+.link-button {
+  padding: 0;
+  border: 0;
+  background: none;
+  color: var(--accent);
+  font: inherit;
+  font-weight: 700;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+  cursor: pointer;
+}
+
+.link-button:hover { color: var(--accent-dark); text-decoration-thickness: 2px; }
+
+/* Doses that can't be made exactly from the selected strengths. */
+.dose-alert {
+  margin: 1.25rem 0;
+  padding: 1rem 1.15rem;
+  border: 1px solid var(--warning-border);
+  border-left-width: 4px;
+  border-radius: var(--radius-sm);
+  background: var(--warning-bg);
+  color: var(--text);
+}
+
+.dose-alert p { margin: 0 0 0.5rem; line-height: 1.5; }
+.dose-alert-title { font-weight: 700; color: var(--warning-ink); }
+.dose-alert-actions { display: flex; flex-wrap: wrap; gap: 0.6rem; margin-top: 0.85rem; }
+.summary-grid > .dose-alert { margin-top: 0; }
+
+/* ---------- Multi-phase taper: dose list (Oct 23, 2026) ---------- */
+#custom-override-panel .advanced-taper-editor > .table-scroll,
+#custom-override-panel #mobile-advanced-taper-target,
+#custom-override-panel #mobile-advanced-starting-dose-target,
+.form-grid.is-advanced-mode .starting-dose-field { display: none !important; }
+
+.dose-list { display: grid; gap: 0.75rem; }
+
+.dose-list-header,
+.dose-list-row {
+  display: grid;
+  grid-template-columns: minmax(8rem, 1.1fr) minmax(7rem, 1fr) minmax(7rem, 1fr) 2.5rem;
+  gap: 0.75rem;
+  align-items: center;
+}
+
+.dose-list-header {
+  padding: 0 0 0.35rem;
+  border-bottom: 1px solid var(--border);
+  font-size: 0.82rem;
+  font-weight: 600;
+  color: var(--muted);
+}
+
+.dose-list-rows { list-style: none; margin: 0; padding: 0; display: grid; gap: 0.5rem; counter-reset: none; }
+
+.dose-list-row { padding: 0.15rem 0; }
+.group .dose-list-row label.dl-cell { margin: 0; display: block; }
+.dl-label { display: none; }
+
+.dl-input { position: relative; display: block; }
+.group .dl-input input { padding-right: 3.4rem; }
+.dl-input > span {
+  position: absolute;
+  right: 0.75rem;
+  top: 50%;
+  transform: translateY(-50%);
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: var(--muted) !important;
+  pointer-events: none;
+}
+
+.dl-dates { font-size: 0.88rem; color: var(--muted); }
+.dose-list-row:first-child .dl-dates { color: var(--text); }
+
+.dl-remove {
+  width: 2.5rem;
+  height: 2.5rem;
+  border: 1px solid var(--border-strong);
+  border-radius: var(--radius-sm);
+  background: var(--surface);
+  color: var(--muted);
+  font-size: 1.3rem;
+  line-height: 1;
+  cursor: pointer;
+}
+.dl-remove:hover:not(:disabled) { color: var(--danger); border-color: var(--danger); }
+.dl-remove:disabled { opacity: 0.35; cursor: default; }
+
+#dose-list-add { justify-self: start; }
+
+.quick-fill {
+  margin-top: 0.5rem;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  background: var(--surface-soft);
+}
+.quick-fill > summary {
+  padding: 0.75rem 1rem;
+  font-weight: 700;
+  color: var(--accent);
+  cursor: pointer;
+}
+.quick-fill-body { padding: 0 1rem 1rem; }
+.quick-fill-body .help-text { margin: 0 0 0.85rem; font-size: 0.9rem; }
+.quick-fill-fields {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 0.75rem;
+  margin-bottom: 0.85rem;
+}
+.group .quick-fill-fields label { margin: 0; }
+#qf-status { margin: 0.6rem 0 0; }
+
+@media (max-width: 640px) {
+  .dose-list-header { display: none; }
+  .dose-list-row {
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+    grid-template-areas: "dose days" "dates remove";
+    row-gap: 0.4rem;
+    padding: 0.6rem 0;
+    border-bottom: 1px solid var(--border);
+  }
+  .dose-list-row > .dl-cell:nth-child(1) { grid-area: dose; }
+  .dose-list-row > .dl-cell:nth-child(2) { grid-area: days; }
+  .dose-list-row > .dl-dates { grid-area: dates; }
+  .dose-list-row > .dl-remove { grid-area: remove; justify-self: end; width: 2.2rem; height: 2.2rem; }
+  .dl-label { display: block; margin-bottom: 0.25rem; font-size: 0.82rem; }
+  .group .dl-input input { padding-right: 2.9rem; }
+  .dl-input > span { right: 0.6rem; font-size: 0.8rem; }
+  .quick-fill-fields { grid-template-columns: 1fr 1fr; }
+}
+@media (max-width: 1100px) {
+  body.guided-preview-active.mobile-step-2 .advanced-taper-workspace { grid-template-columns: minmax(0, 1fr); }
+}

@@ -112,7 +112,7 @@ async function next() {button('next').click(); await settled();}
   assert.deepEqual(snapshot().slice(10,13),['10','7','5']);
   assert.equal(DOMRefs.useCustomOverrideInput.value,'false');
   await next();
-  assert.equal(get('#tutorial-title').textContent,'Standard can also titrate up');
+  assert.equal(get('#tutorial-title').textContent,'A simple taper can also titrate up');
   await next();
   assert.equal(DOMRefs.useCustomOverrideInput.value,'true');
   button('back').click(); await settled();

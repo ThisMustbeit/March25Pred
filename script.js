@@ -1,9 +1,9 @@
 const APP_CONFIG = {
   epsilon: 1e-6,
   defaultCustomSegmentCount: 3,
-  maxCustomSegmentCount: 8,
+  maxCustomSegmentCount: 40,
   messages: {
-    exactDoseWarning: "Dose not exact with selected medication strengths",
+    exactDoseWarning: "Can't be made exactly with the selected strengths. Tablet count not shown.",
     noSchedule: "No taper days to display yet.",
     customMode: "Custom taper override",
     standardMode: "Standard step taper",
@@ -993,7 +993,9 @@ const ScheduleLogic = {
 
     return {
       totalLine: `Total = ${Formatters.dose(doseMg)}`,
-      tabletLines: Strengths.buildTabletLines(allocation.allocations, dosageForm, solutionUnit),
+      // A dose that can't be made exactly never gets a tablet count: a count that
+      // doesn't add up to the total would mislead the patient.
+      tabletLines: warning ? [] : Strengths.buildTabletLines(allocation.allocations, dosageForm, solutionUnit),
       warningLine: warning || "",
     };
   },
@@ -1248,6 +1250,7 @@ const ViewModelFactory = {
       calendarStatus,
       calendars,
       scheduleRows,
+      inputs,
     };
   },
 };
@@ -1334,7 +1337,7 @@ const MobileFlow = {
     {title:"Medication & Start", description:"Enter the medication name, form and start date.", nextLabel:"Next: Taper Setup"},
     {title:"Taper Setup", description:"Set the starting dose, dose changes and durations.", nextLabel:"Next: Strengths"},
     {title:"Medication Strengths", description:"Optionally enter strengths for tablet quantities, or skip for a dose-only calendar.", nextLabel:"Next: Overview & Review"},
-    {title:"Overview & Review", description:"Review your plan and choose the strengths used for each advanced segment.", nextLabel:"Generate Calendar"},
+    {title:"Overview & Review", description:"Check the plan before generating the calendar.", nextLabel:"Generate Calendar"},
     {title:"Calendar & Print", description:"Review and print the generated calendar.", nextLabel:"Generate Calendar"},
   ],
 
@@ -1429,6 +1432,59 @@ const MobileFlow = {
   },
 };
 
+const InexactDoses = {
+  // Days whose dose can't be made exactly from the selected strengths.
+  describe(rows, inputs) {
+    if (!inputs || inputs.doseOnly || inputs.dosageForm === "solution") return null;
+    const affected = rows.filter((row) => row.warning);
+    if (affected.length === 0) return null;
+    const doses = [...new Set(affected.map((row) => row.doseMg))].sort((a, b) => b - a);
+    const strengths = (inputs.strengths || []).filter((strength) => strength.value != null).map((strength) => Formatters.dose(strength.value)).join(" + ");
+    const doseText = doses.map((dose) => Formatters.dose(dose)).join(", ");
+    return {
+      days: affected.length,
+      canAllowHalves: !inputs.allowPartialTablets,
+      message:
+        `${doses.length === 1 ? "This dose" : "These doses"} can't be made exactly with ` +
+        `${strengths || "the selected strengths"}: ${doseText} (${affected.length} day${affected.length === 1 ? "" : "s"}). ` +
+        "On the printed calendar those days show the total dose only, with no tablet count.",
+    };
+  },
+
+  markup(info, {editLabel = "Edit strengths"} = {}) {
+    if (!info) return "";
+    return `
+      <div class="dose-alert" role="alert">
+        <p class="dose-alert-title">Some doses can't be made exactly</p>
+        <p>${Html.escape(info.message)}</p>
+        <div class="dose-alert-actions">
+          ${info.canAllowHalves ? '<button type="button" class="button" data-inexact-action="halves">Allow half tablets</button>' : ""}
+          <button type="button" class="button button-secondary" data-inexact-action="strengths">${Html.escape(editLabel)}</button>
+        </div>
+      </div>`;
+  },
+
+  handleAction(action) {
+    if (action === "halves") {
+      DOMRefs.form.allowPartialTablets.checked = true;
+      DOMRefs.form.allowPartialTablets.dispatchEvent(new Event("change", { bubbles: true }));
+      if (MobileFlow.isActive() && MobileFlow.currentStep === 4) {
+        GuidedReview.render();
+      } else {
+        AppController.render();
+      }
+      return;
+    }
+    if (action === "strengths") {
+      if (MobileFlow.isActive()) {
+        MobileFlow.setStep(3);
+      } else {
+        document.querySelector(".group-strengths")?.scrollIntoView({ behavior: "smooth", block: "start" });
+      }
+    }
+  },
+};
+
 const GuidedReview = {
   render() {
     const root = document.getElementById("guided-review");
@@ -1468,7 +1524,7 @@ const GuidedReview = {
       });
     } else {
       add("p", "Standard taper: " + Math.abs(inputs.doseChangePerStep) + (inputs.dosageForm==="solution"?" "+inputs.solutionUnit:" mg") + (inputs.doseChangePerStep>0?" increase":" reduction") + " every " + inputs.daysPerStep + " day(s), for " + inputs.totalSteps + " step(s).");
-      if (!inputs.doseOnly) add("p", "The standard taper uses the available strengths throughout. Use Advanced Multi-Taper for different strength choices by segment.");
+      if (!inputs.doseOnly) add("p", "The standard taper uses the available strengths throughout. Use a multi-phase taper for different strength choices by phase.");
     }
     const totals=add("p","");totals.id="review-totals";totals.setAttribute("role","status");
     GuidedReview.updateTotals(root);
@@ -1479,6 +1535,9 @@ const GuidedReview = {
     const rows=ScheduleLogic.generateScheduleRows(inputs);
     const warnings=rows.filter(row=>row.warning).length;
     target.textContent=rows.length+" scheduled days"+(rows.length?" · Final scheduled dose: "+rows[rows.length-1].doseMg+(inputs.dosageForm==="solution"?" "+inputs.solutionUnit:" mg"):"")+(inputs.doseOnly?" · Dose only (no tablet quantities).":" · "+warnings+" day(s) with allocation warnings.");
+    root.querySelector(".dose-alert")?.remove();
+    const info=InexactDoses.describe(rows,inputs);
+    if(info) target.insertAdjacentHTML("afterend",InexactDoses.markup(info));
   },
 };
 
@@ -1849,7 +1908,7 @@ const DOMBuilders = {
                 ${
                   hasVisibleDose
                     ? `<p><strong>Total dose:</strong> ${Html.escape(Formatters.dose(row.doseMg))}</p>
-                ${row.doseOnly ? "" : `<p><strong>Strength breakdown:</strong><br>${Html.escape(row.compactTabletSummary).replace(
+                ${row.doseOnly || row.warning ? "" : `<p><strong>Strength breakdown:</strong><br>${Html.escape(row.compactTabletSummary).replace(
                   /\n/g,
                   "<br>"
                 )}</p>`}
@@ -1874,6 +1933,7 @@ const DOMBuilders = {
 
         const counts = Object.fromEntries(row.allocations.map((item) => [item.key, item.count]));
         const isSolution = row.doseOnly || row.dosageForm === "solution";
+        const countCell = (key) => (isSolution ? "" : row.warning ? "—" : Html.escape(Formatters.tabletCount(counts[key] ?? 0)));
 
         return `
           <tr class="${row.warning ? "row-warning" : ""}">
@@ -1881,9 +1941,9 @@ const DOMBuilders = {
             <td>${row.dayIndex}</td>
             <td>${row.stepIndex}</td>
             <td>${Html.escape(Formatters.dose(row.doseMg))}</td>
-            <td>${isSolution ? "" : Html.escape(Formatters.tabletCount(counts.A ?? 0))}</td>
-            <td>${isSolution ? "" : Html.escape(Formatters.tabletCount(counts.B ?? 0))}</td>
-            <td>${isSolution ? "" : Html.escape(Formatters.tabletCount(counts.C ?? 0))}</td>
+            <td>${countCell("A")}</td>
+            <td>${countCell("B")}</td>
+            <td>${countCell("C")}</td>
             <td>${warningBadge}</td>
             <td class="pre">${Html.escape(row.printableText)}</td>
           </tr>
@@ -1999,12 +2059,6 @@ const DOMBuilders = {
       );
     }
 
-    if (cell.scheduleRow.instructionParts.warningLine) {
-      lines.push(
-        `<div class="print-day-warning">${Html.escape(cell.scheduleRow.instructionParts.warningLine)}</div>`
-      );
-    }
-
     return lines.join("");
   },
 };
@@ -2067,7 +2121,8 @@ const DOMRenderer = {
   render(viewModel) {
     DOMRefs.results?.classList.toggle("is-hidden", viewModel.scheduleRows.length === 0);
     const summaryMarkup = DOMBuilders.summaryMarkup(viewModel.summaryItems);
-    DOMRefs.summaryGrid.innerHTML = summaryMarkup;
+    const inexact = InexactDoses.describe(viewModel.scheduleRows, viewModel.inputs);
+    DOMRefs.summaryGrid.innerHTML = InexactDoses.markup(inexact) + summaryMarkup;
     DOMRefs.calendarTitle.textContent = viewModel.calendarTitle;
     DOMRefs.calendarStatus.textContent = viewModel.calendarStatus;
     DOMRefs.calendarMonths.innerHTML = viewModel.calendars.map(DOMBuilders.monthMarkup).join("");
@@ -2417,6 +2472,15 @@ const UISetup = {
       : "Starting Daily Dose (mg)";
   },
 
+  // The starting-dose field may sit inside the Baseline row; move it out before rows are removed.
+  rescueStartingDoseField() {
+    const startingDoseLabel = DOMRefs.form.startingDose?.closest("label");
+    const taperStartDateLabel = DOMRefs.form.taperStartDate?.closest("label");
+    if (startingDoseLabel && DOMRefs.customSegmentBody.contains(startingDoseLabel) && taperStartDateLabel) {
+      DOMRefs.medStartGroup.insertBefore(startingDoseLabel, taperStartDateLabel);
+    }
+  },
+
   syncMobileFieldPlacement() {
     const startingDoseLabel = DOMRefs.form.startingDose?.closest("label");
     const taperStartDateLabel = DOMRefs.form.taperStartDate?.closest("label");
@@ -2435,7 +2499,18 @@ const UISetup = {
         ? DOMRefs.mobileAdvancedTaperTarget
         : DOMRefs.mobileStartingDoseTarget;
 
-      if (mobileTaperContainer && mobileStartingDoseAnchor) {
+      // Advanced taper: ask for the starting dose inside the Baseline (starting dose) card.
+      const baselineCell = isAdvancedMode
+        ? DOMRefs.customSegmentBody.querySelector("tr.is-first-segment .segment-label-cell")
+        : null;
+      const baselineHead = baselineCell?.querySelector(".segment-card-head");
+      if (baselineCell && baselineHead) {
+        startingDoseLabel.classList.add("is-in-baseline");
+        if (baselineHead.nextElementSibling !== startingDoseLabel) {
+          baselineCell.insertBefore(startingDoseLabel, baselineHead.nextSibling);
+        }
+      } else if (mobileTaperContainer && mobileStartingDoseAnchor) {
+        startingDoseLabel.classList.remove("is-in-baseline");
         const desiredStartingDoseSibling = mobileStartingDoseAnchor.nextSibling;
         if (
           startingDoseLabel.parentElement !== mobileTaperContainer ||
@@ -2458,6 +2533,7 @@ const UISetup = {
       return;
     }
 
+    startingDoseLabel.classList.remove("is-in-baseline");
     if (DOMRefs.mobileStartingDoseHome && taperStartDateLabel) {
       if (
         startingDoseLabel.parentElement !== DOMRefs.medStartGroup ||
@@ -2583,6 +2659,7 @@ const UISetup = {
         fields.repeatsInput.value = "1";
       }
     });
+    if (DOMRefs.medStartGroup) UISetup.syncMobileFieldPlacement();
   },
 
   syncCustomSegmentStrengthSelectors() {
@@ -2840,6 +2917,7 @@ const UISetup = {
   },
 
   rebuildCustomSegmentRows(valuesList = []) {
+    UISetup.rescueStartingDoseField();
     DOMRefs.customSegmentBody.innerHTML = "";
 
     valuesList.slice(0, APP_CONFIG.maxCustomSegmentCount).forEach((values) => UISetup.appendCustomSegmentRow(values));
@@ -3243,6 +3321,7 @@ const AppController = {
     const deleteButton = event.target.closest(".row-delete-button");
     if (!deleteButton) return;
 
+    UISetup.rescueStartingDoseField();
     deleteButton.closest("tr")?.remove();
     UISetup.reindexCustomSegmentRows();
     UISetup.syncCustomSegmentDoseHelpers();
@@ -3295,3 +3374,259 @@ const AppController = {
   };
 
 AppController.initialize();
+
+
+// Simple taper is the default; a link switches to (or back from) the multi-phase taper.
+document.addEventListener("click", (event) => {
+  const link = event.target.closest("[data-switch-taper]");
+  if (!link) return;
+  const mode = link.dataset.switchTaper === "advanced" ? "advanced" : "standard";
+  document.getElementById(`taper-mode-${mode}`)?.click();
+  const target = mode === "advanced"
+    ? document.getElementById("custom-override-panel")
+    : document.querySelector(".group-primary-taper");
+  target?.scrollIntoView({ behavior: "smooth", block: "start" });
+});
+
+document.addEventListener("click", (event) => {
+  const button = event.target.closest("[data-inexact-action]");
+  if (button) InexactDoses.handleAction(button.dataset.inexactAction);
+});
+
+// ---------------------------------------------------------------------------
+// Dose list: the multi-phase taper entered the way prescriptions are written
+// (one daily dose + number of days per line). Lines are converted into the
+// existing custom segments, so the schedule engine is unchanged.
+// ---------------------------------------------------------------------------
+const DoseList = {
+  rows: [],
+  writing: false,
+  maxLines: 120,
+
+  init() {
+    this.rowsEl = document.getElementById("dose-list-rows");
+    if (!this.rowsEl) return;
+    this.rowsEl.addEventListener("input", (event) => this.handleRowInput(event));
+    this.rowsEl.addEventListener("click", (event) => {
+      const remove = event.target.closest("[data-dl-remove]");
+      if (remove) this.removeLine(Number(remove.dataset.dlRemove));
+    });
+    this.rowsEl.addEventListener("keydown", (event) => {
+      if (event.key !== "Enter") return;
+      event.preventDefault();
+      const line = event.target.closest("[data-line]");
+      if (line && Number(line.dataset.line) === this.rows.length - 1) this.addLine(true);
+    });
+    document.getElementById("dose-list-add").addEventListener("click", () => this.addLine(true));
+    document.getElementById("qf-apply").addEventListener("click", () => this.quickFill());
+
+    // Keep the list in step when segments change elsewhere (examples, saved codes, tutorial, reset).
+    const resync = () => { if (!this.writing) this.refresh(); };
+    DOMRefs.customSegmentBody.addEventListener("input", resync);
+    DOMRefs.customSegmentBody.addEventListener("change", resync);
+    this.observer = new MutationObserver(resync);
+    this.observer.observe(DOMRefs.customSegmentBody, { childList: true });
+    DOMRefs.form.startingDose.addEventListener("input", resync);
+    DOMRefs.form.taperStartDate.addEventListener("input", () => this.renderDates());
+    DOMRefs.form.taperStartDate.addEventListener("change", () => this.renderDates());
+    DOMRefs.form.dosageForm.addEventListener("change", () => this.render());
+    this.refresh();
+  },
+
+  unit() {
+    const form = MedicationTerms.normalizeDosageForm(DOMRefs.form.dosageForm.value);
+    if (form !== "solution") return "mg";
+    return MedicationTerms.normalizeSolutionUnit(DOMRefs.solutionUnitInput?.value) === "drop" ? "drops" : "mL";
+  },
+
+  round(value) {
+    return Math.round(value * 1000) / 1000;
+  },
+
+  // Hidden segments -> list lines.
+  fromSegments() {
+    const startText = DOMRefs.form.startingDose.value.trim();
+    const start = NumberUtils.parseOptionalNumber(startText);
+    const segments = InputFactory.readCustomSegments([]);
+    const baseline = segments[0];
+    const lines = [{ dose: startText, days: baseline ? String(baseline.daysPerStep || "") : "" }];
+    if (start == null) return lines;
+    let dose = start;
+    for (const segment of segments.slice(1)) {
+      if (!segment || !segment.repeats) continue;
+      for (let repeat = 0; repeat < segment.repeats; repeat += 1) {
+        dose = this.round(dose + segment.doseChange);
+        if (dose <= 0) return lines;
+        lines.push({ dose: String(dose), days: String(segment.daysPerStep || "") });
+        if (lines.length >= this.maxLines) return lines;
+      }
+    }
+    return lines;
+  },
+
+  // List lines -> hidden segments (runs of the same change and duration share one segment).
+  toSegmentValues() {
+    const complete = [];
+    for (const line of this.rows) {
+      const dose = NumberUtils.parseOptionalNumber(line.dose);
+      const days = NumberUtils.parseOptionalInteger(line.days);
+      if (complete.length === 0) {
+        complete.push({ dose, days });
+        continue;
+      }
+      if (dose == null || days == null) break;
+      complete.push({ dose, days });
+    }
+    const values = [["", complete[0]?.days ?? "", ""]];
+    for (let index = 1; index < complete.length; index += 1) {
+      const change = this.round(complete[index].dose - complete[index - 1].dose);
+      const days = complete[index].days;
+      const last = values[values.length - 1];
+      if (values.length > 1 && last[0] === change && last[1] === days) {
+        last[2] += 1;
+      } else {
+        values.push([change, days, 1]);
+      }
+    }
+    return values.map(([change, days, repeats], index) =>
+      index === 0 ? ["", days === "" || days == null ? "" : String(days), ""] : [String(change), String(days), String(repeats)]
+    );
+  },
+
+  write() {
+    this.writing = true;
+    try {
+      const first = this.rows[0]?.dose ?? "";
+      if (DOMRefs.form.startingDose.value !== first) {
+        DOMRefs.form.startingDose.value = first;
+        DOMRefs.form.startingDose.dispatchEvent(new Event("input", { bubbles: true }));
+      }
+      UISetup.rebuildCustomSegmentRows(this.toSegmentValues());
+      UISetup.syncAdvancedCalendarPreview();
+      UISetup.syncInputUnitAffixes();
+      this.observer?.takeRecords(); // our own rebuild, not an outside change
+    } finally {
+      this.writing = false;
+    }
+    this.renderDates();
+  },
+
+  refresh() {
+    this.rows = this.fromSegments();
+    this.render();
+  },
+
+  handleRowInput(event) {
+    const line = event.target.closest("[data-line]");
+    if (!line) return;
+    const index = Number(line.dataset.line);
+    const field = event.target.dataset.dlField;
+    if (!field || !this.rows[index]) return;
+    this.rows[index][field] = event.target.value.trim();
+    this.write();
+  },
+
+  addLine(focus) {
+    if (this.rows.length >= this.maxLines) return;
+    const previous = this.rows[this.rows.length - 1];
+    this.rows.push({ dose: "", days: previous?.days || "" });
+    this.render();
+    this.write();
+    if (focus) this.rowsEl.querySelector(`[data-line="${this.rows.length - 1}"] [data-dl-field="dose"]`)?.focus();
+  },
+
+  removeLine(index) {
+    if (this.rows.length <= 1) {
+      this.rows = [{ dose: "", days: "" }];
+    } else {
+      this.rows.splice(index, 1);
+    }
+    this.render();
+    this.write();
+  },
+
+  quickFill() {
+    const status = document.getElementById("qf-status");
+    const direction = document.getElementById("qf-direction").value;
+    const amount = NumberUtils.parseOptionalNumber(document.getElementById("qf-amount").value);
+    const days = NumberUtils.parseOptionalInteger(document.getElementById("qf-days").value);
+    const untilText = document.getElementById("qf-until").value.trim();
+    const until = untilText === "" ? null : NumberUtils.parseOptionalNumber(untilText);
+    const unit = this.unit();
+
+    let last = this.rows.length - 1;
+    while (last > 0 && NumberUtils.parseOptionalNumber(this.rows[last].dose) == null) last -= 1;
+    const base = NumberUtils.parseOptionalNumber(this.rows[last]?.dose);
+
+    if (base == null) { status.textContent = "Enter the starting dose on the first line first."; return; }
+    if (amount == null || amount <= 0) { status.textContent = `Enter how many ${unit} to change by.`; return; }
+    if (days == null || days < 1) { status.textContent = "Enter how many days each dose lasts."; return; }
+    if (direction === "increase" && until == null) { status.textContent = `Enter the dose to increase up to.`; return; }
+
+    this.rows = this.rows.slice(0, last + 1);
+    if (!this.rows[last].days) this.rows[last].days = String(days);
+
+    const added = [];
+    let dose = base;
+    while (this.rows.length + added.length < this.maxLines) {
+      dose = this.round(direction === "reduce" ? dose - amount : dose + amount);
+      if (direction === "reduce" && (dose <= 0 || (until != null && dose < until - 1e-9))) break;
+      if (direction === "increase" && dose > until + 1e-9) break;
+      added.push({ dose: String(dose), days: String(days) });
+    }
+
+    if (added.length === 0) {
+      status.textContent = "That pattern doesn't add any doses after the last line.";
+      return;
+    }
+    this.rows.push(...added);
+    this.render();
+    this.write();
+    status.textContent = `Added ${added.length} dose${added.length === 1 ? "" : "s"}: ${added[0].dose} to ${added[added.length - 1].dose} ${unit}.`;
+  },
+
+  dateRange(offset, days) {
+    const startValue = DOMRefs.form.taperStartDate.value;
+    if (!startValue || !days) return "";
+    const start = new Date(`${startValue}T00:00:00`);
+    if (Number.isNaN(start.getTime())) return "";
+    const from = new Date(start); from.setDate(from.getDate() + offset);
+    const to = new Date(start); to.setDate(to.getDate() + offset + days - 1);
+    const fmt = (date, withMonth) => date.toLocaleDateString("en-CA", withMonth ? { month: "short", day: "numeric" } : { day: "numeric" });
+    if (days === 1) return fmt(from, true);
+    return `${fmt(from, true)} – ${fmt(to, to.getMonth() !== from.getMonth())}`;
+  },
+
+  renderDates() {
+    if (!this.rowsEl) return;
+    let offset = 0;
+    this.rows.forEach((line, index) => {
+      const days = NumberUtils.parseOptionalInteger(line.days);
+      const target = this.rowsEl.querySelector(`[data-line="${index}"] .dl-dates`);
+      if (target) target.textContent = days ? this.dateRange(offset, days) : "";
+      offset += days || 0;
+    });
+  },
+
+  render() {
+    if (!this.rowsEl) return;
+    const unit = this.unit();
+    document.querySelectorAll(".dl-unit").forEach((el) => { el.textContent = unit; });
+    this.rowsEl.innerHTML = this.rows
+      .map((line, index) => `
+        <li class="dose-list-row" data-line="${index}">
+          <label class="dl-cell"><span class="dl-label">${index === 0 ? "Starting dose" : `Dose ${index + 1}`}</span>
+            <span class="dl-input"><input data-dl-field="dose" type="number" min="0" step="any" inputmode="decimal" value="${Html.escape(line.dose)}" aria-label="${index === 0 ? "Starting daily dose" : `Daily dose, line ${index + 1}`} (${unit})"><span>${unit}</span></span>
+          </label>
+          <label class="dl-cell"><span class="dl-label">For</span>
+            <span class="dl-input"><input data-dl-field="days" type="number" min="1" step="1" inputmode="numeric" value="${Html.escape(line.days)}" aria-label="Number of days, line ${index + 1}"><span>days</span></span>
+          </label>
+          <span class="dl-dates"></span>
+          <button type="button" class="dl-remove" data-dl-remove="${index}" aria-label="Remove line ${index + 1}" ${this.rows.length === 1 ? "disabled" : ""}>×</button>
+        </li>`)
+      .join("");
+    this.renderDates();
+  },
+};
+
+DoseList.init();

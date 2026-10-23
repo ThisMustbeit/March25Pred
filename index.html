@@ -38,9 +38,6 @@
   <link rel="icon" href="./website-icon.png" type="image/png">
   <link rel="shortcut icon" href="./website-icon.png" type="image/png">
   <link rel="apple-touch-icon" href="./website-icon.png">
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible+Next:wght@400;500;600;700;800&display=swap">
   <link rel="stylesheet" href="style.css">
   <link rel="stylesheet" href="print-calendar.css" media="print">
   <script src="script.js" defer></script>
@@ -236,7 +233,7 @@
             </fieldset>
 
             <fieldset class="group group-primary-taper">
-              <legend>Primary Taper</legend>
+              <legend>Taper</legend>
               <div id="mobile-taper-mode-home"></div>
               <div id="mobile-starting-dose-target"></div>
               <label>
@@ -296,6 +293,10 @@
                   <input id="total-steps-mode" name="totalStepsMode" type="hidden" value="manual">
                 </div>
               </div>
+              <p class="taper-switch no-print">
+                Prescription has more than one phase?
+                <button id="switch-to-multi" type="button" class="link-button" data-switch-taper="advanced">Switch to a multi-phase taper</button>
+              </p>
             </fieldset>
 
             <fieldset class="group group-strengths">
@@ -331,12 +332,35 @@
 
             <div id="custom-override-panel" class="custom-override-panel group-wide-panel is-hidden" aria-hidden="true">
               <fieldset class="group group-wide">
-                <legend>Custom Taper Override</legend>
+                <legend>Multi-phase taper</legend>
                 <p class="help-text">
-                  The starting dose begins on the taper start date. Blank repeats are treated as 1 for later segments.
+                  Enter each daily dose the way it's written on the prescription, top to bottom. The first line starts on the taper start date.
                 </p>
                 <div class="advanced-taper-workspace">
                   <div class="advanced-taper-editor">
+                    <div id="dose-list-editor" class="dose-list">
+                      <div class="dose-list-header" aria-hidden="true">
+                        <span>Daily dose</span><span>For</span><span>Dates</span><span></span>
+                      </div>
+                      <ol id="dose-list-rows" class="dose-list-rows" aria-label="Dose list"></ol>
+                      <button id="dose-list-add" type="button" class="button button-secondary">Add a dose</button>
+                      <details id="dose-list-quickfill" class="quick-fill">
+                        <summary>Quick fill from a pattern</summary>
+                        <div class="quick-fill-body">
+                          <p class="help-text">Adds doses after the last line. Example: reduce by 10 mg every 7 days until 20 mg.</p>
+                          <div class="quick-fill-fields">
+                            <label><span>Change</span>
+                              <select id="qf-direction"><option value="reduce">Reduce by</option><option value="increase">Increase by</option></select>
+                            </label>
+                            <label><span>Amount (<span class="dl-unit">mg</span>)</span><input id="qf-amount" type="number" min="0" step="any" inputmode="decimal"></label>
+                            <label><span>Every (days)</span><input id="qf-days" type="number" min="1" step="1" inputmode="numeric"></label>
+                            <label><span>Until (<span class="dl-unit">mg</span>)</span><input id="qf-until" type="number" min="0" step="any" inputmode="decimal" placeholder="Blank = until stopped"></label>
+                          </div>
+                          <button id="qf-apply" type="button" class="button">Add these doses</button>
+                          <p id="qf-status" class="help-text" aria-live="polite"></p>
+                        </div>
+                      </details>
+                    </div>
                     <div id="mobile-advanced-taper-target"></div>
                     <div id="mobile-advanced-starting-dose-target"></div>
                     <div class="table-scroll">
@@ -365,6 +389,10 @@
                   </div>
                   <aside id="advanced-calendar-preview" class="advanced-calendar-preview" aria-live="polite"></aside>
                 </div>
+                <p class="taper-switch no-print">
+                  Same dose change all the way through?
+                  <button id="switch-to-simple" type="button" class="link-button" data-switch-taper="standard">Switch back to a simple taper</button>
+                </p>
               </fieldset>
             </div>
 
