@@ -29,11 +29,11 @@ Deploy the complete `tools/patient-assistance/` directory (including its PDF, CS
 
 ## Sig List & Shortcuts
 
-Open `/tools/sigs/` from the Tools directory to add or edit shortcuts, meanings, notes, and comma-separated tags. Search covers all fields; tag buttons filter the list. The bundled `tools/sigs/ls-data.js` contains 568 shortcuts transcribed from all 14 pages of the supplied LS reference, each tagged LS with a source page note. Unusual source wording is preserved, with specific verification notes for G1.5TS and INS1. `analysis/ls-transcription.txt` contains the page-by-page transcription used to build the catalog.
+Open `/tools/sigs/` from the Tools directory to search shortcuts, meanings, notes and tags, and (when signed in) to add, edit, tag, favourite or bulk-edit entries. Tag buttons filter the list; **Select** enables multi-select with an action bar (add/remove tags, delete with undo, favourite, copy to my list).
 
-New browsers receive the bundled catalog automatically. Existing browser lists gain missing catalog entries without overwriting matching local shortcuts. A catalog version marker is saved with edits so removed entries stay removed on reload. The CS catalog adds 662 entries from all 17 pages of CO Sigs.pdf, tagged CS; exact matches share tags, and different meanings stay separate (794 combined entries in a fresh library). Existing LDS tags and source references migrate to LS without altering shortcut text. Upload ls-data.js and cs-data.js with the updated sigs.js and index.html. Source copies are included as Sig list LS.pdf and CO Sigs.pdf. Personal edits remain in local browser storage, not synced between devices. Export/import JSON backups to transfer the list; imports combine tags and source notes for identical code/meaning pairs while keeping different meanings separately. Removals have an Undo button until the page reloads or another entry is removed.
+The LS and CS sig lists are **private to the owner account** and are not part of this website or repository. They live in the owner's personal list in Firestore (readable only by that account). The source scans, data files and import file are kept outside this folder in `CalendRx PRIVATE - do not upload`. To restore them after a reset, sign in as the owner and use **Import private sig file** on the Sig List page with `LS-CS-sigs-import.json`; the import is safe to re-run.
 
-Deploy the `tools/sigs/` directory and the updated `tools/index.html`. Run `node analysis/sig-list-check.cjs` for data and simulated-DOM interaction checks.
+Deploy the `tools/sigs/` directory and the updated `tools/index.html`. Run `node analysis/sig-cloud-check.cjs`, `node analysis/sig-bulk-check.cjs` and `node analysis/sig-private-check.cjs` for simulated checks.
 
 ## Print Preview
 

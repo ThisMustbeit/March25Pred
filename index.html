@@ -347,7 +347,7 @@
                       <details id="dose-list-quickfill" class="quick-fill">
                         <summary>Quick fill from a pattern</summary>
                         <div class="quick-fill-body">
-                          <p class="help-text">Adds doses after the last line. Example: reduce by 10 mg every 7 days until 20 mg.</p>
+                          <p id="qf-help" class="help-text">Adds doses after the last line. Example: reduce by 10 mg every 7 days until 20 mg.</p>
                           <div class="quick-fill-fields">
                             <label><span>Change</span>
                               <select id="qf-direction"><option value="reduce">Reduce by</option><option value="increase">Increase by</option></select>
@@ -356,7 +356,10 @@
                             <label><span>Every (days)</span><input id="qf-days" type="number" min="1" step="1" inputmode="numeric"></label>
                             <label><span>Until (<span class="dl-unit">mg</span>)</span><input id="qf-until" type="number" min="0" step="any" inputmode="decimal" placeholder="Blank = until stopped"></label>
                           </div>
-                          <button id="qf-apply" type="button" class="button">Add these doses</button>
+                          <div class="quick-fill-buttons">
+                            <button id="qf-apply" type="button" class="button">Add these doses</button>
+                            <button id="qf-cancel" type="button" class="button button-secondary" hidden>Cancel</button>
+                          </div>
                           <p id="qf-status" class="help-text" aria-live="polite"></p>
                         </div>
                       </details>
@@ -421,6 +424,107 @@
           <button id="mobile-step-back" type="button" class="button button-secondary">Back</button>
           <button id="mobile-step-next" type="button" class="button">Next</button>
         </div>
+        <aside id="evidence-slides" class="evidence-slides no-print" aria-roledescription="carousel" aria-labelledby="evidence-title">
+          <div class="evidence-head">
+            <h3 id="evidence-title">Why give patients a taper calendar?</h3>
+            <span id="evidence-position" class="evidence-position" aria-hidden="true">1 / 10</span>
+          </div>
+          <div class="evidence-track">
+            <article class="evidence-slide is-active" role="group" aria-roledescription="slide" aria-label="1 of 10">
+              <p class="evidence-topic">Tapers and medication incidents</p>
+              <h4>Tapers are a common source of medication incidents</h4>
+              <p>ISMP Canada analysed 122 tapering and titration incidents reported by Canadian community pharmacies (2010–2014); the majority involved corticosteroids. It recommends giving patients a tapering schedule tool, such as a personalized calendar or booklet.</p>
+              <ol class="evidence-refs"><li><a href="https://www.ismp-canada.org/download/PharmacyConnection/PC2014-Fall_DrugTapering.pdf" target="_blank" rel="noopener noreferrer">Chen A, Liang S, Ho C. Medication incidents involving drug tapering in community pharmacy: a multi-incident analysis by ISMP Canada. Pharmacy Connection. Fall 2014:34–37.</a></li></ol>
+            </article>
+            <article class="evidence-slide" role="group" aria-roledescription="slide" aria-label="2 of 10" hidden>
+              <p class="evidence-topic">Prednisone</p>
+              <h4>Put the stop plan in writing</h4>
+              <p>“It is important to provide clear written instructions to the patient about when and how to stop prednisone, including detailed instructions for dose tapering if required.” Medsafe New Zealand, after a patient reported steroid withdrawal symptoms.</p>
+              <ol class="evidence-refs"><li><a href="https://www.medsafe.govt.nz/profs/PUArticles/June2021/Prednisone-treatment-follow-dosing-recommendations.html" target="_blank" rel="noopener noreferrer">Medsafe. Prednisone treatment – follow dosing recommendations. Prescriber Update. 2021;42(2):21–22.</a></li></ol>
+            </article>
+            <article class="evidence-slide" role="group" aria-roledescription="slide" aria-label="3 of 10" hidden>
+              <p class="evidence-topic">Glucocorticoid guideline</p>
+              <h4>Guidelines call for patient education</h4>
+              <p>The 2024 European Society of Endocrinology and Endocrine Society guideline recommends that clinicians who start glucocorticoids educate patients, and lists withdrawal symptoms as a topic to discuss with patients on long-term therapy when tapering begins.</p>
+              <ol class="evidence-refs"><li><a href="https://academic.oup.com/ejendo/article/190/5/G25/7663654" target="_blank" rel="noopener noreferrer">Beuschlein F, et al. European Society of Endocrinology and Endocrine Society joint clinical guideline: diagnosis and therapy of glucocorticoid-induced adrenal insufficiency. Eur J Endocrinol. 2024;190(5):G25–G51.</a></li></ol>
+            </article>
+            <article class="evidence-slide" role="group" aria-roledescription="slide" aria-label="4 of 10" hidden>
+              <p class="evidence-topic">Label comprehension</p>
+              <h4>Standard labels are often misread</h4>
+              <p>When 395 primary care patients explained how they would take five labelled medications, about 1 in 5 instructions were misunderstood. Errors were more likely with lower health literacy and with more medications.</p>
+              <ol class="evidence-refs"><li><a href="https://www.aafp.org/pubs/afp/issues/2007/0615/p1851a.html" target="_blank" rel="noopener noreferrer">Davis TC, et al. Literacy and misunderstanding prescription drug labels. Ann Intern Med. 2006;145(12):887–894.</a></li></ol>
+            </article>
+            <article class="evidence-slide" role="group" aria-roledescription="slide" aria-label="5 of 10" hidden>
+              <p class="evidence-topic">Complex regimens</p>
+              <h4>Patients struggle to organize complex regimens</h4>
+              <p>When 464 primary care patients were asked how they would schedule a typical seven-drug regimen, many planned more dosing times than needed and missed chances to take compatible drugs together. Low health literacy was the strongest predictor.</p>
+              <ol class="evidence-refs"><li><a href="https://jamanetwork.com/journals/jamainternalmedicine/fullarticle/226687" target="_blank" rel="noopener noreferrer">Wolf MS, Curtis LM, Waite K, et al. Helping patients simplify and safely use complex prescription regimens. Arch Intern Med. 2011;171(4):300–305.</a></li></ol>
+            </article>
+            <article class="evidence-slide" role="group" aria-roledescription="slide" aria-label="6 of 10" hidden>
+              <p class="evidence-topic">Day-by-day reminders</p>
+              <h4>Showing when each dose is due helps</h4>
+              <p>A Cochrane review of 12 randomized trials (2,196 people) looked at packaging that shows the date or time each dose is due. In the 4 trials that counted pills, it increased the percentage of pills taken by 11 points on average, though results varied widely.</p>
+              <ol class="evidence-refs"><li><a href="https://www.cochrane.org/evidence/CD005025_reminder-packaging-help-people-take-long-term-medications" target="_blank" rel="noopener noreferrer">Mahtani KR, Heneghan CJ, Glasziou PP, Perera R. Reminder packaging for improving adherence to self-administered long-term medications. Cochrane Database Syst Rev. 2011;(9):CD005025.</a></li></ol>
+            </article>
+            <article class="evidence-slide" role="group" aria-roledescription="slide" aria-label="7 of 10" hidden>
+              <p class="evidence-topic">Beyond steroids</p>
+              <h4>A written taper plan helps patients act</h4>
+              <p>In the EMPOWER trial in Montreal pharmacies (303 older adults), a booklet that included a tapering protocol led 27% to stop their benzodiazepine within 6 months, compared with 4.5% with usual care.</p>
+              <ol class="evidence-refs"><li><a href="https://www.wikijournalclub.org/wiki/EMPOWER" target="_blank" rel="noopener noreferrer">Tannenbaum C, et al. Reduction of inappropriate benzodiazepine prescriptions among older adults through direct patient education: the EMPOWER cluster randomized trial. JAMA Intern Med. 2014;174(6):890–898.</a></li></ol>
+            </article>
+            <article class="evidence-slide" role="group" aria-roledescription="slide" aria-label="8 of 10" hidden>
+              <p class="evidence-topic">Illustrated schedules</p>
+              <h4>Visual schedules help most when regimens are complex</h4>
+              <p>In a randomized trial of 435 patients with heart disease, illustrated daily schedules did not improve adherence overall. In a post-hoc analysis, patients taking more than eight medications had about twice the odds of adherence with them. In a 20-person pilot with older adults, self-efficacy and adherence increased.</p>
+              <ol class="evidence-refs"><li><a href="https://link.springer.com/article/10.1007/s11606-012-2136-z" target="_blank" rel="noopener noreferrer">Kripalani S, Schmotzer B, Jacobson TA. Improving medication adherence through graphically enhanced interventions in coronary heart disease (IMAGE-CHD): a randomized controlled trial. J Gen Intern Med. 2012;27(12):1609–1617.</a></li><li><a href="https://pmc.ncbi.nlm.nih.gov/articles/PMC3785231" target="_blank" rel="noopener noreferrer">Martin D, Kripalani S, et al. Improving medication management among at-risk older adults. J Gerontol Nurs. 2012;38(6):24–37.</a></li></ol>
+            </article>
+            <article class="evidence-slide" role="group" aria-roledescription="slide" aria-label="9 of 10" hidden>
+              <p class="evidence-topic">Written plans with steroids</p>
+              <h4>Individualized written plans improve outcomes</h4>
+              <p>In a review of 26 randomized trials, individualized written asthma action plans that said when and how to step up treatment, including starting oral corticosteroids, consistently improved outcomes.</p>
+              <ol class="evidence-refs"><li><a href="https://thorax.bmj.com/content/59/2/94" target="_blank" rel="noopener noreferrer">Gibson PG, Powell H. Written action plans for asthma: an evidence-based review of the key components. Thorax. 2004;59(2):94–99.</a></li></ol>
+            </article>
+            <article class="evidence-slide" role="group" aria-roledescription="slide" aria-label="10 of 10" hidden>
+              <p class="evidence-topic">In practice</p>
+              <h4>Hand over the calendar, then talk it through</h4>
+              <p>ISMP Canada advises that a tapering calendar be given together with face-to-face counselling and appropriate follow-up, not on its own.</p>
+              <ol class="evidence-refs"><li><a href="https://www.ismp-canada.org/download/PharmacyConnection/PC2014-Fall_DrugTapering.pdf" target="_blank" rel="noopener noreferrer">Chen A, Liang S, Ho C. Medication incidents involving drug tapering in community pharmacy: a multi-incident analysis by ISMP Canada. Pharmacy Connection. Fall 2014:34–37.</a></li></ol>
+            </article>
+          </div>
+          <div class="evidence-controls">
+            <button type="button" class="evidence-arrow" data-evidence="prev" aria-label="Previous slide">‹</button>
+            <div class="evidence-dots" role="group" aria-label="Choose slide">
+              <button type="button" class="evidence-dot" data-evidence-go="0" aria-label="Slide 1" aria-current="true"></button>
+              <button type="button" class="evidence-dot" data-evidence-go="1" aria-label="Slide 2"></button>
+              <button type="button" class="evidence-dot" data-evidence-go="2" aria-label="Slide 3"></button>
+              <button type="button" class="evidence-dot" data-evidence-go="3" aria-label="Slide 4"></button>
+              <button type="button" class="evidence-dot" data-evidence-go="4" aria-label="Slide 5"></button>
+              <button type="button" class="evidence-dot" data-evidence-go="5" aria-label="Slide 6"></button>
+              <button type="button" class="evidence-dot" data-evidence-go="6" aria-label="Slide 7"></button>
+              <button type="button" class="evidence-dot" data-evidence-go="7" aria-label="Slide 8"></button>
+              <button type="button" class="evidence-dot" data-evidence-go="8" aria-label="Slide 9"></button>
+              <button type="button" class="evidence-dot" data-evidence-go="9" aria-label="Slide 10"></button>
+            </div>
+            <button type="button" class="evidence-arrow" data-evidence="next" aria-label="Next slide">›</button>
+            <button type="button" class="evidence-pause link-button" data-evidence="pause" aria-pressed="false">Pause</button>
+          </div>
+          <details class="evidence-all">
+            <summary>All references</summary>
+            <ol>
+              <li><a href="https://www.ismp-canada.org/download/PharmacyConnection/PC2014-Fall_DrugTapering.pdf" target="_blank" rel="noopener noreferrer">Chen A, Liang S, Ho C. Medication incidents involving drug tapering in community pharmacy: a multi-incident analysis by ISMP Canada. Pharmacy Connection. Fall 2014:34–37.</a></li>
+              <li><a href="https://www.medsafe.govt.nz/profs/PUArticles/June2021/Prednisone-treatment-follow-dosing-recommendations.html" target="_blank" rel="noopener noreferrer">Medsafe. Prednisone treatment – follow dosing recommendations. Prescriber Update. 2021;42(2):21–22.</a></li>
+              <li><a href="https://academic.oup.com/ejendo/article/190/5/G25/7663654" target="_blank" rel="noopener noreferrer">Beuschlein F, et al. European Society of Endocrinology and Endocrine Society joint clinical guideline: diagnosis and therapy of glucocorticoid-induced adrenal insufficiency. Eur J Endocrinol. 2024;190(5):G25–G51.</a></li>
+              <li><a href="https://www.aafp.org/pubs/afp/issues/2007/0615/p1851a.html" target="_blank" rel="noopener noreferrer">Davis TC, et al. Literacy and misunderstanding prescription drug labels. Ann Intern Med. 2006;145(12):887–894.</a></li>
+              <li><a href="https://jamanetwork.com/journals/jamainternalmedicine/fullarticle/226687" target="_blank" rel="noopener noreferrer">Wolf MS, Curtis LM, Waite K, et al. Helping patients simplify and safely use complex prescription regimens. Arch Intern Med. 2011;171(4):300–305.</a></li>
+              <li><a href="https://www.cochrane.org/evidence/CD005025_reminder-packaging-help-people-take-long-term-medications" target="_blank" rel="noopener noreferrer">Mahtani KR, Heneghan CJ, Glasziou PP, Perera R. Reminder packaging for improving adherence to self-administered long-term medications. Cochrane Database Syst Rev. 2011;(9):CD005025.</a></li>
+              <li><a href="https://www.wikijournalclub.org/wiki/EMPOWER" target="_blank" rel="noopener noreferrer">Tannenbaum C, et al. Reduction of inappropriate benzodiazepine prescriptions among older adults through direct patient education: the EMPOWER cluster randomized trial. JAMA Intern Med. 2014;174(6):890–898.</a></li>
+              <li><a href="https://link.springer.com/article/10.1007/s11606-012-2136-z" target="_blank" rel="noopener noreferrer">Kripalani S, Schmotzer B, Jacobson TA. Improving medication adherence through graphically enhanced interventions in coronary heart disease (IMAGE-CHD): a randomized controlled trial. J Gen Intern Med. 2012;27(12):1609–1617.</a></li>
+              <li><a href="https://pmc.ncbi.nlm.nih.gov/articles/PMC3785231" target="_blank" rel="noopener noreferrer">Martin D, Kripalani S, et al. Improving medication management among at-risk older adults. J Gerontol Nurs. 2012;38(6):24–37.</a></li>
+              <li><a href="https://thorax.bmj.com/content/59/2/94" target="_blank" rel="noopener noreferrer">Gibson PG, Powell H. Written action plans for asthma: an evidence-based review of the key components. Thorax. 2004;59(2):94–99.</a></li>
+            </ol>
+            <p class="evidence-note">Summaries written for CalendRx from the sources above. Links open the original source or a summary of it.</p>
+          </details>
+        </aside>
       </section>
 
       <section id="results" class="results-stack">

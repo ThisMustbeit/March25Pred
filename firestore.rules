@@ -44,8 +44,9 @@ service cloud.firestore {
       allow read: if true;
       allow create: if owner() && validSig() && request.resource.data.revision == 1;
       allow update: if owner() && validSig() && request.resource.data.revision == resource.data.revision + 1;
-      // Deletions are tombstones so bundled entries do not return.
-      allow delete: if false;
+      // Removals are normally tombstones. The owner may delete entries outright, which is how
+      // edits of the private LS/CS lists are taken out of the public shared library.
+      allow delete: if owner();
     }
     match /users/{uid}/sigs/{id} {
       allow read: if own(uid);

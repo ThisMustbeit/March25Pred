@@ -19,14 +19,14 @@ The owner UID is `ukzzYYtIU3cyfoqP5BFgDhxjOCJ3`. It must match in both `tools/si
 - Every signed-in user, including the owner, has a private personal list and favourites. Other users cannot read or write those paths under the supplied rules.
 - Use **Copy to my list** to customize a shared entry's wording or tags privately.
 - The owner can select **Shared library (everyone)** when adding a shortcut, or use **Copy to shared library** on a personal entry.
-- LS/CS reference entries remain bundled with the website. Shared additions, edits and removal markers are saved under `sharedSigs/{entryId}` and applied over the bundled entries. An empty collection is normal before the first shared change.
+- No sig lists are bundled with the website. The shared library is whatever the owner saves under `sharedSigs/{entryId}` (readable by everyone). The LS/CS lists are private: they are stored in the owner's personal list (`users/{ownerUid}/sigs`), loaded with **Import private sig file** (owner only). That import also moves the owner's earlier shared-library edits of LS/CS entries into the private list and deletes them from `sharedSigs`, which requires the updated rules (owner may delete shared entries).
 - Personal entries use `users/{UID}/sigs/{entryId}`; favourites use `users/{UID}/favorites/{source_entryId}`. Firestore creates collections with the first saved document. No manual collection creation or seeding is needed.
 - Sign-in lasts for the current browser session. Cloud data remains saved after sign-out; signing back into the same account retrieves it. Private data is cleared from the page when signing out or changing accounts. Firestore uses its default memory-only cache, not persistent disk caching.
 - Saves require an internet connection. Transactions reject edits when the same entry changed in another session; reopen the editor to use the latest revision.
 - **Import browser-saved list into my account** copies local additions/customizations into the personal list, skipping unchanged bundled entries. Original localStorage is left intact. Browser-only removals do not remove anything from the shared library.
 - **Import personal backup** imports version-1 JSON backups into the current account's personal list. It preserves existing entries; retrying an interrupted import does not overwrite earlier imports. An interrupted import can have saved some entries already.
 - **Export backup** exports the selected view (All, Shared, Personal or Favourites). Importing that file always creates personal entries, never shared ones.
-- If Firebase's CDN fails to load, the bundled reference list stays searchable, but cloud controls are unavailable until reloading successfully.
+- If Firebase's CDN fails to load, the page shows a connection message; reload to try again.
 
 The tools password gate is a separate convenience screen. Firestore security comes from the published rules and Firebase Authentication. The public web config is not an admin credential. Analytics is not initialized by this integration.
 
@@ -36,7 +36,8 @@ Local checks:
 
 ```
 node analysis/sig-cloud-check.cjs
-node analysis/sig-list-check.cjs
+node analysis/sig-bulk-check.cjs
+node analysis/sig-private-check.cjs
 node --check tools/sigs/cloud.js
 ```
 
@@ -54,6 +55,6 @@ Features: named sections, multiple pages, title/content search, pinned pages, au
 
 Notebook saves require connectivity and use revision checks to prevent overwriting concurrent edits. Failed saves leave the draft on the page. Switching notebooks/pages or signing out first attempts to save; a failed save stops navigation. The browser warns before leaving an unsaved draft. Drafts are not persisted to localStorage. Export includes the current unsaved draft for recovery; other pages come from the loaded notebook. Account changes clear private page content. Markdown export contains plain text, not a runnable HTML preview.
 
-For sigs, the owner can click **Edit tags** on a shared entry. Type comma-separated names to create multiple tags (up to 20 per sig), then save. Personal entries support the same tags. No full sig migration was performed: bundled LS/CS entries remain the starting library, with Firebase overrides for shared edits and Firebase collections for personal entries.
+For sigs, the owner can click **Edit tags** on a shared entry. Type comma-separated names to create multiple tags (up to 20 per sig), then save. Personal entries support the same tags. The LS/CS lists are no longer bundled; see the private-list note above.
 
 Run `node analysis/notepad-check.cjs` for simulated notebook integration checks. These cover private isolation, shared owner/member UI, sections, autosave, failed-save recovery, conflicts, export, trash/restore and account switching. Actual Firebase rule enforcement and deployment still need live verification after publishing the rules and uploading files.

@@ -3402,6 +3402,10 @@ const DoseList = {
   rows: [],
   writing: false,
   maxLines: 120,
+  // Lines added by Quick fill stay grouped with their pattern so the pattern can be edited later.
+  groups: new Map(),
+  nextGroup: 1,
+  editingGroup: null,
 
   init() {
     this.rowsEl = document.getElementById("dose-list-rows");
@@ -3410,6 +3414,10 @@ const DoseList = {
     this.rowsEl.addEventListener("click", (event) => {
       const remove = event.target.closest("[data-dl-remove]");
       if (remove) this.removeLine(Number(remove.dataset.dlRemove));
+      const edit = event.target.closest("[data-group-edit]");
+      if (edit) this.editGroup(Number(edit.dataset.groupEdit));
+      const drop = event.target.closest("[data-group-remove]");
+      if (drop) this.removeGroup(Number(drop.dataset.groupRemove));
     });
     this.rowsEl.addEventListener("keydown", (event) => {
       if (event.key !== "Enter") return;
@@ -3419,6 +3427,7 @@ const DoseList = {
     });
     document.getElementById("dose-list-add").addEventListener("click", () => this.addLine(true));
     document.getElementById("qf-apply").addEventListener("click", () => this.quickFill());
+    document.getElementById("qf-cancel").addEventListener("click", () => this.cancelGroupEdit());
 
     // Keep the list in step when segments change elsewhere (examples, saved codes, tutorial, reset).
     const resync = () => { if (!this.writing) this.refresh(); };
@@ -3512,8 +3521,125 @@ const DoseList = {
   },
 
   refresh() {
-    this.rows = this.fromSegments();
+    const next = this.fromSegments();
+    const same = (a, b) => NumberUtils.parseOptionalNumber(a) === NumberUtils.parseOptionalNumber(b);
+    const complete = this.rows.filter((line, index) => index === 0 || (line.dose !== "" && line.days !== ""));
+    const unchanged = complete.length === next.length && next.every((line, index) => same(line.dose, complete[index].dose) && same(line.days, complete[index].days));
+    if (unchanged) return; // nothing really changed: keep blank lines and pattern groups as they are
+    this.rows = next;
+    this.groups.clear();
+    this.cancelGroupEdit();
     this.render();
+  },
+
+  // A hand edit inside a pattern group means the pattern no longer describes it: keep the lines, drop the link.
+  detachGroup(id) {
+    if (id == null) return;
+    this.rows.forEach((line) => { if (line.group === id) delete line.group; });
+    this.groups.delete(id);
+    if (this.editingGroup === id) this.cancelGroupEdit();
+  },
+
+  groupSpan(id) {
+    const start = this.rows.findIndex((line) => line.group === id);
+    let end = start;
+    while (end + 1 < this.rows.length && this.rows[end + 1].group === id) end += 1;
+    return [start, end];
+  },
+
+  editGroup(id) {
+    const pattern = this.groups.get(id);
+    if (!pattern) return;
+    this.editingGroup = id;
+    document.getElementById("qf-direction").value = pattern.direction;
+    document.getElementById("qf-amount").value = pattern.amount;
+    document.getElementById("qf-days").value = pattern.days;
+    document.getElementById("qf-until").value = pattern.until ?? "";
+    document.getElementById("qf-status").textContent = "";
+    this.syncQuickFillMode();
+    const details = document.getElementById("dose-list-quickfill");
+    details.open = true;
+    details.scrollIntoView({ behavior: "smooth", block: "nearest" });
+    document.getElementById("qf-amount").focus({ preventScroll: true });
+    this.render();
+  },
+
+  cancelGroupEdit() {
+    this.editingGroup = null;
+    this.syncQuickFillMode();
+    if (this.rowsEl) this.render();
+  },
+
+  syncQuickFillMode() {
+    const editing = this.editingGroup != null;
+    const apply = document.getElementById("qf-apply");
+    const cancel = document.getElementById("qf-cancel");
+    const summary = document.querySelector("#dose-list-quickfill > summary");
+    if (apply) apply.textContent = editing ? "Update these doses" : "Add these doses";
+    if (cancel) cancel.hidden = !editing;
+    if (summary) summary.textContent = editing ? "Edit pattern" : "Quick fill from a pattern";
+    const help = document.getElementById("qf-help");
+    if (help) help.textContent = editing
+      ? "Change the pattern and its doses are rewritten. Patterns after it continue from its last dose."
+      : "Adds doses after the last line. Example: reduce by 10 mg every 7 days until 20 mg.";
+  },
+
+  removeGroup(id) {
+    const [start, end] = this.groupSpan(id);
+    if (start < 0) return;
+    this.rows.splice(start, end - start + 1);
+    this.groups.delete(id);
+    if (this.editingGroup === id) this.cancelGroupEdit();
+    if (!this.rows.length) this.rows = [{ dose: "", days: "" }];
+    const followed = this.regenerateGroupsAfter(start);
+    this.render();
+    this.write();
+    const base = this.rows[start - 1]?.dose;
+    document.getElementById("qf-status").textContent = `Removed ${end - start + 1} dose${end === start ? "" : "s"}.` +
+      (followed.length && base ? ` The next pattern now continues from ${base} ${this.unit()}.` : "");
+  },
+
+  // Doses a pattern produces after a starting dose.
+  generate(base, pattern, room) {
+    const lines = [];
+    let dose = base;
+    while (lines.length < room) {
+      dose = this.round(pattern.direction === "reduce" ? dose - pattern.amount : dose + pattern.amount);
+      if (pattern.direction === "reduce" && (dose <= 0 || (pattern.until != null && dose < pattern.until - 1e-9))) break;
+      if (pattern.direction === "increase" && dose > pattern.until + 1e-9) break;
+      lines.push({ dose: String(dose), days: String(pattern.days) });
+    }
+    return lines;
+  },
+
+  // Patterns are relative ("then reduce by 2.5 mg"), so groups after a change follow on from the new dose.
+  // Returns the groups that were recalculated.
+  regenerateGroupsAfter(index) {
+    const updated = [];
+    let i = index;
+    while (i < this.rows.length) {
+      const id = this.rows[i].group;
+      if (id == null || !this.groups.has(id) || this.rows[i - 1]?.group === id) { i += 1; continue; }
+      const [start, end] = this.groupSpan(id);
+      const base = NumberUtils.parseOptionalNumber(this.rows[start - 1]?.dose);
+      if (base == null) { i = end + 1; continue; }
+      const room = this.maxLines - (this.rows.length - (end - start + 1));
+      const fresh = this.generate(base, this.groups.get(id), room);
+      fresh.forEach((line) => { line.group = id; });
+      const old = this.rows.slice(start, end + 1).map((line) => `${line.dose}x${line.days}`).join();
+      if (old !== fresh.map((line) => `${line.dose}x${line.days}`).join()) updated.push(id);
+      if (!fresh.length) this.groups.delete(id);
+      this.rows.splice(start, end - start + 1, ...fresh);
+      i = start + fresh.length;
+    }
+    return updated;
+  },
+
+  describePattern(pattern) {
+    const unit = this.unit();
+    const verb = pattern.direction === "reduce" ? "Reduce" : "Increase";
+    const until = pattern.until == null ? (pattern.direction === "reduce" ? " until stopped" : "") : ` until ${pattern.until} ${unit}`;
+    return `${verb} by ${pattern.amount} ${unit} every ${pattern.days} day${pattern.days === 1 ? "" : "s"}${until}`;
   },
 
   handleRowInput(event) {
@@ -3523,6 +3649,10 @@ const DoseList = {
     const field = event.target.dataset.dlField;
     if (!field || !this.rows[index]) return;
     this.rows[index][field] = event.target.value.trim();
+    if (this.rows[index].group != null) {
+      this.detachGroup(this.rows[index].group);
+      this.renderGroupHeads();
+    }
     this.write();
   },
 
@@ -3536,6 +3666,7 @@ const DoseList = {
   },
 
   removeLine(index) {
+    this.detachGroup(this.rows[index]?.group);
     if (this.rows.length <= 1) {
       this.rows = [{ dose: "", days: "" }];
     } else {
@@ -3554,7 +3685,9 @@ const DoseList = {
     const until = untilText === "" ? null : NumberUtils.parseOptionalNumber(untilText);
     const unit = this.unit();
 
-    let last = this.rows.length - 1;
+    const editing = this.editingGroup != null && this.groups.has(this.editingGroup);
+    const [groupStart, groupEnd] = editing ? this.groupSpan(this.editingGroup) : [-1, -1];
+    let last = editing ? groupStart - 1 : this.rows.length - 1;
     while (last > 0 && NumberUtils.parseOptionalNumber(this.rows[last].dose) == null) last -= 1;
     const base = NumberUtils.parseOptionalNumber(this.rows[last]?.dose);
 
@@ -3563,26 +3696,32 @@ const DoseList = {
     if (days == null || days < 1) { status.textContent = "Enter how many days each dose lasts."; return; }
     if (direction === "increase" && until == null) { status.textContent = `Enter the dose to increase up to.`; return; }
 
-    this.rows = this.rows.slice(0, last + 1);
-    if (!this.rows[last].days) this.rows[last].days = String(days);
+    const before = editing ? this.rows.slice(0, groupStart) : this.rows.slice(0, last + 1);
+    const after = editing ? this.rows.slice(groupEnd + 1) : [];
+    if (!editing && !before[last].days) before[last].days = String(days);
 
-    const added = [];
-    let dose = base;
-    while (this.rows.length + added.length < this.maxLines) {
-      dose = this.round(direction === "reduce" ? dose - amount : dose + amount);
-      if (direction === "reduce" && (dose <= 0 || (until != null && dose < until - 1e-9))) break;
-      if (direction === "increase" && dose > until + 1e-9) break;
-      added.push({ dose: String(dose), days: String(days) });
-    }
+    const added = this.generate(base, { direction, amount, days, until }, this.maxLines - before.length - after.length);
 
     if (added.length === 0) {
-      status.textContent = "That pattern doesn't add any doses after the last line.";
+      status.textContent = editing
+        ? "That pattern doesn't produce any doses. Change it, or use Remove on the group."
+        : "That pattern doesn't add any doses after the last line.";
       return;
     }
-    this.rows.push(...added);
+    const id = editing ? this.editingGroup : this.nextGroup++;
+    this.groups.set(id, { direction, amount, days, until });
+    added.forEach((line) => { line.group = id; });
+    this.rows = [...before, ...added, ...after];
+    const followed = editing ? this.regenerateGroupsAfter(before.length + added.length) : [];
+    this.editingGroup = null;
+    this.syncQuickFillMode();
     this.render();
     this.write();
-    status.textContent = `Added ${added.length} dose${added.length === 1 ? "" : "s"}: ${added[0].dose} to ${added[added.length - 1].dose} ${unit}.`;
+    const range = `${added[0].dose} to ${added[added.length - 1].dose} ${unit}`;
+    const followNote = followed.length ? ` The pattern${followed.length === 1 ? "" : "s"} after it now continue${followed.length === 1 ? "s" : ""} from ${added[added.length - 1].dose} ${unit}.` : "";
+    status.textContent = editing
+      ? `Updated the pattern: now ${added.length} dose${added.length === 1 ? "" : "s"}, ${range}.${followNote}`
+      : `Added ${added.length} dose${added.length === 1 ? "" : "s"}: ${range}. Use Edit pattern above them to change it later.`;
   },
 
   dateRange(offset, days) {
@@ -3608,13 +3747,39 @@ const DoseList = {
     });
   },
 
+  groupHeadMarkup(line, index) {
+    if (line.group == null || this.rows[index - 1]?.group === line.group) return "";
+    const pattern = this.groups.get(line.group);
+    if (!pattern) return "";
+    const count = this.rows.filter((row) => row.group === line.group).length;
+    const editing = this.editingGroup === line.group;
+    return `
+        <li class="dose-list-group${editing ? " is-editing" : ""}" data-group="${line.group}">
+          <span class="dl-group-text"><strong>${Html.escape(this.describePattern(pattern))}</strong> · ${count} dose${count === 1 ? "" : "s"}${editing ? " · editing below" : ""}</span>
+          <span class="dl-group-actions">
+            <button type="button" class="link-button" data-group-edit="${line.group}">Edit pattern</button>
+            <button type="button" class="link-button dl-group-remove" data-group-remove="${line.group}">Remove</button>
+          </span>
+        </li>`;
+  },
+
+  // Remove headers whose group was just detached, without re-rendering the inputs being typed in.
+  renderGroupHeads() {
+    this.rowsEl.querySelectorAll(".dose-list-group").forEach((head) => {
+      if (!this.groups.has(Number(head.dataset.group))) head.remove();
+    });
+    this.rowsEl.querySelectorAll(".dose-list-row.is-grouped").forEach((row) => {
+      if (this.rows[Number(row.dataset.line)]?.group == null) row.classList.remove("is-grouped", "is-editing");
+    });
+  },
+
   render() {
     if (!this.rowsEl) return;
     const unit = this.unit();
     document.querySelectorAll(".dl-unit").forEach((el) => { el.textContent = unit; });
     this.rowsEl.innerHTML = this.rows
-      .map((line, index) => `
-        <li class="dose-list-row" data-line="${index}">
+      .map((line, index) => `${this.groupHeadMarkup(line, index)}
+        <li class="dose-list-row${line.group != null ? " is-grouped" : ""}${line.group != null && line.group === this.editingGroup ? " is-editing" : ""}" data-line="${index}">
           <label class="dl-cell"><span class="dl-label">${index === 0 ? "Starting dose" : `Dose ${index + 1}`}</span>
             <span class="dl-input"><input data-dl-field="dose" type="number" min="0" step="any" inputmode="decimal" value="${Html.escape(line.dose)}" aria-label="${index === 0 ? "Starting daily dose" : `Daily dose, line ${index + 1}`} (${unit})"><span>${unit}</span></span>
           </label>
@@ -3630,3 +3795,62 @@ const DoseList = {
 };
 
 DoseList.init();
+
+// Evidence slideshow beside the guided setup: advances every 10 s. Any interaction (arrows, dots,
+// arrow keys, reference links) holds it on the current slide for 5 minutes, then it resumes.
+// Hovering pauses it while the pointer is over it; Pause stops it until Play; it never
+// auto-advances for people who prefer reduced motion.
+(() => {
+  const root = document.getElementById("evidence-slides");
+  if (!root) return;
+  const ADVANCE_MS = 10 * 1000;
+  const HOLD_AFTER_INTERACTION_MS = 5 * 60 * 1000;
+  const slides = [...root.querySelectorAll(".evidence-slide")];
+  const dots = [...root.querySelectorAll(".evidence-dot")];
+  const position = document.getElementById("evidence-position");
+  const pauseButton = root.querySelector('[data-evidence="pause"]');
+  const reduceMotion = window.matchMedia?.("(prefers-reduced-motion: reduce)").matches;
+  let index = 0, timer = null, hovering = false, userPaused = Boolean(reduceMotion);
+
+  const show = (next) => {
+    index = (next + slides.length) % slides.length;
+    slides.forEach((slide, i) => { slide.hidden = i !== index; slide.classList.toggle("is-active", i === index); });
+    dots.forEach((dot, i) => { if (i === index) dot.setAttribute("aria-current", "true"); else dot.removeAttribute("aria-current"); });
+    if (position) position.textContent = `${index + 1} / ${slides.length}`;
+  };
+  const visible = () => root.offsetParent !== null && document.visibilityState === "visible";
+  // Wait `delay`, then advance (if nobody is hovering and the panel is on screen) and keep going every 10 s.
+  const schedule = (delay = ADVANCE_MS) => {
+    clearTimeout(timer);
+    if (userPaused) return;
+    timer = setTimeout(() => {
+      if (!hovering && visible()) show(index + 1);
+      schedule(ADVANCE_MS);
+    }, delay);
+  };
+  const interacted = () => schedule(HOLD_AFTER_INTERACTION_MS);
+  const setPaused = (paused) => {
+    userPaused = paused;
+    pauseButton.textContent = paused ? "Play" : "Pause";
+    pauseButton.setAttribute("aria-pressed", String(paused));
+    schedule();
+  };
+
+  root.addEventListener("click", (event) => {
+    const go = event.target.closest("[data-evidence-go]");
+    const action = event.target.closest("[data-evidence]")?.dataset.evidence;
+    if (action === "pause") { setPaused(!userPaused); return; }
+    if (go) show(Number(go.dataset.evidenceGo));
+    if (action === "prev") show(index - 1);
+    if (action === "next") show(index + 1);
+    if (go || action || event.target.closest("a, summary")) interacted();
+  });
+  root.addEventListener("keydown", (event) => {
+    if (event.key === "ArrowLeft") { show(index - 1); interacted(); }
+    if (event.key === "ArrowRight") { show(index + 1); interacted(); }
+  });
+  root.addEventListener("mouseenter", () => { hovering = true; });
+  root.addEventListener("mouseleave", () => { hovering = false; });
+  setPaused(userPaused);
+  show(0);
+})();

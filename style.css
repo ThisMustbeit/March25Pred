@@ -4644,3 +4644,105 @@ tr.is-first-segment:has(.starting-dose-field.is-in-baseline) .segment-sequence-n
 @media (max-width: 1100px) {
   body.guided-preview-active.mobile-step-2 .advanced-taper-workspace { grid-template-columns: minmax(0, 1fr); }
 }
+
+/* Quick-fill pattern groups in the dose list */
+.dose-list-group {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  align-items: center;
+  gap: 0.35rem 1rem;
+  margin-top: 0.5rem;
+  padding: 0.5rem 0.75rem;
+  border-left: 3px solid var(--brand);
+  border-radius: 0 var(--radius-sm) var(--radius-sm) 0;
+  background: var(--accent-tint);
+  font-size: 0.9rem;
+}
+.dose-list-group.is-editing { border-left-color: var(--warning-border); background: var(--warning-bg); }
+.dl-group-actions { display: flex; gap: 1rem; }
+.dl-group-remove { color: var(--danger) !important; }
+.dose-list-row.is-grouped { padding-left: 0.75rem; border-left: 3px solid var(--accent-tint); }
+.dose-list-row.is-editing { border-left-color: var(--warning-border); }
+.quick-fill-buttons { display: flex; flex-wrap: wrap; gap: 0.6rem; }
+@media (max-width: 640px) {
+  .dose-list-row.is-grouped { padding-left: 0.6rem; }
+}
+
+/* ---------- Evidence slideshow beside guided setup (Oct 26, 2026) ---------- */
+.evidence-slides { display: none; }
+
+body.guided-preview-active .evidence-slides {
+  display: grid;
+  gap: 0.9rem;
+  align-content: start;
+  padding: 1.4rem 1.5rem 1.25rem;
+  border: 1px solid var(--border);
+  border-top: 4px solid var(--brand);
+  border-radius: var(--radius);
+  background: var(--surface-soft);
+}
+
+/* Multi-phase step 2 needs the full width for the dose list and live calendar. */
+body.guided-preview-active.mobile-step-2:has(.form-grid.is-advanced-mode) .evidence-slides { display: none; }
+
+@media (min-width: 1100px) {
+  body.guided-preview-active .form-card:not(:has(.form-grid.is-advanced-mode)) {
+    grid-template-columns: minmax(0, 1fr) minmax(300px, 380px);
+    column-gap: 3rem;
+  }
+  body.guided-preview-active .form-card:not(:has(.form-grid.is-advanced-mode)) > :not(.evidence-slides) { grid-column: 1; }
+  body.guided-preview-active .form-card:not(:has(.form-grid.is-advanced-mode)) > .evidence-slides {
+    grid-column: 2;
+    grid-row: 1 / span 6;
+    align-self: start;
+    position: sticky;
+    top: 1.5rem;
+  }
+}
+
+.evidence-head { display: flex; justify-content: space-between; align-items: baseline; gap: 1rem; }
+.evidence-head h3 { margin: 0; font-size: 1.05rem; }
+.evidence-position { font-size: 0.82rem; color: var(--muted); white-space: nowrap; }
+
+.evidence-track { min-height: 27rem; }
+.evidence-slide { animation: evidence-in 260ms ease; }
+.evidence-slide[hidden] { display: none; }
+@keyframes evidence-in { from { opacity: 0; transform: translateX(8px); } to { opacity: 1; transform: none; } }
+
+.evidence-topic { margin: 0 0 0.35rem; font-size: 0.82rem; font-weight: 700; color: var(--accent); }
+.evidence-slide h4 { margin: 0 0 0.6rem; font-size: 1.3rem; line-height: 1.25; letter-spacing: -0.01em; }
+.evidence-slide > p:not(.evidence-topic) { margin: 0 0 0.85rem; line-height: 1.55; color: var(--text); }
+.evidence-refs { margin: 0; padding: 0.7rem 0 0; list-style: none; border-top: 1px solid var(--border); display: grid; gap: 0.35rem; }
+.evidence-refs a, .evidence-all a { color: var(--muted); font-size: 0.8rem; line-height: 1.45; text-decoration: underline; text-decoration-color: var(--border-strong); text-underline-offset: 2px; }
+.evidence-refs a:hover, .evidence-all a:hover { color: var(--accent); text-decoration-color: currentColor; }
+
+.evidence-controls { display: flex; align-items: center; gap: 0.6rem; }
+.evidence-arrow {
+  width: 2.25rem; height: 2.25rem;
+  border: 1px solid var(--border-strong); border-radius: 50%;
+  background: var(--surface); color: var(--text);
+  font-size: 1.3rem; line-height: 1; cursor: pointer;
+}
+.evidence-arrow:hover { border-color: var(--accent); color: var(--accent); }
+.evidence-dots { display: flex; flex-wrap: wrap; gap: 0.35rem; flex: 1; justify-content: center; }
+.evidence-dot { width: 0.6rem; height: 0.6rem; padding: 0; border: 0; border-radius: 50%; background: var(--border-strong); cursor: pointer; }
+.evidence-dot[aria-current="true"] { background: var(--accent); width: 1.4rem; border-radius: 0.3rem; }
+.evidence-pause { font-size: 0.82rem; }
+
+.evidence-all { border-top: 1px solid var(--border); padding-top: 0.6rem; }
+.evidence-all summary { cursor: pointer; font-size: 0.88rem; font-weight: 700; color: var(--accent); }
+.evidence-all ol { margin: 0.6rem 0 0; padding-left: 1.2rem; display: grid; gap: 0.4rem; }
+.evidence-note { margin: 0.6rem 0 0; font-size: 0.78rem; color: var(--muted); }
+
+@media (max-width: 1099px) {
+  body.guided-preview-active .evidence-slides { margin-top: 0.5rem; }
+  .evidence-track { min-height: 0; }
+}
+@media (prefers-reduced-motion: reduce) { .evidence-slide { animation: none; } }
+@media print { .evidence-slides { display: none !important; } }
+@media (max-width: 480px) {
+  .evidence-dots { flex-wrap: nowrap; gap: 0.25rem; }
+  .evidence-dot { width: 0.5rem; height: 0.5rem; }
+  .evidence-dot[aria-current="true"] { width: 1rem; }
+}
