@@ -2,10 +2,10 @@ document.addEventListener('DOMContentLoaded', async () => {
   if (!document.getElementById('sig-tool')) return;
   try { await import('./cloud.js'); }
   catch (error) {
-    document.getElementById('sig-account-state').textContent = 'Cloud connection unavailable. Reload to try again. The bundled reference list is available below.';
-    document.getElementById('sig-sync-state').textContent = 'Offline reference list; shared updates are unavailable.';
+    document.getElementById('sig-account-state').textContent = 'Cloud connection unavailable. Reload to try again.';
+    document.getElementById('sig-sync-state').textContent = 'The sig library needs a connection. Reload to try again.';
     const model = globalThis.CalendRxSigModel;
-    const entries = model.mergeVariants(CALENDRX_SIG_CATALOG.entries, CALENDRX_CS_CATALOG.entries).entries;
+    const entries = model.mergeVariants(globalThis.CALENDRX_SIG_CATALOG?.entries || [], globalThis.CALENDRX_CS_CATALOG?.entries || []).entries;
     const render = () => {
       const rows = entries.filter(row => model.matches(row, document.getElementById('sig-search').value));
       const list = document.getElementById('sig-list'); list.replaceChildren();

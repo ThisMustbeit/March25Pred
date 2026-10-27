@@ -11,8 +11,6 @@
   <link rel="stylesheet" href="/tools/sigs/sigs.css">
   <script src="/tools/access-gate.js" defer></script>
   <script src="/password-toggle.js" defer></script>
-  <script src="/tools/sigs/ls-data.js" defer></script>
-  <script src="/tools/sigs/cs-data.js" defer></script>
   <script src="/tools/sigs/sigs.js" defer></script>
   <script src="/tools/sigs/cloud-model.js" defer></script>
   <script src="/tools/sigs/cloud-loader.js" defer></script>
@@ -54,6 +52,12 @@
           <button id="sig-import-local" type="button" class="button button-secondary" disabled>Import browser-saved list into my account</button>
         </div>
         <p id="sig-auth-status" role="status"></p>
+        <div id="sig-owner-tools" class="sig-owner-tools" hidden>
+          <h3>Private sig lists (owner only)</h3>
+          <p>Import your private sig file into your personal list, where only this account can see it. Earlier edits to those entries in the shared library are moved into your list too, then removed from the shared library. Safe to run again.</p>
+          <button id="sig-owner-import" type="button" class="button button-secondary" disabled>Import private sig file</button>
+          <input id="sig-owner-file" type="file" accept=".json,application/json" hidden>
+        </div>
       </section>
 
       <section class="card" aria-labelledby="sig-library-title">
@@ -63,7 +67,7 @@
             <input id="sig-import-file" type="file" accept=".json,application/json" hidden>
           </div>
         </div>
-        <p class="sig-storage-note">Everyone can read the shared LS and CS lists. Sign in to save personal shortcuts, tags and favourites across devices. Only the owner can change the shared list. Copy a shared shortcut to your personal list to customize it.</p>
+        <p class="sig-storage-note">Everyone can read the shared library. Sign in to save personal shortcuts, tags and favourites across devices. Only the owner can change the shared list. Copy a shared shortcut to your personal list to customize it.</p>
         <label for="sig-view">Show <select id="sig-view"><option value="all">All shortcuts</option><option value="shared">Shared library</option><option value="personal">My personal shortcuts</option><option value="favorites">My favourites</option></select></label>
         <p id="sig-sync-state" role="status">Loading the shared library…</p>
         <div class="sig-search-row">
@@ -113,7 +117,7 @@
           <label for="sig-scope">Save to<select id="sig-scope"><option value="personal">My personal list</option><option value="shared" id="sig-shared-option" hidden>Shared library (everyone)</option></select></label>
           <label for="sig-code"><span>Shortcut</span><input id="sig-code" maxlength="80" required autocomplete="off"></label>
           <label for="sig-meaning"><span>Meaning / expanded instructions</span><textarea id="sig-meaning" rows="3" maxlength="2000" required></textarea></label>
-          <label for="sig-entry-tags"><span>Tags (separate with commas)</span><input id="sig-entry-tags" maxlength="1000" placeholder="e.g. LS, counselling, antibiotics" aria-describedby="sig-tags-help"><small id="sig-tags-help">A sig can have up to 20 tags. Type a new tag to create it, separate multiple tags with commas, or choose suggestions below. Saving a shared sig updates its tags for everyone.</small></label>
+          <label for="sig-entry-tags"><span>Tags (separate with commas)</span><input id="sig-entry-tags" maxlength="1000" placeholder="e.g. counselling, antibiotics" aria-describedby="sig-tags-help"><small id="sig-tags-help">A sig can have up to 20 tags. Type a new tag to create it, separate multiple tags with commas, or choose suggestions below. Saving a shared sig updates its tags for everyone.</small></label>
           <div id="sig-tag-suggestions" class="sig-tags" role="group" aria-label="Add an existing tag"></div>
           <label for="sig-notes"><span>Notes (optional)</span><textarea id="sig-notes" rows="2" maxlength="2000"></textarea></label>
           <p id="sig-form-error" role="alert"></p>

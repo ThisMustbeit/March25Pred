@@ -11,7 +11,16 @@ const auth = getAuth(app);
 const db = getFirestore(app);
 // Session-only authentication avoids leaving an account signed in on shared pharmacy computers.
 await setPersistence(auth, browserSessionPersistence);
-const base = await Promise.all(model.mergeVariants(CALENDRX_SIG_CATALOG.entries, CALENDRX_CS_CATALOG.entries).entries.map(model.entry).map(async row => ({...row, id:await cloud.stableId(row.code,row.meaning), scope:'shared',revision:0})));
+// Bundled reference lists are no longer shipped with the site (the LS/CS lists are private to the owner's account).
+// If a bundled catalog is present (tests or a future public list), it is still merged in as before.
+const bundled = [globalThis.CALENDRX_SIG_CATALOG, globalThis.CALENDRX_CS_CATALOG];
+const base = bundled.some(Boolean)
+  ? await Promise.all(model.mergeVariants(bundled[0]?.entries || [], bundled[1]?.entries || []).entries.map(model.entry).map(async row => ({...row, id:await cloud.stableId(row.code,row.meaning), scope:'shared',revision:0})))
+  : [];
+const bundledIds = new Set(base.map(row => row.id));
+// Shared-library edits of entries from a bundled list use a 64-character content hash as their id.
+// When that list is no longer bundled, those edits must not show to everyone.
+const isOrphanOverride = row => /^[0-9a-f]{64}$/.test(row.id) && !bundledIds.has(row.id);
 let user = null, shared = [], personal = [], favorites = new Set(), subscriptions = [];
 let generation = 0, sharedReady = false, personalReady = false, favoritesReady = false;
 let selectedTag = '', editing = null, busy = false;
@@ -19,7 +28,7 @@ let selectedTag = '', editing = null, busy = false;
 let selectMode = false, selected = new Set(), lastIndex = -1, shown = [], bulkMode = null, bulkRemove = new Set(), undoRows = null;
 const status = (text, error = false) => { $('sig-status').textContent = text; $('sig-status').classList.toggle('is-error',error); };
 const isOwner = () => user?.uid === ownerUid;
-const rows = () => [...cloud.combine(base,shared), ...personal.filter(row=>!row.deleted)];
+const rows = () => [...cloud.combine(base,shared.filter(row=>!isOrphanOverride(row))), ...personal.filter(row=>!row.deleted)];
 function button(text, action, className = 'button button-secondary') {
   const el = document.createElement('button'); el.type='button'; el.className=className; el.textContent=text;
   el.addEventListener('click',action); return el;
@@ -44,6 +53,8 @@ function controls() {
   $('sig-signout').disabled = busy;
   $('sig-save').disabled = busy;
   $('sig-shared-option').hidden = !isOwner();
+  $('sig-owner-tools').hidden = !isOwner();
+  $('sig-owner-import').disabled = !isOwner() || !personalReady || !sharedReady || busy;
 }
 function render() {
   controls();
@@ -385,24 +396,85 @@ async function toggleFavorite(row) {
 async function importRows(incoming) {
   const uid=user?.uid;
   if(!uid || !personalReady) throw new Error('Sign in and wait for your personal list to connect.');
-  const existing=new Set(personal.map(row=>JSON.stringify([row.code.normalize('NFKC').toLowerCase(),row.meaning])));
-  let added=0;
-  for(const row of incoming) {
+  const keyFor=row=>JSON.stringify([row.code.normalize('NFKC').toLowerCase(),row.meaning]);
+  const existing=new Set(personal.map(keyFor)), pending=[];
+  for(const row of incoming) { const key=keyFor(row); if(existing.has(key)) continue; existing.add(key); pending.push(row); }
+  let processed=0;
+  for(let start=0; start<pending.length; start+=100) {
     if(auth.currentUser?.uid!==uid) throw new Error('Import stopped because your account changed.');
-    const key=JSON.stringify([row.code.normalize('NFKC').toLowerCase(),row.meaning]);
-    if(existing.has(key)) continue;
+    const chunk=pending.slice(start,start+100);
     // Deterministic IDs make retrying interrupted imports safe without overwriting edits.
-    const id='import_'+await cloud.stableId(row.code,row.meaning), ref=refFor('personal',id,uid);
+    const ids=await Promise.all(chunk.map(row=>cloud.stableId(row.code,row.meaning)));
     await runTransaction(db,async tx=>{
       if(auth.currentUser?.uid!==uid) throw new Error('Import stopped because your account changed.');
-      const snapshot=await tx.get(ref);
-      if(!snapshot.exists()) tx.set(ref,{...model.entry(row),deleted:false,revision:1,updatedAt:serverTimestamp()});
+      const refs=ids.map(id=>refFor('personal','import_'+id,uid)), snapshots=[];
+      for(const ref of refs) snapshots.push(await tx.get(ref));
+      chunk.forEach((row,i)=>{ if(!snapshots[i].exists()) tx.set(refs[i],{...model.entry(row),deleted:false,revision:1,updatedAt:serverTimestamp()}); });
     });
-    existing.add(key); added++;
-    status(`Importing into your personal list… ${added} processed. Keep this page open.`);
+    processed+=chunk.length;
+    status(`Importing into your personal list… ${processed} of ${pending.length} processed. Keep this page open.`);
   }
-  return `Import complete: ${added} entries processed. Existing personal entries were preserved.`;
+  return `Import complete: ${processed} entries processed. Existing personal entries were preserved.`;
 }
+// Owner only: bring the private LS/CS lists into the owner's personal list, carrying over earlier
+// shared-library edits of those entries, then remove those edits from the public shared library.
+// Each entry is stored under an id derived from its ORIGINAL text, and entries the owner had removed
+// are stored as hidden removal markers, so running the import again never brings anything back.
+async function migrateOwnerCatalog(incoming) {
+  if(!isOwner()) throw new Error('Only the owner account can import the private sig file.');
+  if(!sharedReady || !personalReady) throw new Error('Wait for the shared and personal lists to connect.');
+  const uid=user.uid;
+  const keyFor=row=>JSON.stringify([row.code.normalize('NFKC').toLowerCase(),row.meaning]);
+  const overrides=shared.filter(isOrphanOverride), byId=new Map(overrides.map(row=>[row.id,row])), used=new Set(), items=[];
+  for(const entry of incoming) {
+    const hash=await cloud.stableId(entry.code,entry.meaning), edited=byId.get(hash);
+    if(edited) used.add(hash);
+    items.push({docId:'import_'+hash, row:edited?model.entry(edited):entry, deleted:Boolean(edited?.deleted)});
+  }
+  for(const row of overrides) if(!used.has(row.id)) items.push({docId:'import_'+row.id, row:model.entry(row), deleted:Boolean(row.deleted)});
+  // Skip entries already in the personal list with the same text (unless writing a removal marker).
+  const present=new Set(personal.filter(row=>!row.deleted).map(keyFor));
+  const pending=items.filter(item=>{ if(item.deleted) return true; const key=keyFor(item.row); if(present.has(key)) return false; present.add(key); return true; });
+  let added=0, processed=0;
+  for(let start=0; start<pending.length; start+=100) {
+    const chunk=pending.slice(start,start+100);
+    let chunkAdded=0;
+    await runTransaction(db,async tx=>{
+      chunkAdded=0;
+      if(!isOwner() || auth.currentUser?.uid!==uid) throw new Error('Import stopped because your account changed.');
+      const refs=chunk.map(item=>refFor('personal',item.docId,uid)), snapshots=[];
+      for(const ref of refs) snapshots.push(await tx.get(ref));
+      chunk.forEach((item,i)=>{
+        if(snapshots[i].exists()) return;
+        tx.set(refs[i],{...model.entry(item.row),deleted:item.deleted,revision:1,updatedAt:serverTimestamp()});
+        if(!item.deleted) chunkAdded++;
+      });
+    });
+    added+=chunkAdded; processed+=chunk.length;
+    status(`Importing into your private list… ${processed} of ${pending.length} processed. Keep this page open.`);
+  }
+  const imported=`Import complete: ${added} new entr${added===1?'y':'ies'} added to your personal list (only your account can see them).`;
+  let removed=0;
+  try {
+    for(let start=0; start<overrides.length; start+=100) {
+      const chunk=overrides.slice(start,start+100);
+      await runTransaction(db,async tx=>{
+        if(!isOwner() || auth.currentUser?.uid!==uid) throw new Error('Your account changed. Sign in again.');
+        chunk.forEach(row=>tx.delete(refFor('shared',row.id)));
+      });
+      removed+=chunk.length;
+    }
+  } catch(error) {
+    const hint=error.code==='permission-denied'?' Publish the updated Firestore rules (they allow the owner to delete shared entries), then run this import again; it will not duplicate entries.':' '+fail(error);
+    return `${imported} The earlier shared-library edits could not be removed yet.${hint}`;
+  }
+  return `${imported} ${removed ? `Removed ${removed} earlier edit${removed===1?'':'s'} of these entries from the public shared library.` : 'No earlier edits were left in the public shared library.'}`;
+}
+$('sig-owner-import').onclick=()=>$('sig-owner-file').click();
+$('sig-owner-file').onchange=event=>{
+  const file=event.target.files[0]; event.target.value=''; if(!file) return;
+  action(async()=>{if(file.size>20*1024*1024) throw new Error('Choose a file smaller than 20 MB.'); return await migrateOwnerCatalog(model.decode(await file.text()));});
+};
 $('sig-import-local').onclick=()=>action(async()=>{
   const raw=localStorage.getItem('calendrx_sig_library_v1');
   if(!raw) throw new Error('There is no saved list in this browser.');

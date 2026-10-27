@@ -75,3 +75,6 @@
   .sig-entry.is-selectable { padding-left: 2.8rem; }
   .sig-check { left: 0.9rem; }
 }
+.sig-owner-tools { margin-top: 1.25rem; padding: 1rem 1.15rem; border: 1px dashed var(--border-strong); border-radius: var(--radius-sm); background: var(--surface-soft); }
+.sig-owner-tools h3 { margin: 0 0 0.35rem; font-size: 1rem; }
+.sig-owner-tools p { margin: 0 0 0.75rem; color: var(--muted); line-height: 1.5; }
