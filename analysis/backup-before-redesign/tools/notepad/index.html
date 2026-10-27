@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>My Notepad | CalendRx</title>
+  <meta name="description" content="A private notebook with sections, searchable pages and cloud saving for your CalendRx account.">
+  <script>if(sessionStorage.getItem('calendrx_tools_dummy_access')!=='granted')document.documentElement.classList.add('tools-gate-pending');</script>
+  <link rel="icon" href="/website-icon.png" type="image/png">
+  <link rel="stylesheet" href="/style.css"><link rel="stylesheet" href="/tools/notepad/notepad.css">
+  <script src="/tools/access-gate.js" defer></script><script src="/password-toggle.js" defer></script>
+  <script src="/tools/notepad/loader.js" defer></script>
+</head>
+<body><div class="app-shell" id="notepad">
+  <nav class="site-nav" aria-label="Primary"><div class="site-nav-inner"><a class="site-nav-link" href="/">Taper Planner</a><a class="site-nav-link" href="/tools/">Other Pharmacy Tools</a><a class="site-nav-link" href="/tools/sigs/">Sig List</a><a class="site-nav-link is-current" href="/tools/notepad/" aria-current="page">My Notepad</a></div></nav>
+  <main>
+    <section class="hero"><p class="section-kicker">Personal workspace</p><h1>My Notepad</h1><p class="hero-copy">Keep reference notes in sections, pin useful pages, and find them with search. Your private notebook belongs to your account. The shared notebook contains references maintained by the owner.</p></section>
+    <section class="card">
+      <h2>Your account</h2><p id="account-state" role="status">Connecting…</p>
+      <form id="login" hidden><label>Email<input id="email" type="email" autocomplete="username" required></label><label>Password<input id="password" type="password" autocomplete="current-password" required></label><label class="inline"><input id="show-password" type="checkbox"> Show password</label><div class="note-actions"><button class="button" type="submit">Sign in</button><a class="button button-secondary" href="/tools/sigs/">Create account / reset password</a></div></form>
+      <button id="signout" class="button button-secondary" hidden>Sign out</button><p id="auth-status" role="status"></p>
+    </section>
+    <section id="workspace" class="card" hidden>
+      <label>Notebook<select id="notebook-scope"><option value="personal">My private notebook</option><option value="shared">Shared notebook</option></select></label><p id="scope-help"></p>
+      <div class="note-actions"><button id="new-page" class="button">+ Page</button><button id="new-section" class="button button-secondary">+ Section</button><button id="export" class="button button-secondary">Export notebook (.md)</button></div>
+      <p id="sync-state" role="status"></p>
+      <div class="notebook-layout">
+        <aside aria-label="Notebook pages">
+          <label>Search pages<input id="search" type="search" placeholder="Title, section or content"></label>
+          <label>Section<select id="section-filter"><option value="">All sections</option></select></label>
+          <label class="inline"><input id="trash" type="checkbox"> Show trash</label>
+          <p id="page-count"></p><div id="page-list"></div>
+        </aside>
+        <div>
+          <p id="empty-editor">Create a page or choose one from your notebook.</p>
+          <form id="editor" hidden>
+            <label>Page title<input id="title" maxlength="160" required></label>
+            <label>Section<input id="section" maxlength="80" list="section-options" required><small>Choose an existing section or type a new name to move this page.</small></label><datalist id="section-options"></datalist>
+            <label class="inline"><input id="pinned" type="checkbox"> Pin this page</label>
+            <label>Notes<textarea id="body" maxlength="100000" rows="20" placeholder="Write your notes here…"></textarea></label>
+            <p id="word-count"></p><p id="save-state" role="status"></p>
+            <div class="note-actions"><button id="save" class="button" type="submit">Save now</button><button id="reload" class="button button-secondary" type="button">Reload saved page</button><button id="remove" class="button button-secondary" type="button">Move to trash</button></div>
+          </form>
+        </div>
+      </div>
+    </section>
+  </main>
+</div></body></html>

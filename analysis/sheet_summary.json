@@ -1,0 +1,32 @@
+﻿[
+    {
+        "Name":  "Inputs",
+        "CellCount":  187,
+        "FormulaCount":  27,
+        "NonEmptyCount":  105
+    },
+    {
+        "Name":  "Database",
+        "CellCount":  11,
+        "FormulaCount":  10,
+        "NonEmptyCount":  11
+    },
+    {
+        "Name":  "Schedule",
+        "CellCount":  4411,
+        "FormulaCount":  4400,
+        "NonEmptyCount":  4411
+    },
+    {
+        "Name":  "Calendar",
+        "CellCount":  604,
+        "FormulaCount":  85,
+        "NonEmptyCount":  92
+    },
+    {
+        "Name":  "Calendar (Old Format)",
+        "CellCount":  182,
+        "FormulaCount":  85,
+        "NonEmptyCount":  94
+    }
+]

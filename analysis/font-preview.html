@@ -1,0 +1,64 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>CalendRx font preview</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible+Next:wght@400;600;700;800&family=Figtree:wght@400;600;700;800&family=Lexend:wght@400;600;700;800&family=Plus+Jakarta+Sans:wght@400;600;700;800&family=Source+Sans+3:wght@400;600;700;800&family=Manrope:wght@400;600;700;800&display=swap">
+<style>
+  :root { --bg:#f1f5f7; --ink:#13232b; --muted:#55666e; --line:#d6e0e5; --accent:#167590; --dark:#0f5a71; --brand:#219ebc; }
+  body { margin:0; background:var(--bg); color:var(--ink); font-family: system-ui, sans-serif; }
+  .wrap { width:min(1100px, calc(100% - 2rem)); margin:0 auto; padding:2rem 0 4rem; }
+  .intro { color:var(--muted); margin:0 0 2rem; }
+  .opt { background:#fff; border:1px solid var(--line); border-radius:10px; padding:1.75rem 2rem; margin-bottom:1.25rem; }
+  .tag { display:flex; justify-content:space-between; gap:1rem; font: 600 .85rem system-ui, sans-serif; color:var(--muted); margin-bottom:1rem; }
+  .tag b { color:var(--accent); }
+  h2 { font-size:2.4rem; line-height:1.05; letter-spacing:-.025em; font-weight:800; margin:0 0 .6rem; }
+  p { margin:0 0 1.25rem; max-width:60ch; line-height:1.6; color:var(--muted); font-size:1.05rem; }
+  .row { display:flex; gap:1.5rem; align-items:flex-start; flex-wrap:wrap; }
+  .btn { background:var(--accent); color:#fff; border-radius:6px; padding:.7rem 1.1rem; font-weight:700; font-size:.95rem; }
+  .field { font-size:.88rem; font-weight:600; }
+  .field div { margin-top:.35rem; border:1px solid #afbfc7; border-radius:6px; padding:.6rem .8rem; font-weight:400; font-size:1rem; width:14rem; }
+  .cells { display:grid; grid-template-columns:repeat(3, 9.5rem); border-left:1px solid #afbfc7; border-top:1px solid #afbfc7; }
+  .cell { border-right:1px solid #afbfc7; border-bottom:1px solid #afbfc7; padding:.55rem .65rem; background:#f8fcfd; box-shadow: inset 0 3px 0 var(--brand); }
+  .cell .d { font-weight:700; font-size:.9rem; }
+  .cell .t { font-weight:800; font-size:1.12rem; color:var(--dark); letter-spacing:-.01em; }
+  .cell .c { font-size:.8rem; color:var(--muted); }
+  .nums { font-variant-numeric: tabular-nums; }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <h1 style="margin:0 0 .4rem">Font options for CalendRx</h1>
+  <p class="intro">Each block uses the real site colours. Tell Claude which one you like (or mix: one for headings, one for text).</p>
+  <div id="list"></div>
+</div>
+<script>
+const fonts = [
+  ["Atkinson Hyperlegible Next","Current pick. Designed for low-vision readers; very clear 1/l/I and 0/O, so doses can't be misread."],
+  ["Figtree","Friendly and rounded, matches the soft round logo. Clean but warmer than most clinical fonts."],
+  ["Lexend","Built for reading ease; wide letters and generous spacing. Feels calm and approachable."],
+  ["Plus Jakarta Sans","Modern and polished with a bit of personality. Looks like a current health-tech product."],
+  ["Manrope","Crisp, slightly technical, strong numbers. Feels precise and professional."],
+  ["Source Sans 3","Plain, neutral and very readable. The most 'pharmacy software' of the set."]
+];
+document.getElementById("list").innerHTML = fonts.map(([f, why], i) => `
+  <section class="opt" style="font-family:'${f}', sans-serif">
+    <div class="tag"><span><b>${i + 1}. ${f}</b></span><span>${why}</span></div>
+    <h2>Medication taper calendar generator</h2>
+    <p>CalendRx creates day-by-day medication taper schedules with standard or advanced dose changes. Prednisone 50 mg, reduce by 4 mg every 2 days.</p>
+    <div class="row nums">
+      <div class="cells">
+        <div class="cell"><div class="d">22</div><div class="t">Total = 50 mg</div><div class="c">10 tablets of 5 mg</div></div>
+        <div class="cell"><div class="d">24</div><div class="t">Total = 46 mg</div><div class="c">9 tablets of 5 mg<br>1 tablet of 1 mg</div></div>
+        <div class="cell"><div class="d">31</div><div class="t">Total = 11.5 mg</div><div class="c">2 tablets of 5 mg<br>1½ tablets of 1 mg</div></div>
+      </div>
+      <div class="field">Starting Daily Dose (mg)<div>0.5 · 1 · 10 · 100 Il1|O0</div></div>
+      <span class="btn">Generate Schedule</span>
+    </div>
+  </section>`).join("");
+</script>
+</body>
+</html>

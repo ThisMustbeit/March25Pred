@@ -1,0 +1,11 @@
+.suspension-card { max-width:780px; margin-inline:auto; }
+#conversion-form { display:grid; gap:1rem; }
+#conversion-form label { display:grid; gap:.45rem; }
+#conversion-form input, #conversion-form select { width:100%; padding:.85rem; border:1px solid var(--border); border-radius:10px; background:#fbfdfe; color:var(--text); font:inherit; }
+.conversion-actions { display:flex; flex-wrap:wrap; gap:.75rem; }
+.conversion-result { margin-top:1.5rem; padding:1.5rem; background:var(--surface-soft); border:1px solid var(--border); border-radius:var(--radius-sm); overflow-wrap:anywhere; }
+#conversion-result { display:block; font-size:clamp(1.8rem,5vw,2.7rem); font-weight:700; color:var(--accent-dark); }
+#result-label { margin-top:0; }
+#conversion-error { color:var(--danger); margin:0; }
+.conversion-note, #conversion-formula { color:var(--muted); line-height:1.6; }
+#conversion-form :is(input,select,button):focus-visible { outline:2px solid var(--accent); outline-offset:3px; }

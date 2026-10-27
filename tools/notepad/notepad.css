@@ -1,0 +1,16 @@
+#notepad [hidden] { display:none !important; }
+#notepad label { display:grid; gap:.4rem; margin-bottom:1rem; }
+#notepad input:not([type=checkbox]), #notepad select, #notepad textarea { width:100%; padding:.75rem; color:var(--text); background:#fbfdfe; border:1px solid var(--border); border-radius:10px; font:inherit; }
+#notepad .inline { display:flex; gap:.5rem; align-items:center; }
+#notepad textarea { resize:vertical; line-height:1.7; }
+#notepad #login { max-width:34rem; }
+.note-actions { display:flex; flex-wrap:wrap; gap:.6rem; margin-bottom:1rem; }
+.notebook-layout { display:grid; grid-template-columns:minmax(210px,280px) minmax(0,1fr); gap:2rem; margin-top:1.5rem; }
+#page-list { display:grid; gap:.6rem; max-height:65vh; overflow:auto; }
+.note-page { width:100%; text-align:left; padding:.8rem; background:var(--surface-soft); border:1px solid var(--border); border-radius:10px; color:var(--text); cursor:pointer; overflow-wrap:anywhere; }
+.note-page[aria-current=true] { border-color:var(--accent); box-shadow:inset 3px 0 var(--accent); }
+.note-page small { display:block; margin-top:.3rem; color:var(--muted); }
+#notepad .is-error { color:var(--danger); }
+#notepad button:disabled { opacity:.55; cursor:not-allowed; }
+#notepad :is(button,input,textarea,select):focus-visible { outline:2px solid var(--accent); outline-offset:3px; }
+@media(max-width:760px) { .notebook-layout { grid-template-columns:1fr; } #page-list { max-height:18rem; } }
