@@ -75,7 +75,14 @@
           <label for="sig-search"><span>Search shortcuts, meanings, notes, or tags</span><input id="sig-search" type="search" placeholder="Search your sig list…" autocomplete="off"></label>
           <button id="sig-clear" type="button" class="button button-secondary">Clear filters</button>
         </div>
-        <div id="sig-tags" class="sig-tags" role="group" aria-label="Filter by tag"></div>
+        <div class="sig-tag-filter">
+          <div id="sig-tag-bar" class="sig-tags" role="group" aria-label="Tag filters"></div>
+          <div id="sig-tag-panel" class="sig-tag-panel" hidden>
+            <label for="sig-tag-search"><span>Find a tag</span><input id="sig-tag-search" type="search" placeholder="Type a drug or tag name…" autocomplete="off"></label>
+            <p class="sig-tag-hint">Choose as many tags as you like. Shortcuts with any of the chosen tags are shown.</p>
+            <div id="sig-tags" class="sig-tags sig-tag-options" role="group" aria-label="Filter by tag"></div>
+          </div>
+        </div>
         <p id="sig-count" class="sig-count" aria-live="polite"></p>
         <div id="sig-status" role="status" aria-live="polite"></div>
         <button id="sig-undo" type="button" class="button button-secondary" hidden>Undo removal</button>

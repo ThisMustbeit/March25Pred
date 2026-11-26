@@ -23,7 +23,9 @@ const bundledIds = new Set(base.map(row => row.id));
 const isOrphanOverride = row => /^[0-9a-f]{64}$/.test(row.id) && !bundledIds.has(row.id);
 let user = null, shared = [], personal = [], favorites = new Set(), subscriptions = [];
 let generation = 0, sharedReady = false, personalReady = false, favoritesReady = false;
-let selectedTag = '', editing = null, busy = false;
+// Tag filter: chosen tags (normalized key -> display name), whether the tag panel is open, and the last tag counts.
+let selectedTags = new Map(), tagPanelOpen = false, tagCounts = new Map(), editing = null, busy = false;
+const tagKey = tag => String(tag).normalize('NFKC').toLowerCase().trim();
 // Bulk selection state.
 let selectMode = false, selected = new Set(), lastIndex = -1, shown = [], bulkMode = null, bulkRemove = new Set(), undoRows = null;
 const status = (text, error = false) => { $('sig-status').textContent = text; $('sig-status').classList.toggle('is-error',error); };
@@ -69,17 +71,59 @@ function controls() {
   $('sig-owner-tools').hidden = !isOwner();
   $('sig-owner-import').disabled = !isOwner() || !personalReady || !sharedReady || busy;
 }
+function toggleTag(k, name) {
+  selectedTags.has(k) ? selectedTags.delete(k) : selectedTags.set(k, name);
+  render();
+}
+function renderTagFilter() {
+  const sorted = [...tagCounts].sort((a, b) => a[1].name.localeCompare(b[1].name));
+  const bar = $('sig-tag-bar'); bar.replaceChildren();
+  const toggle = button(tagPanelOpen ? 'Done choosing tags ▴' : `Filter by tag (${sorted.length}) ▾`, () => {
+    tagPanelOpen = !tagPanelOpen; renderTagFilter();
+    if (tagPanelOpen) $('sig-tag-search').focus?.();
+  }, 'sig-tag sig-tag-toggle');
+  toggle.setAttribute('aria-expanded', String(tagPanelOpen)); toggle.setAttribute('aria-controls', 'sig-tag-panel');
+  toggle.disabled = !sorted.length;
+  bar.append(toggle);
+  // The owner's CS/LS switches stay in view.
+  for (const [k, {name}] of sorted.filter(([k]) => isSourceTag(k))) {
+    const b = button(name, () => toggleTag(k, name), 'sig-tag');
+    b.setAttribute('aria-pressed', String(selectedTags.has(k))); bar.append(b);
+  }
+  // Chosen tags show as chips; clicking one removes it.
+  for (const [k, name] of selectedTags) {
+    if (isSourceTag(k)) continue;
+    const chip = button(name, () => toggleTag(k, name), 'sig-tag sig-tag-chip');
+    chip.setAttribute('aria-pressed', 'true'); chip.setAttribute('aria-label', `Remove the ${name} filter`); bar.append(chip);
+  }
+  if (selectedTags.size) bar.append(button('Clear tags', () => { selectedTags.clear(); render(); }, 'sig-tag-clear'));
+  $('sig-tag-panel').hidden = !tagPanelOpen;
+  const options = $('sig-tags'); options.replaceChildren();
+  const query = tagKey($('sig-tag-search').value || '');
+  const matching = sorted.filter(([k]) => !query || k.includes(query));
+  for (const [k, {name, count}] of matching) {
+    const b = button(name, () => toggleTag(k, name), 'sig-tag');
+    b.setAttribute('aria-pressed', String(selectedTags.has(k))); b.setAttribute('data-count', String(count));
+    options.append(b);
+  }
+  if (!matching.length) { const p = document.createElement('p'); p.className = 'sig-tag-empty'; p.textContent = 'No tags match.'; options.append(p); }
+}
 function render() {
   controls();
   const all = rows(), view = $('sig-view').value;
   const scoped = all.filter(row => view==='all' || row.scope===view || (view==='favorites' && favorites.has(cloud.key(row))));
-  const tagNames = [...new Set(scoped.flatMap(row=>row.tags))].sort((a,b)=>a.localeCompare(b));
-  const tagBox = $('sig-tags'); tagBox.replaceChildren();
-  for (const tag of ['',...tagNames]) {
-    const b = button(tag || 'All tags',()=>{selectedTag=tag;render();},'sig-tag');
-    b.setAttribute('aria-pressed',String(tag===selectedTag)); tagBox.append(b);
+  tagCounts = new Map();
+  for (const row of scoped) for (const tag of row.tags) {
+    const k = tagKey(tag), current = tagCounts.get(k);
+    tagCounts.set(k, {name: current?.name || tag, count: (current?.count || 0) + 1});
   }
-  const filtered = scoped.filter(row=>model.matches(row,$('sig-search').value,selectedTag)).sort((a,b)=>a.code.localeCompare(b.code));
+  for (const k of [...selectedTags.keys()]) if (!tagCounts.has(k)) selectedTags.delete(k);
+  renderTagFilter();
+  // Several tags can be chosen: a shortcut shows when it has any of them. The owner's CS/LS switches
+  // narrow the list separately, so "LS" + "Ozempic" shows only the LS Ozempic shortcuts.
+  const chosen = [...selectedTags.keys()], sourceChosen = chosen.filter(isSourceTag), otherChosen = chosen.filter(k => !isSourceTag(k));
+  const hasAny = (row, keys) => !keys.length || row.tags.some(tag => keys.includes(tagKey(tag)));
+  const filtered = scoped.filter(row=>model.matches(row,$('sig-search').value) && hasAny(row,sourceChosen) && hasAny(row,otherChosen)).sort((a,b)=>a.code.localeCompare(b.code));
   shown = filtered;
   const existing = new Set(all.map(cloud.key));
   for (const k of [...selected]) if (!existing.has(k)) selected.delete(k);
@@ -554,8 +598,10 @@ $('sig-export').onclick=()=>{
 $('sig-add').onclick=()=>openEditor();
 $('sig-cancel').onclick=closeEditor;
 $('sig-search').addEventListener('input',render);
-$('sig-view').onchange=()=>{selectedTag='';render();};
-$('sig-clear').onclick=()=>{$('sig-search').value='';selectedTag='';render();};
+$('sig-view').onchange=()=>{selectedTags.clear();render();};
+$('sig-tag-search').addEventListener('input',()=>renderTagFilter());
+$('sig-tag-search').addEventListener('keydown',event=>{ if(event?.key==='Escape'){ tagPanelOpen=false; renderTagFilter(); } });
+$('sig-clear').onclick=()=>{$('sig-search').value='';$('sig-tag-search').value='';selectedTags.clear();render();};
 $('sig-show-password').onchange=()=>{$('sig-password').type=$('sig-show-password').checked?'text':'password';};
 let authBusy=false;
 async function authenticate(mode) {

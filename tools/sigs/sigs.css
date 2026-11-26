@@ -78,3 +78,21 @@
 .sig-owner-tools { margin-top: 1.25rem; padding: 1rem 1.15rem; border: 1px dashed var(--border-strong); border-radius: var(--radius-sm); background: var(--surface-soft); }
 .sig-owner-tools h3 { margin: 0 0 0.35rem; font-size: 1rem; }
 .sig-owner-tools p { margin: 0 0 0.75rem; color: var(--muted); line-height: 1.5; }
+
+/* Tag filter: chosen tags stay visible, the full tag list sits in a searchable panel. */
+.sig-tag-filter { margin: 0.85rem 0; }
+.sig-tag-filter > .sig-tags { margin: 0; }
+.sig-tag-toggle { font-weight: 600; }
+.sig-tag-toggle[aria-expanded="true"] { background: var(--accent-tint, #e3f2f7); border-color: var(--accent); }
+.sig-tag-chip::after { content: " \00d7"; font-weight: 700; }
+.sig-tag-clear { background: none; border: 0; color: var(--accent-dark); text-decoration: underline; cursor: pointer; padding: 0.45rem 0.3rem; font: inherit; }
+.sig-tag-panel { margin-top: 0.6rem; padding: 0.85rem 1rem; border: 1px solid var(--border); border-radius: var(--radius-sm); background: #fbfdfe; }
+.sig-tag-panel label { display: grid; gap: 0.4rem; }
+.sig-tag-panel label > span { font-size: 0.88rem; font-weight: 600; }
+.sig-tag-panel input { width: 100%; min-height: 44px; padding: 0.6rem 0.8rem; border: 1px solid var(--border-strong, var(--border)); border-radius: var(--radius-sm); }
+.sig-tag-hint { margin: 0.5rem 0 0; color: var(--muted); font-size: 0.88rem; }
+.sig-tag-options { max-height: 14rem; overflow-y: auto; margin: 0.6rem 0 0; padding: 0.1rem; }
+.sig-tag-options .sig-tag { font-size: 0.9rem; padding: 0.35rem 0.7rem; }
+.sig-tag[data-count]::after { content: " " attr(data-count); opacity: 0.7; font-size: 0.85em; }
+.sig-tag-empty { color: var(--muted); margin: 0; }
+#sig-tag-suggestions { max-height: 9.5rem; overflow-y: auto; }
